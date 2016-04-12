@@ -3,7 +3,6 @@
         <thead>
             <tr>
                 <th>Respondee</th>
-                <th>Status</th>
                 <th class="datetime">Submitted</th>
                 <th class="actions">Actions</th>
             </tr>
@@ -47,11 +46,8 @@
 
                             ?>
                         </td>
-                        <td><?=$oResponse->status?></td>
                         <?=adminHelper('loadDateTimeCell', $oResponse->date_submitted, 'Not yet submitted')?>
-                        <td class="actions">
-
-                        </td>
+                        <td class="actions"></td>
                     </tr>
                     <?php
                 }
@@ -60,7 +56,7 @@
 
                 ?>
                 <tr>
-                    <td colspan="4" class="no-data">
+                    <td colspan="3" class="no-data">
                         No Responses
                     </td>
                 </tr>

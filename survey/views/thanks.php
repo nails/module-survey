@@ -1,3 +1,7 @@
 <div class="nails-survey thanks">
-    @todo - thanks
+    <div class="container">
+        <p>
+            @todo - Thank you page
+        </p>
+    </div>
 </div>

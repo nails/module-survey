@@ -79,14 +79,40 @@ class Response extends Base
 
     public function setOpen($iResponseId)
     {
-        return $this->update($iResponseId, array('status' => self::STATUS_OPEN));
+        $bResult = $this->update(
+            $iResponseId,
+            array(
+                'status'         => self::STATUS_OPEN,
+                'date_submitted' => null
+            )
+        );
+
+        if ($bResult) {
+            $oEventService = Factory::service('Event');
+            $oEventService->trigger('RESPONSE.OPEN', 'nailsapp/module-survey', $iResponseId);
+        }
+
+        return $bResult;
     }
 
     // --------------------------------------------------------------------------
 
     public function setSubmitted($iResponseId)
     {
-        return $this->update($iResponseId, array('status' => self::STATUS_SUBMITTED));
+        $bResult = $this->update(
+            $iResponseId,
+            array(
+                'status'         => self::STATUS_SUBMITTED,
+                'date_submitted' => array('NOW()', false)
+            )
+        );
+
+        if ($bResult) {
+            $oEventService = Factory::service('Event');
+            $oEventService->trigger('RESPONSE.SUBMITTED', 'nailsapp/module-survey', $iResponseId);
+        }
+
+        return $bResult;
     }
 
     // --------------------------------------------------------------------------
