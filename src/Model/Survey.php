@@ -49,6 +49,19 @@ class Survey extends Base
                     )
                 );
             }
+
+            if (!empty($aData['includeAll']) || !empty($aData['includeQuestions'])) {
+                $this->getManyAssociatedItems(
+                    $aItems,
+                    'questions',
+                    'survey_id',
+                    'SurveyQuestion',
+                    'nailsapp/module-survey',
+                    array(
+                        'includeOptions' => true
+                    )
+                );
+            }
         }
 
         return $aItems;

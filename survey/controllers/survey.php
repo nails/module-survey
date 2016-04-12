@@ -75,7 +75,7 @@ class Survey extends NAILS_Controller
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
 
         //  Get the Survey
-        $oSurvey = $oSurveyModel->getById($iSurveyId);
+        $oSurvey = $oSurveyModel->getById($iSurveyId, array('includeQuestions' => true));
         if (empty($oSurvey) || $oSurvey->access_token != $sSurveyToken) {
             show_404();
         }
