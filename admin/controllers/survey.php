@@ -44,12 +44,13 @@ class Survey extends BaseAdmin
     {
         $permissions = parent::permissions();
 
-        $permissions['browse']           = 'Can browse surveys';
-        $permissions['create']           = 'Can create surveys';
-        $permissions['edit']             = 'Can edit surveys';
-        $permissions['delete']           = 'Can delete surveys';
-        $permissions['responses']        = 'Can view responses';
-        $permissions['responses:delete'] = 'Can delete responses';
+        $permissions['browse']          = 'Can browse surveys';
+        $permissions['create']          = 'Can create surveys';
+        $permissions['edit']            = 'Can edit surveys';
+        $permissions['delete']          = 'Can delete surveys';
+        $permissions['stats']           = 'Can view survey stats';
+        $permissions['response']        = 'Can view responses';
+        $permissions['response:delete'] = 'Can delete responses';
 
         return $permissions;
     }
@@ -98,6 +99,7 @@ class Survey extends BaseAdmin
 
         //  Define the $data variable for the queries
         $data = array(
+            'includeResponses' => true,
             'sort' => array(
                 array($sortOn, $sortOrder)
             ),
@@ -140,13 +142,13 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::model('Session', 'nailsapp/module-auth');
                     $oSession->set_flashdata('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
                 } else {
 
-                    $this->data['error'] = 'Failed to create survey.' . $this->oSurveyModel->lastError();
+                    $this->data['error'] = 'Failed to create survey.' . $oSurveyModel->lastError();
                 }
 
             } else {
@@ -174,26 +176,34 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
-        $iSurveyId = (int) $this->uri->segment(5);
-        $this->data['survey'] = $this->oSurveyModel->getById($iSurveyId, array('includeFields' => true));
+        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
-        if (empty($this->data['survey'])) {
+        $iSurveyId = (int) $this->uri->segment(5);
+        $this->data['survey'] = $oSurveyModel->getById(
+            $iSurveyId,
+            array(
+                'includeFields'    => true,
+                'includeResponses' => true
+            )
+        );
+
+        if (empty($this->data['survey']) || $this->data['survey']->responses->count > 0) {
             show_404();
         }
 
-        $oSurveyModel = Factory::service('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
         if ($this->input->post()) {
             if ($this->runFormValidation()) {
-                if ($this->oSurveyModel->update($iSurveyId, $this->getPostObject())) {
+                if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::model('Session', 'nailsapp/module-auth');
                     $oSession->set_flashdata('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
                 } else {
 
-                    $this->data['error'] = 'Failed to update survey.' . $this->oSurveyModel->lastError();
+                    $this->data['error'] = 'Failed to update survey.' . $oSurveyModel->lastError();
                 }
 
             } else {
@@ -222,7 +232,7 @@ class Survey extends BaseAdmin
 
     protected function runFormValidation()
     {
-        $oFormValidation = Factory::service('FormValidation');
+        $oFormValidation = Factory::model('FormValidation');
 
         //  Define the rules
         $aRules = array(
@@ -342,6 +352,17 @@ class Survey extends BaseAdmin
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
+        $oSurvey = $oSurveyModel->getById(
+            $iSurveyId,
+            array(
+                'includeResponses' => true
+            )
+        );
+
+        if (empty($oSurvey) || $oSurvey->responses->count > 0) {
+            show_404();
+        }
+
         if ($oSurveyModel->delete($iSurveyId)) {
 
             $sStatus  = 'success';
@@ -350,11 +371,83 @@ class Survey extends BaseAdmin
         } else {
 
             $sStatus  = 'error';
-            $sMessage = 'Custom survey failed to delete. ' . $this->oSurveyModel->lastError();
+            $sMessage = 'Custom survey failed to delete. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', 'nailsapp/module-auth');
+        $oSession = Factory::model('Session', 'nailsapp/module-auth');
         $oSession->set_flashdata($sStatus, $sMessage);
         redirect($sReturn);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Browse survey responses
+     * @return void
+     */
+    public function response()
+    {
+        if (!userHasPermission('admin:survey:survey:response')) {
+            unauthorised();
+        }
+
+        // --------------------------------------------------------------------------
+
+        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+
+        $iSurveyId = (int) $this->uri->segment(5);
+        $this->data['survey'] = $oSurveyModel->getById(
+            $iSurveyId,
+            array(
+                'includeFields'    => true,
+                'includeResponses' => true
+            )
+        );
+
+        if (empty($this->data['survey'])) {
+            show_404();
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Set method info
+        $this->data['page']->title = 'Survey Responses &rsaquo; ' . $this->data['survey']->label;
+
+        // --------------------------------------------------------------------------
+
+        Helper::loadView('response');
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Browse existing survey
+     * @return void
+     */
+    public function stats()
+    {
+        if (!userHasPermission('admin:survey:survey:stats')) {
+            unauthorised();
+        }
+
+        // --------------------------------------------------------------------------
+
+        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+
+        $iSurveyId = (int) $this->uri->segment(5);
+        $this->data['survey'] = $oSurveyModel->getById($iSurveyId);
+
+        if (empty($this->data['survey'])) {
+            show_404();
+        }
+
+        // --------------------------------------------------------------------------
+
+        //  Set method info
+        $this->data['page']->title = 'Survey Statistics &rsaquo; ' . $this->data['survey']->label;
+
+        // --------------------------------------------------------------------------
+
+        Helper::loadView('stats');
     }
 }

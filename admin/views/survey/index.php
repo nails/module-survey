@@ -8,7 +8,7 @@
         <table>
             <thead>
                 <tr>
-                    <th class="id">ID</th>
+                    <th class="id text-center">ID</th>
                     <th class="label">Label</th>
                     <th class="datetime">Modified</th>
                     <th class="user">Modified By</th>
@@ -24,7 +24,7 @@
 
                     ?>
                     <tr>
-                        <td class="id">
+                        <td class="id text-center">
                             <?=number_format($survey->id)?>
                         </td>
                         <td class="label">
@@ -38,26 +38,29 @@
                         echo anchor($survey->url, 'View', 'class="btn btn-xs btn-default" target="_blank"');
 
                         if (userHasPermission('admin:survey:survey:edit')) {
-
-                            echo anchor('admin/survey/survey/edit/' . $survey->id, 'Edit', 'class="btn btn-xs btn-primary"');
+                            if ($survey->responses->count === 0) {
+                                echo anchor('admin/survey/survey/edit/' . $survey->id, 'Edit', 'class="btn btn-xs btn-primary"');
+                            }
                         }
 
-                        if (userHasPermission('admin:survey:survey:responses')) {
-
-                            echo anchor(
-                                'admin/survey/survey/responses/' . $survey->id,
-                                'View Responses (' . number_surveyat($survey->responses->count) . ')',
-                                'class="btn btn-xs btn-warning"'
-                            );
+                        if (userHasPermission('admin:survey:survey:response')) {
+                            if ($survey->responses->count > 0) {
+                                echo anchor(
+                                    'admin/survey/survey/response/' . $survey->id,
+                                    'Responses (' . $survey->responses->count . ')',
+                                    'class="btn btn-xs btn-warning"'
+                                );
+                            }
                         }
 
                         if (userHasPermission('admin:survey:survey:delete')) {
-
-                            echo anchor(
-                                'admin/survey/survey/delete/' . $survey->id,
-                                'Delete',
-                                'class="btn btn-xs btn-danger confirm" data-body="This action is also not undoable." data-title="Confirm Delete"'
-                            );
+                            if ($survey->responses->count === 0) {
+                                echo anchor(
+                                    'admin/survey/survey/delete/' . $survey->id,
+                                    'Delete',
+                                    'class="btn btn-xs btn-danger confirm" data-body="This action is also not undoable." data-title="Confirm Delete"'
+                                );
+                            }
                         }
 
                         ?>
