@@ -142,7 +142,7 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
-                    $oSession = Factory::model('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
                     $oSession->set_flashdata('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
@@ -182,7 +182,7 @@ class Survey extends BaseAdmin
         $this->data['survey'] = $oSurveyModel->getById(
             $iSurveyId,
             array(
-                'includeFields'    => true,
+                'includeForm'      => true,
                 'includeResponses' => true
             )
         );
@@ -197,7 +197,7 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
-                    $oSession = Factory::model('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
                     $oSession->set_flashdata('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
@@ -225,14 +225,20 @@ class Survey extends BaseAdmin
     {
         $oAsset = Factory::service('Asset');
         $oAsset->load('admin.survey.edit.min.js', 'nailsapp/module-survey');
-        $oAsset->inline('var _admin_survey_edit = new _ADMIN_SURVEY_EDIT();', 'JS');
+
+        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        adminLoadFormBuilderAssets('#survey-fields');
+
+        $oCaptchaModel = Factory::model('Captcha', 'nailsapp/module-captcha');
+        $this->data['isCaptchaEnabled'] = $oCaptchaModel->isEnabled();
     }
 
     // --------------------------------------------------------------------------
 
     protected function runFormValidation()
     {
-        $oFormValidation = Factory::model('FormValidation');
+        $oFormValidation = Factory::service('FormValidation');
+        $oInput          = Factory::service('Input');
 
         //  Define the rules
         $aRules = array(
@@ -241,7 +247,7 @@ class Survey extends BaseAdmin
             'footer'                 => '',
             'cta_label'              => 'xss_clean',
             'cta_attributes'         => 'xss_clean',
-            'survey_attributes'        => 'xss_clean',
+            'survey_attributes'      => 'xss_clean',
             'has_captcha'            => '',
             'fields'                 => 'required',
             'notification_email'     => 'valid_emails',
@@ -259,14 +265,23 @@ class Survey extends BaseAdmin
         $oFormValidation->set_message('required', lang('fv_required'));
         $oFormValidation->set_message('valid_emails', lang('fv_valid_emails'));
 
-        return $oFormValidation->run();
+        $bValidForm = $oFormValidation->run();
+
+        //  Validate fields
+        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        $bValidFields = adminValidateFormData($oInput->post('fields'));
+
+        return $bValidForm && $bValidFields;
     }
 
     // --------------------------------------------------------------------------
 
     protected function getPostObject()
     {
-        $aData = array(
+        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        $oInput  = Factory::service('Input');
+        $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
+        $aData   = array(
             'label'                  => $this->input->post('label'),
             'header'                 => $this->input->post('header'),
             'footer'                 => $this->input->post('footer'),
@@ -279,50 +294,11 @@ class Survey extends BaseAdmin
             'thankyou_email_body'    => $this->input->post('thankyou_email_body'),
             'thankyou_page_title'    => $this->input->post('thankyou_page_title'),
             'thankyou_page_body'     => $this->input->post('thankyou_page_body'),
-            'fields'                 => array()
+            'form'                   => adminNormalizeFormData(
+                $iFormId,
+                $oInput->post('fields')
+            )
         );
-
-        //  Build up fields
-        $iFieldOrder = 0;
-        $aFields     = $this->input->post('fields') ?: array();
-
-        foreach ($aFields as $aField) {
-
-            $aTemp = array(
-                'id'                   => !empty($aField['id']) ? (int) $aField['id'] : null,
-                'type'                 => !empty($aField['type']) ? $aField['type'] : 'TEXT',
-                'label'                => !empty($aField['label']) ? $aField['label'] : '',
-                'sub_label'            => !empty($aField['sub_label']) ? $aField['sub_label'] : '',
-                'placeholder'          => !empty($aField['placeholder']) ? $aField['placeholder'] : '',
-                'is_required'          => !empty($aField['is_required']) ? (bool) $aField['is_required'] : false,
-                'default_value'        => !empty($aField['default_value']) ? $aField['default_value'] : '',
-                'default_value_custom' => !empty($aField['default_value_custom']) ? $aField['default_value_custom'] : '',
-                'custom_attributes'    => !empty($aField['custom_attributes']) ? $aField['custom_attributes'] : '',
-                'order'                => $iFieldOrder,
-                'options'              => array()
-            );
-
-            if (!empty($aField['options'])) {
-
-                $iOptionOrder = 0;
-
-                foreach ($aField['options'] as $aOption) {
-
-                    $aTemp['options'][] = array(
-                        'id'          => !empty($aOption['id']) ? (int) $aOption['id'] : null,
-                        'label'       => !empty($aOption['label']) ? $aOption['label'] : '',
-                        'is_selected' => !empty($aOption['is_selected']) ? $aOption['is_selected'] : false,
-                        'is_disabled' => !empty($aOption['is_disabled']) ? $aOption['is_disabled'] : false,
-                        'order'       => $iOptionOrder
-                    );
-
-                    $iOptionOrder++;
-                }
-            }
-
-            $aData['fields'][] = $aTemp;
-            $iFieldOrder++;
-        }
 
         //  Format the emails
         $aEmails = explode(',', $this->input->post('notification_email'));
@@ -374,7 +350,7 @@ class Survey extends BaseAdmin
             $sMessage = 'Custom survey failed to delete. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::model('Session', 'nailsapp/module-auth');
+        $oSession = Factory::service('Session', 'nailsapp/module-auth');
         $oSession->set_flashdata($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -399,7 +375,7 @@ class Survey extends BaseAdmin
         $this->data['survey'] = $oSurveyModel->getById(
             $iSurveyId,
             array(
-                'includeFields'    => true,
+                'includeForm'      => true,
                 'includeResponses' => true
             )
         );

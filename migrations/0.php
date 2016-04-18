@@ -45,7 +45,7 @@ class Migration0 extends Base
                 KEY `modified_by` (`modified_by`),
                 KEY `user_id` (`user_id`),
                 CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `{{NAILS_DB_PREFIX}}survey_survey` (`id`) ON DELETE CASCADE,
-                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL,
                 CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL,
                 CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_4` FOREIGN KEY (`modified_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -37,6 +37,19 @@ class Survey extends Base
 
         if (!empty($aItems)) {
 
+            if (!empty($aData['includeAll']) || !empty($aData['includeForm'])) {
+                $this->getSingleAssociatedItem(
+                    $aItems,
+                    'form_id',
+                    'form',
+                    'Form',
+                    'nailsapp/module-form-builder',
+                    array(
+                        'includeFields' => true
+                    )
+                );
+            }
+
             if (!empty($aData['includeAll']) || !empty($aData['includeResponses'])) {
                 $this->getManyAssociatedItems(
                     $aItems,
@@ -50,16 +63,13 @@ class Survey extends Base
                 );
             }
 
-            if (!empty($aData['includeAll']) || !empty($aData['includeQuestions'])) {
+            if (!empty($aData['includeAll']) || !empty($aData['countResponses'])) {
                 $this->getManyAssociatedItems(
                     $aItems,
-                    'questions',
+                    'responses_count',
                     'survey_id',
-                    'SurveyQuestion',
-                    'nailsapp/module-survey',
-                    array(
-                        'includeOptions' => true
-                    )
+                    'Response',
+                    'nailsapp/module-survey'
                 );
             }
         }
@@ -74,7 +84,48 @@ class Survey extends Base
         //  Generate an access token
         Factory::helper('string');
         $aData['access_token'] = generateToken();
-        return parent::create($aData, $bReturnObject);
+
+        //  Extract the form
+        $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
+        unset($aData['form']);
+
+        try {
+
+            $oDb = Factory::service('Database');
+
+            $oDb->trans_begin();
+
+            //  Create the associated form (if no ID supplied)
+            if (empty($aForm['id'])) {
+
+                $oFormModel       = Factory::model('Form', 'nailsapp/module-form-builder');
+                $aData['form_id'] = $oFormModel->create($aForm);
+
+                if (!$aData['form_id']) {
+                    throw new \Exception('Failed to create associated form.', 1);
+                }
+
+            } else {
+
+                $aData['form_id'] = $aForm['id'];
+            }
+
+            $mResult = parent::create($aData, $bReturnObject);
+
+            if (!$mResult) {
+                throw new \Exception('Failed to create survey. ' . $this->lastError(), 1);
+            }
+
+            $oDb->trans_commit();
+            return $mResult;
+
+        } catch (\Exception $e) {
+
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
+
     }
 
     // --------------------------------------------------------------------------
@@ -83,6 +134,41 @@ class Survey extends Base
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
+
+        //  Extract the form
+        $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
+        unset($aData['form']);
+
+        try {
+
+            $oDb = Factory::service('Database');
+
+            $oDb->trans_begin();
+
+            //  Update the associated form (if no ID supplied)
+            if (!empty($aForm['id'])) {
+
+                $oFormModel = Factory::model('Form', 'nailsapp/module-form-builder');
+
+                if (!$oFormModel->update($aForm['id'], $aForm)) {
+                    throw new \Exception('Failed to update associated form.', 1);
+                }
+            }
+
+            if (!parent::update($iId, $aData)) {
+                throw new \Exception('Failed to update form. ' . $this->lastError(), 1);
+            }
+
+            $oDb->trans_commit();
+            return true;
+
+        } catch (\Exception $e) {
+
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
+
         return parent::update($iId, $aData);
     }
 
