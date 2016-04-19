@@ -53,7 +53,7 @@
                             echo anchor(
                                 $oResponse->url,
                                 'Link',
-                                'class="btn btn-primary'
+                                'class="btn btn-primary" target-"_blank"'
                             );
 
                             ?>
