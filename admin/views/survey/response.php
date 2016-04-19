@@ -47,7 +47,17 @@
                             ?>
                         </td>
                         <?=adminHelper('loadDateTimeCell', $oResponse->date_submitted, 'Not yet submitted')?>
-                        <td class="actions"></td>
+                        <td class="actions">
+                            <?php
+
+                            echo anchor(
+                                $oResponse->url,
+                                'Link',
+                                'class="btn btn-primary'
+                            );
+
+                            ?>
+                        </td>
                     </tr>
                     <?php
                 }
