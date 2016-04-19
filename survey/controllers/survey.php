@@ -66,16 +66,18 @@ class Survey extends NAILS_Controller
 
     public function _remap()
     {
-        $iSurveyId      = (int) $this->uri->rsegment(2);
-        $sSurveyToken   = $this->uri->rsegment(3);
-        $iResponseId    = (int) $this->uri->rsegment(4);
-        $sResponseToken = $this->uri->rsegment(5);
+        $iSurveyId      = (int) $this->uri->rsegment(3);
+        $sSurveyToken   = $this->uri->rsegment(4);
+        $iResponseId    = (int) $this->uri->rsegment(5);
+        $sResponseToken = $this->uri->rsegment(6);
 
         $oSurveyModel   = Factory::model('Survey', 'nailsapp/module-survey');
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
 
+        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+
         //  Get the Survey
-        $oSurvey = $oSurveyModel->getById($iSurveyId, array('includeQuestions' => true));
+        $oSurvey = $oSurveyModel->getById($iSurveyId, array('includeForm' => true));
         if (empty($oSurvey) || $oSurvey->access_token != $sSurveyToken) {
             show_404();
         }
@@ -89,6 +91,14 @@ class Survey extends NAILS_Controller
         } else {
             $oResponse = null;
         }
+
+        //  Surveys should be on blank screens
+        $this->data['headerOverride'] = 'structure/header/blank';
+        $this->data['footerOverride'] = 'structure/footer/blank';
+
+        //  Load assets
+        $oAsset = Factory::service('Asset');
+        $oAsset->load('survey.css', 'nailsapp/module-survey');
 
         //  Show the survey
         $this->index($oSurvey, $oResponse);

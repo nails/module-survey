@@ -4,10 +4,10 @@
             <?=$oSurvey->label?>
         </h1>
         <h2 class="text-center">
-            <?=$oSurvey->thankyou_page_title ?: 'Thank You'?>
+            <?=$oSurvey->thankyou_page->title ?: 'Thank You'?>
         </h2>
         <p class="text-center">
-            <?=$oSurvey->thankyou_page_body ?: 'Your responses have been recorded.'?>
+            <?=$oSurvey->thankyou_page->body ?: 'Your responses have been recorded.'?>
         </p>
     </div>
 </div>

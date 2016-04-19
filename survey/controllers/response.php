@@ -16,8 +16,8 @@ class Response extends NAILS_Controller
 {
     public function _remap()
     {
-        $iResponseId    = (int) $this->uri->rsegment(2);
-        $sResponseToken = $this->uri->rsegment(3);
+        $iResponseId    = (int) $this->uri->rsegment(3);
+        $sResponseToken = $this->uri->rsegment(4);
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
 
         //  Get the Survey

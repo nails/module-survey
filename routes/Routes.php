@@ -23,7 +23,8 @@ class Routes
     public function getRoutes()
     {
         return array(
-            'survey/(.*)' => 'survey/index/$1'
+            'survey/response/(.*)' => 'survey/response/index/$1',
+            'survey/(.*)'          => 'survey/survey/index/$1'
         );
     }
 }

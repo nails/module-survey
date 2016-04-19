@@ -181,8 +181,50 @@ class Survey extends Base
         $aBools = array(),
         $aFloats = array()
     ) {
+
+        $aBools[] = 'has_captcha';
+        $aBools[] = 'thankyou_email';
+
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
 
+        // --------------------------------------------------------------------------
+
         $oObj->url = site_url('survey/' . $oObj->id . '/' . $oObj->access_token);
+
+        // --------------------------------------------------------------------------
+
+        $oObj->header             = json_decode($oObj->header);
+        $oObj->footer             = json_decode($oObj->footer);
+        $oObj->notification_email = json_decode($oObj->notification_email);
+
+        // --------------------------------------------------------------------------
+
+        $oObj->cta             = new \stdClass();
+        $oObj->cta->label      = $oObj->cta_label;
+        $oObj->cta->attributes = $oObj->cta_attributes;
+
+        unset($oObj->cta_label);
+        unset($oObj->cta_attributes);
+
+        // --------------------------------------------------------------------------
+
+        $bSendThankYouEmail = $oObj->thankyou_email;
+
+        $oObj->thankyou_email          = new \stdClass();
+        $oObj->thankyou_email->send    = $bSendThankYouEmail;
+        $oObj->thankyou_email->subject = $oObj->thankyou_email_subject;
+        $oObj->thankyou_email->body    = $oObj->thankyou_email_body;
+
+        unset($oObj->thankyou_email_subject);
+        unset($oObj->thankyou_email_body);
+
+        // --------------------------------------------------------------------------
+
+        $oObj->thankyou_page        = new \stdClass();
+        $oObj->thankyou_page->title = $oObj->thankyou_page_title;
+        $oObj->thankyou_page->body  = $oObj->thankyou_page_body;
+
+        unset($oObj->thankyou_page_title);
+        unset($oObj->thankyou_page_body);
     }
 }
