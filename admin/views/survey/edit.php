@@ -80,6 +80,16 @@
             );
             echo form_field_boolean($aField);
 
+            // --------------------------------------------------------------------------
+
+            $aField = array(
+                'key'     => 'is_minimal',
+                'label'   => 'Minimal Layout',
+                'default' => !empty($form->is_minimal),
+                'info'    => 'When minimal, the form will not feature the site\'s header and footer.',
+            );
+            echo form_field_boolean($aField);
+
             ?>
             </div>
         </div>

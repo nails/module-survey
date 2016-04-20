@@ -184,6 +184,7 @@ class Survey extends Base
 
         $aBools[] = 'has_captcha';
         $aBools[] = 'thankyou_email';
+        $aBools[] = 'is_minimal';
 
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
 

@@ -42,6 +42,7 @@ class Migration0 extends Base
                 `thankyou_page_title` varchar(150) NOT NULL DEFAULT '',
                 `thankyou_page_body` text NOT NULL,
                 `form_id` int(11) unsigned DEFAULT NULL,
+                `is_minimal` tinyint(1) unsigned NOT NULL DEFAULT '0',
                 `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
                 `created` datetime NOT NULL,
                 `created_by` int(11) unsigned DEFAULT NULL,

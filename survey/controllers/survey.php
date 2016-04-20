@@ -93,12 +93,10 @@ class Survey extends NAILS_Controller
         }
 
         //  Surveys should be on blank screens
-        $this->data['headerOverride'] = 'structure/header/blank';
-        $this->data['footerOverride'] = 'structure/footer/blank';
-
-        //  Load assets
-        $oAsset = Factory::service('Asset');
-        $oAsset->load('survey.css', 'nailsapp/module-survey');
+        if ($oSurvey->is_minimal) {
+            $this->data['headerOverride'] = 'structure/header/blank';
+            $this->data['footerOverride'] = 'structure/footer/blank';
+        }
 
         //  Show the survey
         $this->index($oSurvey, $oResponse);
