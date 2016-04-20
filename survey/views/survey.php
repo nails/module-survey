@@ -1,6 +1,6 @@
 <div class="nails-survey survey">
     <?php
-
+dump($oSurvey);
     if (!empty($oSurvey->header)) {
         echo cmsAreaWithData($oSurvey->header);
     }
