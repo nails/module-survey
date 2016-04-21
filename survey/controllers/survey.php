@@ -24,9 +24,7 @@ class Survey extends NAILS_Controller
 
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
 
-            $this->load->view('structure/header', $this->data);
-            $this->load->view('survey/submitted', $this->data);
-            $this->load->view('structure/footer', $this->data);
+            show_404();
 
         } else {
 
@@ -38,11 +36,13 @@ class Survey extends NAILS_Controller
                     //  @todo - update/create response
 
                     //  Mark response as submitted
-                    if (!$oResponseModel->setSubmitted($oResponse->id)) {
-                        throw new \Exception(
-                            'Failed to mark response as submitted. ' . $oResponseModel->lastError(),
-                            1
-                        );
+                    if (!empty($oResponse)) {
+                        if (!$oResponseModel->setSubmitted($oResponse->id)) {
+                            throw new \Exception(
+                                'Failed to mark response as submitted. ' . $oResponseModel->lastError(),
+                                1
+                            );
+                        }
                     }
 
                     //  Show thank you page

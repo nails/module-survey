@@ -43,6 +43,10 @@
                             }
                         }
 
+                        if (userHasPermission('admin:survey:survey:copy')) {
+                            echo anchor('admin/survey/survey/copy/' . $survey->id, 'Copy', 'class="btn btn-xs btn-primary"');
+                        }
+
                         if (userHasPermission('admin:survey:survey:response')) {
                             if ($survey->responses->count > 0) {
                                 echo anchor(

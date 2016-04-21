@@ -174,6 +174,78 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Creates a new copy of an existing survey
+     * @param  integer $iSurveyId    The ID of the survey to duplicate
+     * @param  boolean $bReturnObject Whether to return the entire new survey object, or just the ID
+     * @param  array   $aReturnData   An array to pass to the getById() call when $bReturnObject is true
+     * @return mixed
+     */
+    public function copy($iSurveyId, $bReturnObject = false, $aReturnData = array())
+    {
+        try {
+
+            //  Begin the transaction
+            $oDb = Factory::service('Database');
+            $oDb->trans_begin();
+
+            //  Check survey exists
+            $oSurvey = $this->getById($iSurveyId);
+            if (empty($oSurvey)) {
+                throw new \Exception('Not a valid survey ID.', 1);
+            }
+
+            //  Copy the form
+            $oFormModel = Factory::model('Form', 'nailsapp/module-form-builder');
+            $iNewFormId = $oFormModel->copy($oSurvey->form_id);
+
+            if (empty($iNewFormId)) {
+                throw new \Exception('Failed to copy the survey\'s form. ' . $oFormModel->lastError(), 1);
+            }
+
+            $sTableSurvey = $this->getTableName();
+
+            //  Duplicate the survey
+            $oDb->where('id', $iSurveyId);
+            $oSurveyRow = $oDb->get($sTableSurvey)->row();
+
+            $oNow = Factory::factory('DateTime');
+            $sNow = $oNow->format('Y-m-d H:i:s');
+
+            Factory::helper('string');
+
+            unset($oSurveyRow->id);
+            $oSurveyRow->form_id      = $iNewFormId;
+            $oSurveyRow->access_token = generateToken();
+            $oSurveyRow->label        = $oSurveyRow->label . ' - copy';
+            $oSurveyRow->created      = $sNow;
+            $oSurveyRow->created_by   = activeUser('id') ?: null;
+            $oSurveyRow->modified     = $sNow;
+            $oSurveyRow->modified_by  = activeUser('id') ?: null;
+
+            $oDb->set($oSurveyRow);
+            if (!$oDb->insert($sTableSurvey)) {
+                throw new \Exception('Failed to copy parent form record.', 1);
+            }
+
+            $iNewSurveyId = $oDb->insert_id();
+
+            //  All done
+            $oDb->trans_commit();
+
+            //  Return the new form's ID or object
+            return $bReturnObject ? $this->getById($iNewSurveyId, $aReturnData) : $iNewSurveyId;
+
+        } catch (\Exception $e) {
+
+            $oDb->trans_rollback();
+            $this->setError($e->getMessage());
+            return false;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
     protected function formatObject(
         &$oObj,
         $aData = array(),
@@ -223,7 +295,7 @@ class Survey extends Base
 
         $oObj->thankyou_page        = new \stdClass();
         $oObj->thankyou_page->title = $oObj->thankyou_page_title;
-        $oObj->thankyou_page->body  = $oObj->thankyou_page_body;
+        $oObj->thankyou_page->body  = json_decode($oObj->thankyou_page_body);
 
         unset($oObj->thankyou_page_title);
         unset($oObj->thankyou_page_body);

@@ -47,6 +47,7 @@ class Survey extends BaseAdmin
         $permissions['browse']          = 'Can browse surveys';
         $permissions['create']          = 'Can create surveys';
         $permissions['edit']            = 'Can edit surveys';
+        $permissions['copy']            = 'Can copy surveys';
         $permissions['delete']          = 'Can delete surveys';
         $permissions['stats']           = 'Can view survey stats';
         $permissions['response']        = 'Can view responses';
@@ -343,12 +344,47 @@ class Survey extends BaseAdmin
         if ($oSurveyModel->delete($iSurveyId)) {
 
             $sStatus  = 'success';
-            $sMessage = 'Custom survey was deleted successfully.';
+            $sMessage = 'Survey was deleted successfully.';
 
         } else {
 
             $sStatus  = 'error';
-            $sMessage = 'Custom survey failed to delete. ' . $oSurveyModel->lastError();
+            $sMessage = 'Survey failed to delete. ' . $oSurveyModel->lastError();
+        }
+
+        $oSession = Factory::service('Session', 'nailsapp/module-auth');
+        $oSession->set_flashdata($sStatus, $sMessage);
+        redirect($sReturn);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Delete an existing survey
+     * @return void
+     */
+    public function copy()
+    {
+        if (!userHasPermission('admin:survey:survey:copy')) {
+            unauthorised();
+        }
+
+        $iSurveyId    = (int) $this->uri->segment(5);
+        $sReturn      = $this->input->get('return') ? $this->input->get('return') : 'admin/survey/survey/index';
+        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+
+        $iNewSurveyId = $oSurveyModel->copy($iSurveyId);
+
+        if ($iNewSurveyId) {
+
+            $sStatus  = 'success';
+            $sMessage = 'Survey was copied successfully.';
+            $sReturn  = 'admin/survey/survey/edit/' . $iNewSurveyId;
+
+        } else {
+
+            $sStatus  = 'error';
+            $sMessage = 'Survey failed to copy. ' . $oSurveyModel->lastError();
         }
 
         $oSession = Factory::service('Session', 'nailsapp/module-auth');
