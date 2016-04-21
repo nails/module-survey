@@ -29,7 +29,7 @@ class Survey extends NAILS_Controller
         } else {
 
             if ($this->input->post()) {
-
+dumpanddie($_POST);
                 try {
 
                     //  @todo - validate

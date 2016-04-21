@@ -53,7 +53,13 @@
                             echo anchor(
                                 $oResponse->url,
                                 'Link',
-                                'class="btn btn-primary" target-"_blank"'
+                                'class="btn btn-xs btn-default" target="_blank"'
+                            );
+
+                            echo anchor(
+                                'admin/survey/survey/response/' . $survey->id . '/view/' . $oResponse->id,
+                                'View Answers',
+                                'class="btn btn-xs btn-primary" target-"_blank"'
                             );
 
                             ?>

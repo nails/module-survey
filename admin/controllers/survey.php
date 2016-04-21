@@ -395,30 +395,47 @@ class Survey extends BaseAdmin
     // --------------------------------------------------------------------------
 
     /**
-     * Browse survey responses
+     * Route the response controllers
      * @return void
      */
     public function response()
     {
+        $sMethod = $this->uri->segment(6) ?: 'index';
+        $sMethod = 'response' . ucfirst($sMethod);
+
+        if (is_callable(array($this, $sMethod))) {
+
+            $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+
+            $iSurveyId = (int) $this->uri->segment(5);
+            $this->data['survey'] = $oSurveyModel->getById(
+                $iSurveyId,
+                array(
+                    'includeForm'      => true,
+                    'includeResponses' => true
+                )
+            );
+
+            if (empty($this->data['survey'])) {
+                show_404();
+            }
+
+            $this->{$sMethod}();
+        } else {
+            show_404();
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Browse survey responses
+     * @return void
+     */
+    protected function responseIndex()
+    {
         if (!userHasPermission('admin:survey:survey:response')) {
             unauthorised();
-        }
-
-        // --------------------------------------------------------------------------
-
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
-
-        $iSurveyId = (int) $this->uri->segment(5);
-        $this->data['survey'] = $oSurveyModel->getById(
-            $iSurveyId,
-            array(
-                'includeForm'      => true,
-                'includeResponses' => true
-            )
-        );
-
-        if (empty($this->data['survey'])) {
-            show_404();
         }
 
         // --------------------------------------------------------------------------
@@ -428,7 +445,34 @@ class Survey extends BaseAdmin
 
         // --------------------------------------------------------------------------
 
-        Helper::loadView('response');
+        Helper::loadView('response/index');
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function responseView()
+    {
+        $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
+
+        $iResponseId = (int) $this->uri->segment(7);
+        $this->data['response'] = $oResponseModel->getById(
+            $iResponseId,
+            array(
+                'includeAnswer' => true
+            )
+        );
+
+        if (empty($this->data['response'])) {
+            show_404();
+        }
+
+        // --------------------------------------------------------------------------
+
+        $this->data['page']->title = 'Survey Responses &rsaquo; ' . $this->data['survey']->label . ' &rsaquo; Response';
+
+        // --------------------------------------------------------------------------
+
+        Helper::loadView('response/view');
     }
 
     // --------------------------------------------------------------------------

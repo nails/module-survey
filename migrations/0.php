@@ -83,5 +83,32 @@ class Migration0 extends Base
                 CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_ibfk_4` FOREIGN KEY (`modified_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+        $this->query("
+            CREATE TABLE `{{NAILS_DB_PREFIX}}survey_response_answer` (
+                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                `survey_response_id` int(11) unsigned NOT NULL,
+                `form_field_id` int(11) unsigned NOT NULL,
+                `form_field_option_id` int(11) unsigned DEFAULT NULL,
+                `text` text,
+                `data` text,
+                `order` int(11) unsigned NOT NULL DEFAULT '0',
+                `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                `created` datetime NOT NULL,
+                `created_by` int(11) unsigned DEFAULT NULL,
+                `modified` datetime NOT NULL,
+                `modified_by` int(11) unsigned DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                KEY `survey_response_id` (`survey_response_id`),
+                KEY `form_field_id` (`form_field_id`),
+                KEY `form_field_option_id` (`form_field_option_id`),
+                KEY `created_by` (`created_by`),
+                KEY `modified_by` (`modified_by`),
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_answer_ibfk_1` FOREIGN KEY (`survey_response_id`) REFERENCES `{{NAILS_DB_PREFIX}}survey_response` (`id`) ON DELETE CASCADE,
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_answer_ibfk_2` FOREIGN KEY (`form_field_id`) REFERENCES `{{NAILS_DB_PREFIX}}formbuilder_form_field` (`id`),
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_answer_ibfk_3` FOREIGN KEY (`form_field_option_id`) REFERENCES `{{NAILS_DB_PREFIX}}formbuilder_form_field_option` (`id`),
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_answer_ibfk_4` FOREIGN KEY (`created_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL,
+                CONSTRAINT `{{NAILS_DB_PREFIX}}survey_response_answer_ibfk_5` FOREIGN KEY (`modified_by`) REFERENCES `{{NAILS_DB_PREFIX}}user` (`id`) ON DELETE SET NULL
+            ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+        ");
     }
 }

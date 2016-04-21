@@ -15,6 +15,13 @@ return array(
             } else {
                 return new \Nails\Survey\Model\Response();
             }
+        },
+        'ResponseAnswer' => function () {
+            if (class_exists('\App\Survey\Model\ResponseAnswer')) {
+                return new \App\Survey\Model\ResponseAnswer();
+            } else {
+                return new \Nails\Survey\Model\ResponseAnswer();
+            }
         }
     )
 );

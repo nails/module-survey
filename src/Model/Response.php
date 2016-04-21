@@ -45,11 +45,37 @@ class Response extends Base
         if (!empty($aItems)) {
 
             if (!empty($aData['includeAll']) || !empty($aData['includeSurvey'])) {
-                $this->getSingleAssociatedItem($aItems, 'survey_id', 'survey', 'Survey', 'nailsapp/module-survey');
+                $this->getSingleAssociatedItem(
+                    $aItems,
+                    'survey_id',
+                    'survey',
+                    'Survey',
+                    'nailsapp/module-survey'
+                );
             }
 
             if (!empty($aData['includeAll']) || !empty($aData['includeUser'])) {
-                $this->getSingleAssociatedItem($aItems, 'user_id', 'user', 'User', 'nailsapp/module-auth');
+                $this->getSingleAssociatedItem(
+                    $aItems,
+                    'user_id',
+                    'user',
+                    'User',
+                    'nailsapp/module-auth'
+                );
+            }
+
+            if (!empty($aData['includeAll']) || !empty($aData['includeAnswer'])) {
+                $this->getManyAssociatedItems(
+                    $aItems,
+                    'answers',
+                    'survey_response_id',
+                    'ResponseAnswer',
+                    'nailsapp/module-survey',
+                    array(
+                        'includeQuestion' => true,
+                        'includeOption' => true
+                    )
+                );
             }
         }
 
