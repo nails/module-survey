@@ -7,7 +7,7 @@
 
     $aFormConfig = array(
         'form_attr'     => $oSurvey->form_attributes,
-        'has_captcha'   => $oSurvey->has_captcha,
+        'has_captcha'   => $oSurvey->form->has_captcha,
         'captcha_error' => !empty($captchaError) ? $captchaError : null,
         'fields'        => $oSurvey->form->fields->data,
         'buttons'       => array(
@@ -17,6 +17,7 @@
             )
         )
     );
+
     echo formBuilderRender($aFormConfig);
 
     if (!empty($oSurvey->footer)) {

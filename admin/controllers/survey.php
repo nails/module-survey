@@ -231,7 +231,7 @@ class Survey extends BaseAdmin
         adminLoadFormBuilderAssets('#survey-fields');
 
         $oCaptchaModel = Factory::model('Captcha', 'nailsapp/module-captcha');
-        $this->data['isCaptchaEnabled'] = $oCaptchaModel->isEnabled();
+        $this->data['bIsCaptchaEnabled'] = $oCaptchaModel->isEnabled();
     }
 
     // --------------------------------------------------------------------------
@@ -290,7 +290,6 @@ class Survey extends BaseAdmin
             'cta_attributes'         => $this->input->post('cta_attributes'),
             'form_attributes'        => $this->input->post('form_attributes'),
             'is_minimal'             => (bool) $this->input->post('is_minimal'),
-            'has_captcha'            => (bool) $this->input->post('has_captcha'),
             'thankyou_email'         => (bool) $this->input->post('thankyou_email'),
             'thankyou_email_subject' => $this->input->post('thankyou_email_subject'),
             'thankyou_email_body'    => $this->input->post('thankyou_email_body'),
@@ -298,6 +297,7 @@ class Survey extends BaseAdmin
             'thankyou_page_body'     => $this->input->post('thankyou_page_body'),
             'form'                   => adminNormalizeFormData(
                 $iFormId,
+                (bool) $this->input->post('has_captcha'),
                 $oInput->post('fields')
             )
         );

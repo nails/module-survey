@@ -18,9 +18,11 @@ class Survey extends NAILS_Controller
     public function index($oSurvey, $oResponse)
     {
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
+        $oCaptchaModel  = Factory::model('Captcha', 'nailsapp/module-captcha');
 
-        $this->data['oSurvey']   = $oSurvey;
-        $this->data['oResponse'] = $oResponse;
+        $this->data['oSurvey']           = $oSurvey;
+        $this->data['oResponse']         = $oResponse;
+        $this->data['bIsCaptchaEnabled'] = $oCaptchaModel->isEnabled();
 
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
 
@@ -32,26 +34,96 @@ class Survey extends NAILS_Controller
 
                 try {
 
-                    //  @todo - validate
-                    //  @todo - update/create response
+                    //  Validate
+                    $bisFormValid = formBuilderValidate(
+                        $oSurvey->form->fields->data,
+                        $this->input->post('field')
+                    );
 
-                    //  Mark response as submitted
-                    if (!empty($oResponse)) {
+                    if ($oSurvey->form->has_captcha && $this->data['bIsCaptchaEnabled']) {
+                        if (!$oCaptchaModel->verify()) {
+                            $bIsValid = false;
+                            $this->data['captchaError'] = 'You failed the captcha test.';
+                        }
+
+                    } else {
+
+                        $bIsCaptchaValid = true;
+                    }
+
+                    if ($bisFormValid && $bIsCaptchaValid) {
+
+                        //  For each response, extract all the components
+                        $aParsedResponse = formBuilderParseResponse(
+                            $oSurvey->form->fields->data,
+                            $this->input->post('field')
+                        );
+
+                        $aResponseData = array();
+                        $iOrder        = 0;
+                        foreach ($aParsedResponse as $oRow) {
+                            $aResponseData[] = array(
+                                'survey_response_id'   => $oSurvey->id,
+                                'form_field_id'        => $oRow->field_id,
+                                'form_field_option_id' => $oRow->option_id,
+                                'text'                 => $oRow->text,
+                                'data'                 => $oRow->data,
+                                'order'                => $iOrder
+                            );
+                            $iOrder++;
+                        }
+
+
+                        if (empty($oResponse)) {
+                            $aResponse = array(
+                                'survey_id' => $oSurvey->id,
+                                'user_id'   => activeUser('id')
+                            );
+
+                            $oResponse = $oResponseModel->create($aResponse, true);
+                            if (empty($oResponse)) {
+                                throw new \Exception(
+                                    'Failed save response. ' . $oResponseModel->lastError(),
+                                    1
+                                );
+                            }
+                        }
+
+                        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+
+                        foreach ($aResponseData as $aResponseRow) {
+
+                            $aResponseRow['survey_response_id'] = $oResponse->id;
+
+                            if (!$oResponseAnswerModel->create($aResponseRow)) {
+                                throw new \Exception(
+                                    'Failed save response. ' . $oResponseAnswerModel->lastError(),
+                                    2
+                                );
+                            }
+                        }
+
+                        //  Mark response as submitted
                         if (!$oResponseModel->setSubmitted($oResponse->id)) {
                             throw new \Exception(
                                 'Failed to mark response as submitted. ' . $oResponseModel->lastError(),
                                 1
                             );
                         }
+
+                        //  Show thank you page
+                        $this->load->view('structure/header', $this->data);
+                        $this->load->view('survey/thanks', $this->data);
+                        $this->load->view('structure/footer', $this->data);
+                        return;
+
+                    } else {
+
+                        $this->data['error'] = lang('fv_there_were_errors');
                     }
 
-                    //  Show thank you page
-                    $this->load->view('structure/header', $this->data);
-                    $this->load->view('survey/thanks', $this->data);
-                    $this->load->view('structure/footer', $this->data);
-                    return;
-
                 } catch (\Exception $e) {
+                    dumpanddie($e->getMessage(), $e->getCode());
                     $this->data['error'] = $e->getMessage();
                 }
             }
@@ -92,7 +164,7 @@ class Survey extends NAILS_Controller
             $oResponse = null;
         }
 
-        //  Surveys should be on blank screens
+        //  Minimal layout?
         if ($oSurvey->is_minimal) {
             $this->data['headerOverride'] = 'structure/header/blank';
             $this->data['footerOverride'] = 'structure/footer/blank';
