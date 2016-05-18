@@ -16,4 +16,67 @@
             }
         }
     }
+    &.responses {
+        table {
+            td.include-response {
+                text-align: center;
+                max-width: 10px;
+            }
+        }
+        .js-chart-type {
+            display: inline-block;
+            .select2 {
+                width: 125px;
+                margin-top: -4px;
+            }
+        }
+        .alert-danger {
+            margin: 0;
+        }
+        .loading-pulse {
+            animation: loading-pulse 1s linear 1s infinite alternate;
+            color: #CCC;
+            @-webkit-keyframes loading-pulse
+            {
+                0% {
+                    color: #000;
+                }
+                100% {
+                    color: #CCC;
+                }
+            }
+            @keyframes loading-pulse
+            {
+                0% {
+                    color: #CCC;
+                }
+                100% {
+                    color: #000;
+                }
+            }
+        }
+        .target-chart {
+            text-align: center;
+            .alert-error {
+                text-align: left;
+            }
+        }
+        .target-text {
+            margin: 0;
+            border: 1px solid #CCC;
+            border-radius: 2px;
+            list-style: none;
+            padding: 0;
+            max-height: 500px;
+            overflow: auto;
+            li {
+                padding: 10px;
+                margin: 0;
+                border-bottom: 1px solid #CCC;
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
+    }
 }

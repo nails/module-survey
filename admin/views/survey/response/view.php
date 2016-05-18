@@ -8,10 +8,7 @@
                 Option
             </th>
             <th>
-                Text
-            </th>
-            <th>
-                Data
+                Response
             </th>
         </thead>
         <tbody>
@@ -24,7 +21,6 @@
                     <td><?=!empty($oAnswer->question) ? $oAnswer->question->label : ''?></td>
                     <td><?=!empty($oAnswer->option) ? $oAnswer->option->label : ''?></td>
                     <td><?=$oAnswer->text?></td>
-                    <td><?=$oAnswer->data?></td>
                 </tr>
                 <?php
             }

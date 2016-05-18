@@ -246,6 +246,55 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Generates aggregated stats for all the responses for a particular survey
+     * @param  integer $iSurveyId The ID of the survey
+     * @return array
+     */
+    public function getStats($iSurveyId)
+    {
+        $oSurvey = $this->getById(
+            $iSurveyId,
+            array(
+                'includeForm' => true
+            )
+        );
+
+        if (empty($oSurvey)) {
+            return false;
+        }
+
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+        $aOut                 = array();
+
+        //  Generate stats for each field
+        foreach ($oSurvey->form->fields->data as $oField) {
+
+            //  Get responses which apply to this field
+            $aResponses = $oResponseAnswerModel->getAll(
+                null,
+                null,
+                array(
+                    'includeOption' => true,
+                    'where' => array(
+                        array('form_field_id', $oField->id)
+                    )
+                )
+            );
+
+
+            $aOut[] = (object) array(
+                'id'    => $oField->id,
+                'label' => $oField->label,
+                'data'  => array()
+            );
+        }
+
+        return $aOut;
+    }
+
+    // --------------------------------------------------------------------------
+
     protected function formatObject(
         &$oObj,
         $aData = array(),
@@ -255,6 +304,7 @@ class Survey extends Base
     ) {
 
         $aBools[] = 'thankyou_email';
+        $aBools[] = 'is_active';
         $aBools[] = 'is_minimal';
 
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);

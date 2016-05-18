@@ -150,7 +150,7 @@ class Survey extends NAILS_Controller
 
         //  Get the Survey
         $oSurvey = $oSurveyModel->getById($iSurveyId, array('includeForm' => true));
-        if (empty($oSurvey) || $oSurvey->access_token != $sSurveyToken) {
+        if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token != $sSurveyToken) {
             show_404();
         }
 
