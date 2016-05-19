@@ -442,12 +442,6 @@ class Survey extends BaseAdmin
 
         // --------------------------------------------------------------------------
 
-        //  Generate stats
-        // $oSurveyModel        = Factory::model('Survey', 'nailsapp/module-survey');
-        // $this->data['stats'] = $oSurveyModel->getStats($this->data['survey']->id);
-
-        // --------------------------------------------------------------------------
-
         //  Set method info
         $this->data['page']->title = 'Survey Responses &rsaquo; ' . $this->data['survey']->label;
 
@@ -456,6 +450,7 @@ class Survey extends BaseAdmin
         $oAsset = Factory::service('Asset');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
         $oAsset->load('admin.survey.stats.min.js', 'nailsapp/module-survey');
+        $oAsset->load('admin.survey.stats.charts.min.js', 'nailsapp/module-survey');
         $oAsset->inline('var SurveyStats = new _ADMIN_SURVEY_STATS(' . $this->data['survey']->id . ');', 'JS');
 
         // --------------------------------------------------------------------------

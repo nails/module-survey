@@ -17,6 +17,34 @@
         }
     }
     &.responses {
+        .stats,
+        .respondees {
+            width: 50%;
+            padding: 0 15px;
+            transition: width 0.5s;
+        }
+        .stats {
+            float: left;
+            .js-toggle-respondees {
+                display: none;
+            }
+            &.respondees-hidden {
+                width: 100%;
+                .js-toggle-respondees {
+                    display: inline-block;
+                }
+            }
+        }
+        .respondees {
+            float: right;
+            overflow: hidden;
+            &.respondees-hidden {
+                width: 0%;
+            }
+            > * {
+                min-width: 100px;
+            }
+        }
         table {
             td.include-response {
                 text-align: center;

@@ -64,49 +64,19 @@ class Survey extends Base
                 'data' => array(
                     'chart' => array(
                         'columns' => array(
-                            'PIE' => array(
-                                array('string', 'Statement'),
-                                array('number', 'Value'),
-                            ),
-                            'BAR' => array(
-                                array('string', 'Statement'),
-                                array('number', 'Strongly Agree'),
-                                array('number', 'Agree'),
-                                array('number', 'Undecided'),
-                                array('number', 'Disagree'),
-                                array('number', 'Strongly Disagree')
-                            ),
-                            'COLUMN' => array(
-                                array('string', 'Statement'),
-                                array('number', 'Strongly Agree'),
-                                array('number', 'Agree'),
-                                array('number', 'Undecided'),
-                                array('number', 'Disagree'),
-                                array('number', 'Strongly Disagree')
-                            )
+                            array('string', 'Statement'),
+                            array('number', 'Strongly Agree'),
+                            array('number', 'Agree'),
+                            array('number', 'Undecided'),
+                            array('number', 'Disagree'),
+                            array('number', 'Strongly Disagree')
                         ),
                         'rows' => array(
-                            'PIE' => array(
-                                array('Strongly Agree', 1),
-                                array('Agree', 1),
-                                array('Undecided', 1),
-                                array('Disagree', 1),
-                                array('Strongly Disagree', 1)
-                            ),
-                            'BAR' => array(
-                                array('First Option', 1, 2, 4, 5, 6),
-                                array('Second Option', 1, 2, 1, 3, 4),
-                                array('Third Option', 1, 2, 0, 3, 6),
-                                array('Fourth Option', 1, 2, 4, 5, 12),
-                                array('Fifth Option', 1, 2, 4, 5, 12)
-                            ),
-                            'COLUMN' => array(
-                                array('First Option', 1, 2, 4, 5, 6),
-                                array('Second Option', 1, 2, 1, 3, 4),
-                                array('Third Option', 1, 2, 0, 3, 6),
-                                array('Fourth Option', 1, 2, 4, 5, 12),
-                                array('Fifth Option', 1, 2, 4, 5, 12)
-                            ),
+                            array('First Option', 1, 2, 4, 5, 6),
+                            array('Second Option', 1, 2, 1, 3, 4),
+                            array('Third Option', 1, 2, 0, 3, 6),
+                            array('Fourth Option', 1, 2, 4, 5, 12),
+                            array('Fifth Option', 1, 2, 4, 5, 12)
                         )
                     ),
                     'text' => array(

@@ -1,7 +1,12 @@
 <div class="group-survey responses">
     <div class="row">
-    <div class="col-lg-6 col-md-12">
-        <h2>Aggregated Stats</h2>
+    <div class="js-stats stats">
+        <h2>
+            Aggregated Stats
+            <button class="btn btn-xs btn-warning pull-right js-show-respondees">
+                Show Respondees
+            </button>
+        </h2>
         <?php
 
         $i = 0;
@@ -16,30 +21,28 @@
                     Q<?=$i?> &ndash; <strong><?=$oField->label?></strong>
                 </div>
                 <div class="panel-body">
-                    <div class="row text-right">
-                        <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-push-6 text-right">
                             <span class="js-response-count">0</span> Responses
-                            <div class="js-chart-type hidden text-left">
+                            <div class="js-chart-type  text-left">
                                 &mdash;
-                                <select class="select2">
-                                    <option value="pie">Pie Chart</option>
-                                    <option value="bar">Bar Chart</option>
-                                    <option value="column">Column Chart</option>
-                                </select>
+                                <select class="select2"></select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12">
+                        <div class="col-sm-6 col-sm-pull-6">
                             <div class="js-loading loading-pulse clearfix">
                                 <small>
                                     Loading data...
                                 </small>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
                             <div class="js-error alert alert-danger hidden clearfix">
                             </div>
                             <div class="js-targets hidden clearfix">
-                                <div class="js-chart-target target-chart">chart data</div>
+                                <div class="js-chart-target target-chart"></div>
                                 <ul class="js-text-target target-text"></ul>
                             </div>
                         </div>
@@ -52,8 +55,13 @@
 
         ?>
     </div>
-    <div class="col-lg-6 col-md-12">
-        <h2>Respondees</h2>
+    <div class="js-respondees respondees">
+        <h2>
+            Respondees
+            <button class="btn btn-xs btn-warning pull-right js-hide-respondees">
+                Hide
+            </button>
+        </h2>
         <table>
             <thead>
                 <tr>

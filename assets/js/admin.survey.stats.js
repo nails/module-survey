@@ -14,11 +14,49 @@ _ADMIN_SURVEY_STATS = function(surveyId)
 
     // --------------------------------------------------------------------------
 
+    base.charts = [];
+
+    // --------------------------------------------------------------------------
+
     /**
      * Construct the class
      * @return {Void}
      */
     base.__construct = function() {
+
+        //  Set up charts
+        //  Instanciate all defined charts
+        for (var key in window.NAILS.ModuleSurvey.charts) {
+            if (window.NAILS.ModuleSurvey.charts.hasOwnProperty(key)) {
+                base.charts.push(new window.NAILS.ModuleSurvey.charts[key]());
+            }
+        }
+
+        //  Set up dropdown selectors
+        $('.js-field .js-chart-type select').each(function() {
+            $(this).empty();
+            for (var i = 0; i < base.charts.length; i++) {
+                $(this).append($('<option>').val(i).text(base.charts[i].label)).trigger('change');
+            }
+        });
+
+        //  Work out all the packages we need to load from Google
+        var packages = [];
+        for (var i = 0; i < base.charts.length; i++) {
+            $.merge(packages, base.charts[i].packages);
+        }
+
+        //  Filter out duplicates
+        packages = packages.filter(function(el, index, arr) {
+            return index === arr.indexOf(el);
+        });
+
+        google.charts.load('current', {packages: packages});
+        google.charts.setOnLoadCallback(function() {
+
+            //  Go...!
+            base.loadStats();
+        });
 
         //  Bind UI
         $('.js-response input').on('click', function() {
@@ -31,12 +69,32 @@ _ADMIN_SURVEY_STATS = function(surveyId)
             );
         });
 
-        //  Set up charts
-        google.charts.load('current', {packages: ['corechart']});
-        google.charts.setOnLoadCallback(function() {
+        $('.js-hide-respondees').on('click', function() {
 
-            //  Go...!
-            base.loadStats();
+            //  Fix the width of the inner content
+            $('.js-respondees > *').each(function() {
+                $(this).attr('style', 'width:' + $(this).outerWidth() + 'px!important;');
+            });
+
+            //  Animate out
+            $('.js-respondees, .js-stats').addClass('respondees-hidden');
+
+            //  Redraw charts
+            //  @todo
+        });
+
+        $('.js-show-respondees').on('click', function() {
+
+            //  Animate in
+            $('.js-respondees, .js-stats').removeClass('respondees-hidden');
+
+            //  Remove the fixed width
+            setTimeout(function() {
+                $('.js-respondees > *').removeAttr('style');
+            }, 500);
+
+            //  Redraw charts
+            //  @todo
         });
 
         return base;
@@ -67,7 +125,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 var targets = field.find('.js-targets');
                 error.addClass('hidden');
 
-                //  If the request is returned quick enough then dont show the loader (bit jumpy)
+                //  If the request is returned quick enough then don't show the loader (bit jumpy)
                 var loaderTimeout = setTimeout(function() { loader.removeClass('hidden'); }, 250);
 
                 //  Get chart & text data
@@ -98,7 +156,6 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                     //  Draw charts
                     var chartType    = field.find('.js-chart-type');
                     var chartTypeVal = chartType.find('select').val().toUpperCase();
-                    console.log(chartTypeVal, data.data.chart.rows);
 
                     if (data.data.chart.rows[chartTypeVal].length > 0) {
 
@@ -162,58 +219,39 @@ _ADMIN_SURVEY_STATS = function(surveyId)
      */
     base.drawChart = function(target, chartType) {
 
+        // Clean slate
+        target.empty();
+
         var chartData = target.data('chart-data');
-        var chartType = chartType.toUpperCase();
+        chartType = chartType.toUpperCase();
 
         // Create the data table.
         var dataTable = new google.visualization.DataTable();
 
-        for (var i = 0; i < chartData.columns[chartType].length; i++) {
+        for (var i = 0; i < chartData.columns.length; i++) {
             dataTable.addColumn(
-                chartData.columns[chartType][i][0],
-                chartData.columns[chartType][i][1]
+                chartData.columns[i][0],
+                chartData.columns[i][1]
             );
         }
-        dataTable.addRows(chartData.rows[chartType]);
+        dataTable.addRows(chartData.rows);
 
         //  Specify chart options
         var options = {
             'height': 400
         };
 
-        //  Instantiate the chart
-        var chart;
-        switch (chartType) {
-
-            case 'PIE':
-                chart = new google.visualization.PieChart(
-                    target.get(0)
-                );
-                break;
-
-            case 'BAR':
-                chart = new google.visualization.BarChart(
-                    target.get(0)
-                );
-                break;
-
-            case 'COLUMN':
-                chart = new google.visualization.ColumnChart(
-                    target.get(0)
-                );
-                break;
-        }
-
         //  Draw the chart
         var error = target.closest('.js-field').find('.js-error');
-        if (!chart) {
 
-            error.html('Invalid chart type.').removeClass('hidden');
+        if (base.charts[chartType]) {
+
+            base.charts[chartType].draw(target, dataTable, options, chartData);
+            error.addClass('hidden');
 
         } else {
 
-            chart.draw(dataTable, options)
-            error.addClass('hidden');
+            error.html('Invalid chart type.').removeClass('hidden');
         }
 
         return base;
@@ -222,5 +260,4 @@ _ADMIN_SURVEY_STATS = function(surveyId)
     // --------------------------------------------------------------------------
 
     return base.__construct();
-
 };
