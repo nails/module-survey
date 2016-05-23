@@ -72,8 +72,12 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 .data('chart-type', $(this).val())
                 .trigger('draw');
         });
+        var redrawTimeout;
         $(window).on('resize', function() {
-            $('.js-chart-target').trigger('draw');
+            clearTimeout(redrawTimeout);
+            redrawTimeout = setTimeout(function() {
+                $('.js-chart-target').trigger('draw');
+            }, 250);
         });
         $('.js-hide-respondents').on('click', function() {
 
@@ -180,7 +184,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                     if (data.data.text.length > 0) {
 
                         for (var i = 0; i < data.data.text.length; i++) {
-                            var li = $('<li>').text(data.data.text[i]);
+                            var li = $('<li>').html(data.data.text[i]);
                             textTarget.append(li);
                         }
                         textTarget.removeClass('hidden');

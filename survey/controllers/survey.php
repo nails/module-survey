@@ -41,6 +41,7 @@ class Survey extends NAILS_Controller
                     );
 
                     if ($oSurvey->form->has_captcha && $this->data['bIsCaptchaEnabled']) {
+
                         if (!$oCaptchaModel->verify()) {
                             $bIsValid = false;
                             $this->data['captchaError'] = 'You failed the captcha test.';
@@ -123,7 +124,7 @@ class Survey extends NAILS_Controller
                     }
 
                 } catch (\Exception $e) {
-                    dumpanddie($e->getMessage(), $e->getCode());
+
                     $this->data['error'] = $e->getMessage();
                 }
             }
