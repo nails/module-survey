@@ -65,7 +65,7 @@
             <div class="js-respondents respondents">
                 <div>
                     <h2>
-                        respondents
+                        Respondents
                         <button class="btn btn-xs btn-warning pull-right js-hide-respondents">
                             Hide
                         </button>
@@ -73,7 +73,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th colspan="2">Respondee</th>
+                                <th colspan="2">Respondent</th>
                                 <th class="datetime">Submitted</th>
                                 <th class="actions">Actions</th>
                             </tr>
@@ -135,7 +135,7 @@
                                             echo anchor(
                                                 'admin/survey/survey/response/' . $survey->id . '/view/' . $oResponse->id,
                                                 'Answers',
-                                                'class="btn btn-xs btn-primary fancybox"'
+                                                'class="btn btn-xs btn-primary fancybox" data-width="100%"'
                                             );
                                         }
 
