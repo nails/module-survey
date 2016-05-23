@@ -62,39 +62,45 @@ _ADMIN_SURVEY_STATS = function(surveyId)
         $('.js-response input').on('click', function() {
             base.loadStats();
         });
-        $('.js-chart-type select').on('change', function() {
-            base.drawChart(
-                $(this).closest('.js-field').find('.js-chart-target'),
-                $(this).val()
-            );
+        $('.js-chart-target').on('draw', function() {
+            base.drawChart($(this));
         });
-
-        $('.js-hide-respondees').on('click', function() {
+        $('.js-chart-type select').on('change', function() {
+            $(this)
+                .closest('.js-field')
+                .find('.js-chart-target')
+                .data('chart-type', $(this).val())
+                .trigger('draw');
+        });
+        $(window).on('resize', function() {
+            $('.js-chart-target').trigger('draw');
+        });
+        $('.js-hide-respondents').on('click', function() {
 
             //  Fix the width of the inner content
-            $('.js-respondees > *').each(function() {
+            $('.js-respondents > *').each(function() {
                 $(this).attr('style', 'width:' + $(this).outerWidth() + 'px!important;');
             });
 
             //  Animate out
-            $('.js-respondees, .js-stats').addClass('respondees-hidden');
+            $('.js-respondents, .js-stats').addClass('respondents-hidden');
 
             //  Redraw charts
-            //  @todo
+            setTimeout(function() {
+                $('.js-chart-target').trigger('draw');
+            }, 500);
         });
 
-        $('.js-show-respondees').on('click', function() {
+        $('.js-show-respondents').on('click', function() {
 
             //  Animate in
-            $('.js-respondees, .js-stats').removeClass('respondees-hidden');
+            $('.js-respondents, .js-stats').removeClass('respondents-hidden');
 
-            //  Remove the fixed width
+            //  Remove the fixed width and redraw charts
             setTimeout(function() {
-                $('.js-respondees > *').removeAttr('style');
+                $('.js-respondents > *').removeAttr('style');
+                $('.js-chart-target').trigger('draw');
             }, 500);
-
-            //  Redraw charts
-            //  @todo
         });
 
         return base;
@@ -143,27 +149,23 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 })
                 .done(function(data) {
 
-                    var chartTarget = field.find('.js-chart-target');
-                    var textTarget  = field.find('.js-text-target');
+                    var chartTarget  = field.find('.js-chart-target');
+                    var textTarget   = field.find('.js-text-target');
+                    var chartType    = field.find('.js-chart-type');
+                    var chartTypeVal = chartType.find('select').val();
 
                     //  Populate
                     field.find('.js-response-count').text(data.response_count);
                     chartTarget.data('chart-data', data.data.chart);
+                    chartTarget.data('chart-type', chartTypeVal);
 
                     //  Show targets
                     targets.removeClass('hidden');
 
                     //  Draw charts
-                    var chartType    = field.find('.js-chart-type');
-                    var chartTypeVal = chartType.find('select').val().toUpperCase();
+                    if (data.data.chart.length > 0) {
 
-                    if (data.data.chart.rows[chartTypeVal].length > 0) {
-
-                        base.drawChart(
-                            chartTarget,
-                            chartTypeVal
-                        );
-
+                        chartTarget.trigger('draw');
                         chartType.removeClass('hidden');
                         chartTarget.removeClass('hidden');
 
@@ -217,28 +219,18 @@ _ADMIN_SURVEY_STATS = function(surveyId)
      * Draws a specific chart for the data
      * @return {Object}
      */
-    base.drawChart = function(target, chartType) {
+    base.drawChart = function(target) {
 
         // Clean slate
         target.empty();
 
         var chartData = target.data('chart-data');
-        chartType = chartType.toUpperCase();
-
-        // Create the data table.
-        var dataTable = new google.visualization.DataTable();
-
-        for (var i = 0; i < chartData.columns.length; i++) {
-            dataTable.addColumn(
-                chartData.columns[i][0],
-                chartData.columns[i][1]
-            );
-        }
-        dataTable.addRows(chartData.rows);
+        var chartType = target.data('chart-type');
 
         //  Specify chart options
         var options = {
-            'height': 400
+            'height': 400,
+            'title': ''
         };
 
         //  Draw the chart
@@ -246,7 +238,30 @@ _ADMIN_SURVEY_STATS = function(surveyId)
 
         if (base.charts[chartType]) {
 
-            base.charts[chartType].draw(target, dataTable, options, chartData);
+            for (var i = 0; i < chartData.length; i++) {
+
+                //  Generate chart target
+                var chartCanvas = $('<div>');
+                target.append(chartCanvas);
+
+                // Create the data table
+                var dataTable = new google.visualization.DataTable();
+
+                for (var x = 0; x < chartData[i].columns.length; x++) {
+                    dataTable.addColumn(
+                        chartData[i].columns[x][0],
+                        chartData[i].columns[x][1]
+                    );
+                }
+
+                dataTable.addRows(chartData[i].rows);
+
+                //  Specify a title if there is one
+                options.title = chartData[i].title || '';
+
+                //  Draw it
+                base.charts[chartType].draw(chartCanvas, dataTable, options, chartData);
+            }
             error.addClass('hidden');
 
         } else {

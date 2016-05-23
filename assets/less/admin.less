@@ -18,40 +18,43 @@
     }
     &.responses {
         .stats,
-        .respondees {
-            width: 50%;
-            padding: 0 15px;
+        .respondents {
+            box-sizing: border-box;
             transition: width 0.5s;
+            > div {
+                margin-left: 15px;
+                margin-right: 15px;
+            }
         }
         .stats {
+            width: 50%;
             float: left;
-            .js-toggle-respondees {
+            .js-show-respondents {
                 display: none;
             }
-            &.respondees-hidden {
+            &.respondents-hidden {
                 width: 100%;
-                .js-toggle-respondees {
+                .js-show-respondents {
                     display: inline-block;
                 }
             }
         }
-        .respondees {
+        .respondents {
+            width: 50%;
             float: right;
             overflow: hidden;
-            &.respondees-hidden {
+            &.respondents-hidden {
                 width: 0%;
-            }
-            > * {
-                min-width: 100px;
             }
         }
         table {
             td.include-response {
                 text-align: center;
-                max-width: 10px;
+                min-width: 20px;
+                max-width: 20px;
             }
         }
-        .js-chart-type {
+        .chart-type {
             display: inline-block;
             .select2 {
                 width: 125px;
@@ -85,12 +88,14 @@
         }
         .target-chart {
             text-align: center;
+            overflow: hidden;
             .alert-error {
                 text-align: left;
             }
         }
         .target-text {
             margin: 0;
+            margin-top: 1em;
             border: 1px solid #CCC;
             border-radius: 2px;
             list-style: none;

@@ -43,55 +43,59 @@ class Survey extends Base
                 );
             }
 
+            //  Get field
+            $iFieldId        = $oInput->get('field_id');
+            $oFormFieldModel = Factory::model('FormField', 'nailsapp/module-form-builder');
+            $oField          = $oFormFieldModel->getById($iFieldId);
+
+            if (empty($oField)) {
+                return array(
+                    'status' => 404,
+                    'error' => 'Invalid Field ID.'
+                );
+            }
+
+            //  Get Field Type Driver
+            $oFieldTypeModel = Factory::model('FieldType', 'nailsapp/module-form-builder');
+            $oFieldType      = $oFieldTypeModel->getBySlug($oField->type);
+
+            if (empty($oFieldType)) {
+                return array(
+                    'status' => 404,
+                    'error' => 'Invalid Field Type.'
+                );
+            }
+
             //  Get responses
-            $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
-            $aResponses           = $oResponseAnswerModel->getAll(
-                null,
-                null,
-                array(
-                    'includeAnswer' => true,
-                    'where' => array(
-                        array('form_field_id', $oInput->get('field_id'))
-                        //  @todo restrict to response IDs
-                    )
+            $sResponseIds = $oInput->get('response_ids');
+            $aResponseIds = explode(',', $sResponseIds);
+            $aResponseIds = array_filter($aResponseIds);
+            $aResponseIds = array_unique($aResponseIds);
+
+            $aData = array(
+                'includeOption' => true,
+                'where' => array(
+                    array('form_field_id', $oField->id)
                 )
             );
 
+            if (!empty($aResponseIds)) {
+                $aData['where_in'] = array(
+                    array('survey_response_id', $aResponseIds)
+                );
+            }
+
+            $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+            $aResponses           = $oResponseAnswerModel->getAll(null, null, $aData);
+
             //  Format into a data table
-            //  @todo - some charts don't make sense, perhaps need a way to define multiple charts (e.g likert)
             $aOut = array(
                 'response_count' => count($aResponses),
                 'data' => array(
-                    'chart' => array(
-                        'columns' => array(
-                            array('string', 'Statement'),
-                            array('number', 'Strongly Agree'),
-                            array('number', 'Agree'),
-                            array('number', 'Undecided'),
-                            array('number', 'Disagree'),
-                            array('number', 'Strongly Disagree')
-                        ),
-                        'rows' => array(
-                            array('First Option', 1, 2, 4, 5, 6),
-                            array('Second Option', 1, 2, 1, 3, 4),
-                            array('Third Option', 1, 2, 0, 3, 6),
-                            array('Fourth Option', 1, 2, 4, 5, 12),
-                            array('Fifth Option', 1, 2, 4, 5, 12)
-                        )
-                    ),
-                    'text' => array(
-                        'Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies.',
-                        'Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies.',
-                        'Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies.',
-                        'Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies.'
-                    ),
+                    'chart' => $oFieldType->getStatsChartData($aResponses),
+                    'text'  => $oFieldType->getStatsTextData($aResponses)
                 )
             );
-
-            foreach ($aResponses as $oResponse) {
-                # code...
-            }
-
 
             return $aOut;
         }
