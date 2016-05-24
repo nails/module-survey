@@ -3,7 +3,7 @@
 /**
  * Migration:   2
  * Started:     18/05/2016
- * Finalised:
+ * Finalised:   23/05/2016
  *
  * @package     Nails
  * @subpackage  module-survey
