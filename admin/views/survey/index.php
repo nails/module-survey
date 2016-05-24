@@ -10,6 +10,7 @@
                 <tr>
                     <th class="id text-center">ID</th>
                     <th class="label">Label</th>
+                    <th class="active boolean">Active</th>
                     <th class="datetime">Modified</th>
                     <th class="user">Modified By</th>
                     <th class="actions">Actions</th>
@@ -30,6 +31,7 @@
                         <td class="label">
                             <?=$survey->label?>
                         </td>
+                        <?=adminHelper('loadBoolCell', $survey->is_active)?>
                         <?=adminHelper('loadDatetimeCell', $survey->modified)?>
                         <?=adminHelper('loadUserCell', $survey->modified_by)?>
                         <td class="actions">

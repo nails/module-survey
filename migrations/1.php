@@ -27,6 +27,5 @@ class Migration1 extends Base
         $this->query("ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` DROP `has_captcha`;");
         $this->query("ALTER TABLE `{{NAILS_DB_PREFIX}}survey_response` DROP `name`;");
         $this->query("ALTER TABLE `{{NAILS_DB_PREFIX}}survey_response` DROP `email`;");
-
     }
 }

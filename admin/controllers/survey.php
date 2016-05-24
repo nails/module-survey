@@ -244,6 +244,7 @@ class Survey extends BaseAdmin
         //  Define the rules
         $aRules = array(
             'label'                  => 'xss_clean|required',
+            'is_active'              => '',
             'header'                 => '',
             'footer'                 => '',
             'cta_label'              => 'xss_clean',
@@ -284,6 +285,7 @@ class Survey extends BaseAdmin
         $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
         $aData   = array(
             'label'                  => $this->input->post('label'),
+            'is_active'              => (bool) $this->input->post('is_active'),
             'header'                 => $this->input->post('header'),
             'footer'                 => $this->input->post('footer'),
             'cta_label'              => $this->input->post('cta_label'),
@@ -445,6 +447,20 @@ class Survey extends BaseAdmin
 
         // --------------------------------------------------------------------------
 
+        //  Sort the responses so that newest is at the top and unsubmitted are at the bottom
+        array_sort_multi($this->data['survey']->responses->data, 'date_submitted');
+        $this->data['survey']->responses->data = array_reverse($this->data['survey']->responses->data);
+
+        // --------------------------------------------------------------------------
+
+        $oAsset = Factory::service('Asset');
+        $oAsset->load('https://www.gstatic.com/charts/loader.js');
+        $oAsset->load('admin.survey.stats.min.js', 'nailsapp/module-survey');
+        $oAsset->load('admin.survey.stats.charts.min.js', 'nailsapp/module-survey');
+        $oAsset->inline('var SurveyStats = new _ADMIN_SURVEY_STATS(' . $this->data['survey']->id . ');', 'JS');
+
+        // --------------------------------------------------------------------------
+
         Helper::loadView('response/index');
     }
 
@@ -452,9 +468,8 @@ class Survey extends BaseAdmin
 
     protected function responseView()
     {
-        $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
-
-        $iResponseId = (int) $this->uri->segment(7);
+        $oResponseModel         = Factory::model('Response', 'nailsapp/module-survey');
+        $iResponseId            = (int) $this->uri->segment(7);
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
             array(

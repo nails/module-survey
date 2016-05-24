@@ -44,6 +44,17 @@
             // --------------------------------------------------------------------------
 
             $aField = array(
+                'key'      => 'is_active',
+                'label'    => 'Active',
+                'default'  => !empty($survey->is_active),
+                'text_on'  => 'Yes',
+                'text_off' => 'No'
+            );
+            echo form_field_boolean($aField);
+
+            // --------------------------------------------------------------------------
+
+            $aField = array(
                 'key'     => 'header',
                 'label'   => 'Header',
                 'default' => !empty($survey->header) ? $survey->header : ''
