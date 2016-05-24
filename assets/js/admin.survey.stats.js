@@ -244,9 +244,10 @@ _ADMIN_SURVEY_STATS = function(surveyId)
 
             for (var i = 0; i < chartData.length; i++) {
 
-                //  Generate chart target
-                var chartCanvas = $('<div>');
-                target.append(chartCanvas);
+                //  Generate chart target and a printable target
+                var chartCanvas = $('<div>').addClass('media-screen');
+                var printCanvas = $('<img>').addClass('media-print');
+                target.append(chartCanvas).append(printCanvas);
 
                 // Create the data table
                 var dataTable = new google.visualization.DataTable();
@@ -264,7 +265,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 options.title = chartData[i].title || '';
 
                 //  Draw it
-                base.charts[chartType].draw(chartCanvas, dataTable, options, chartData);
+                base.charts[chartType].draw(chartCanvas, printCanvas, dataTable, options, chartData);
             }
             error.addClass('hidden');
 

@@ -22,10 +22,17 @@ window.NAILS.ModuleSurvey = {
              * Renders the chart
              * @return {Void}
              */
-            base.draw = function(target, dataTable, options) {
+            base.draw = function(target, printTarget, dataTable, options) {
+
+                //  Set additional options
                 options.is3D = true;
+
+                //  Instantiate the chart
                 var chart = new google.visualization.PieChart(target.get(0));
+
+                //  Draw the chart and the printable chart
                 chart.draw(dataTable, options);
+                printTarget.attr('src', chart.getImageURI());
             };
         },
         'bar': function() {
@@ -49,9 +56,14 @@ window.NAILS.ModuleSurvey = {
              * Renders the chart
              * @return {Void}
              */
-            base.draw = function(target, dataTable, options) {
+            base.draw = function(target, printTarget, dataTable, options) {
+
+                //  Instantiate the chart
                 var chart = new google.visualization.BarChart(target.get(0));
+
+                //  Draw the chart and the printable chart
                 chart.draw(dataTable, options);
+                printTarget.attr('src', chart.getImageURI());
             };
         },
         'column': function() {
@@ -75,9 +87,14 @@ window.NAILS.ModuleSurvey = {
              * Renders the chart
              * @return {Void}
              */
-            base.draw = function(target, dataTable, options) {
+            base.draw = function(target, printTarget, dataTable, options) {
+
+                //  Instantiate the chart
                 var chart = new google.visualization.ColumnChart(target.get(0));
+
+                //  Draw the chart and the printable chart
                 chart.draw(dataTable, options);
+                printTarget.attr('src', chart.getImageURI());
             };
         }
     }

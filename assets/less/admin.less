@@ -29,6 +29,13 @@
         .stats {
             width: 50%;
             float: left;
+            @media print {
+                width: 100%;
+                float: none;
+                .chart-type {
+                    display: none;
+                }
+            }
             .js-show-respondents {
                 display: none;
             }
@@ -43,11 +50,17 @@
             width: 50%;
             float: right;
             overflow: hidden;
+            @media print {
+                display: none;
+            }
             &.respondents-hidden {
-                width: 0%;
+                width: 0;
             }
         }
         table {
+            tr.disabled {
+                opacity: 0.5;
+            }
             td.include-response {
                 text-align: center;
                 min-width: 20px;
@@ -62,33 +75,31 @@
             }
         }
         .panel-sub-heading {
-            background: #f8f8f8;
+            background: #F8F8F8;
             padding: 1em 0;
             margin-top: -15px;
-            border-bottom:1px solid #EFEFEF;
+            border-bottom: 1px solid #EFEFEF;
         }
         .alert-danger {
             margin: 0;
         }
         .loading-pulse {
             animation: loading-pulse 1s linear 1s infinite alternate;
-            color: #CCC;
-            @-webkit-keyframes loading-pulse
-            {
+            color: #CCCCCC;
+            @-webkit-keyframes loading-pulse {
                 0% {
-                    color: #000;
+                    color: #000000;
                 }
                 100% {
-                    color: #CCC;
+                    color: #CCCCCC;
                 }
             }
-            @keyframes loading-pulse
-            {
+            @keyframes loading-pulse {
                 0% {
-                    color: #CCC;
+                    color: #CCCCCC;
                 }
                 100% {
-                    color: #000;
+                    color: #000000;
                 }
             }
         }
@@ -98,11 +109,26 @@
             .alert-error {
                 text-align: left;
             }
+            .media-screen {
+                display: block;
+            }
+            .media-print {
+                display: none;
+            }
+            @media print {
+                .media-screen {
+                    display: none;
+                }
+                .media-print {
+                    display: block;
+                    margin: auto;
+                }
+            }
         }
         .target-text {
             margin: 0;
             margin-top: 1em;
-            border: 1px solid #CCC;
+            border: 1px solid #CCCCCC;
             border-radius: 2px;
             list-style: none;
             padding: 0;
@@ -111,10 +137,10 @@
             li {
                 padding: 10px;
                 margin: 0;
-                border-bottom: 1px solid #CCC;
+                border-bottom: 1px solid #CCCCCC;
                 .count {
                     float: right;
-                    background: #CCC;
+                    background: #CCCCCC;
                     font-size: 0.8em;
                     padding: 0 0.5em;
                     border-radius: 3px;

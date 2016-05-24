@@ -83,10 +83,21 @@
 
                             foreach ($survey->responses->data as $oResponse) {
 
+                                if (empty($oResponse->date_submitted)) {
+
+                                    $sDisabled = 'disabled';
+                                    $sChecked  = '';
+
+                                } else {
+
+                                    $sDisabled = '';
+                                    $sChecked  = 'checked';
+                                }
+
                                 ?>
-                                <tr class="js-response">
+                                <tr class="js-response <?=$sDisabled?>">
                                     <td class="include-response">
-                                        <input type="checkbox" checked="checked" class="response" value="<?=$oResponse->id?>">
+                                        <input type="checkbox" <?=$sDisabled?> <?=$sChecked?> class="response" value="<?=$oResponse->id?>">
                                     </td>
                                     <td>
                                         <?php
