@@ -30,13 +30,13 @@
                                 <div class="row panel-sub-heading">
                                     <div class="col-sm-6 col-sm-push-6 text-right">
                                         <span class="js-response-count">0</span> Responses
-                                        <div class="js-chart-type chart-type text-left">
+                                        <div class="js-chart-type chart-type hidden text-left">
                                             &mdash;
                                             <select class="select2"></select>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-sm-pull-6">
-                                        <div class="js-loading loading-pulse clearfix">
+                                        <div class="js-loading loading-pulse hidden clearfix">
                                             <small>
                                                 Loading data...
                                             </small>
