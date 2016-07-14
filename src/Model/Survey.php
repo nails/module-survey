@@ -61,16 +61,18 @@ class Survey extends Base
                         'includeUser' => true
                     )
                 );
-            }
 
-            if (!empty($aData['includeAll']) || !empty($aData['countResponses'])) {
-                $this->getManyAssociatedItems(
-                    $aItems,
-                    'responses_count',
-                    'survey_id',
-                    'Response',
-                    'nailsapp/module-survey'
-                );
+                // Loop through them and add a second `count` field, that of actually submitted responses
+                $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
+                foreach ($aItems as $oItem) {
+                    $iCounter = 0;
+                    foreach ($oItem->responses->data as $oResponse) {
+                        if ($oResponse->status == $oResponseModel::STATUS_SUBMITTED) {
+                            $iCounter++;
+                        }
+                    }
+                    $oItem->responses->count_submitted = $iCounter;
+                }
             }
         }
 
@@ -302,7 +304,6 @@ class Survey extends Base
         $aBools = array(),
         $aFloats = array()
     ) {
-
         $aBools[] = 'thankyou_email';
         $aBools[] = 'is_active';
         $aBools[] = 'is_minimal';
