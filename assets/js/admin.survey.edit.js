@@ -12,7 +12,6 @@ _ADMIN_SURVEY_EDIT = function()
 
     /**
      * Construct the class
-     * @return {Void}
      */
     base.__construct = function()
     {
@@ -21,8 +20,13 @@ _ADMIN_SURVEY_EDIT = function()
             base.fieldDoSendThankYou(toggled);
         });
 
+        $('#field-allow-public-stats').on('toggle', function(event, toggled) {
+            base.fieldAllowPublicStats(toggled);
+        });
+
         //  Initial states
         base.fieldDoSendThankYou($('#field-do-send-thankyou input[type=checkbox]').is(':checked'));
+        base.fieldAllowPublicStats($('#field-allow-public-stats input[type=checkbox]').is(':checked'));
 
         return base;
     };
@@ -38,6 +42,24 @@ _ADMIN_SURVEY_EDIT = function()
         } else {
 
             $('#send-thankyou-options').hide();
+        }
+
+        if (typeof _nails === 'object') {
+            _nails.addStripes();
+        }
+    };
+
+    // --------------------------------------------------------------------------
+
+    base.fieldAllowPublicStats = function(toggled) {
+
+        if (toggled) {
+
+            $('#public-stats-options').show();
+
+        } else {
+
+            $('#public-stats-options').hide();
         }
 
         if (typeof _nails === 'object') {

@@ -1,6 +1,27 @@
 <div class="group-survey responses">
     <?php
 
+    if ($survey->allow_public_stats) {
+
+        ?>
+        <div class="alert alert-info">
+            <?=anchor($survey->url_stats, 'View Public Stats', 'class="btn btn-primary btn-xs" target="_blank"')?>
+            <button class="btn btn-xs btn-default copy-link" data-clipboard-text="<?=$survey->url_stats?>">
+                <span class="waiting">
+                    <b class="fa fa-clipboard"></b>
+                    Copy Link
+                </span>
+                <span class="copied">
+                    <b class="fa fa-check-circle"></b>
+                    Copied!
+                </span>
+            </button>
+            &nbsp;&mdash;
+            Public stats are enabled for this survey; anybody with the link can view.
+        </div>
+        <?php
+    }
+
     if ($survey->responses->count) {
 
         ?>
@@ -137,9 +158,22 @@
 
                                             echo anchor(
                                                 $oResponse->url,
-                                                'Link',
+                                                'View',
                                                 'class="btn btn-xs btn-default" target="_blank"'
                                             );
+
+                                            ?>
+                                            <button class="btn btn-xs btn-default copy-link" data-clipboard-text="<?=$oResponse->url?>">
+                                                <span class="waiting">
+                                                    <b class="fa fa-clipboard"></b>
+                                                    Copy Link
+                                                </span>
+                                                <span class="copied">
+                                                    <b class="fa fa-check-circle"></b>
+                                                    Copied!
+                                                </span>
+                                            </button>
+                                            <?php
 
                                         } else {
 

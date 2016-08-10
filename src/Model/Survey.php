@@ -83,9 +83,10 @@ class Survey extends Base
 
     public function create($aData = array(), $bReturnObject = false)
     {
-        //  Generate an access token
+        //  Generate access tokens
         Factory::helper('string');
         $aData['access_token'] = generateToken();
+        $aData['access_token_stats'] = generateToken();
 
         //  Extract the form
         $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
@@ -136,6 +137,7 @@ class Survey extends Base
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
+        unset($aData['access_token_stats']);
 
         //  Extract the form
         $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
@@ -217,13 +219,14 @@ class Survey extends Base
             Factory::helper('string');
 
             unset($oSurveyRow->id);
-            $oSurveyRow->form_id      = $iNewFormId;
-            $oSurveyRow->access_token = generateToken();
-            $oSurveyRow->label        = $oSurveyRow->label . ' - copy';
-            $oSurveyRow->created      = $sNow;
-            $oSurveyRow->created_by   = activeUser('id') ?: null;
-            $oSurveyRow->modified     = $sNow;
-            $oSurveyRow->modified_by  = activeUser('id') ?: null;
+            $oSurveyRow->form_id            = $iNewFormId;
+            $oSurveyRow->access_token       = generateToken();
+            $oSurveyRow->access_token_stats = generateToken();
+            $oSurveyRow->label              = $oSurveyRow->label . ' - copy';
+            $oSurveyRow->created            = $sNow;
+            $oSurveyRow->created_by         = activeUser('id') ?: null;
+            $oSurveyRow->modified           = $sNow;
+            $oSurveyRow->modified_by        = activeUser('id') ?: null;
 
             $oDb->set($oSurveyRow);
             if (!$oDb->insert($sTableSurvey)) {
@@ -306,6 +309,7 @@ class Survey extends Base
     ) {
         $aBools[] = 'thankyou_email';
         $aBools[] = 'allow_anonymous_response';
+        $aBools[] = 'allow_public_stats';
         $aBools[] = 'is_active';
         $aBools[] = 'is_minimal';
 
@@ -314,6 +318,7 @@ class Survey extends Base
         // --------------------------------------------------------------------------
 
         $oObj->url = site_url('survey/' . $oObj->id . '/' . $oObj->access_token);
+        $oObj->url_stats = site_url('survey/stats/' . $oObj->id . '/' . $oObj->access_token_stats);
 
         // --------------------------------------------------------------------------
 

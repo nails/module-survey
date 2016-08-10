@@ -81,11 +81,12 @@ class Survey extends BaseAdmin
 
         //  Get pagination and search/sort variables
         $tablePrefix = $oSurveyModel->getTablePrefix();
-        $page        = $this->input->get('page')      ? $this->input->get('page')      : 0;
-        $perPage     = $this->input->get('perPage')   ? $this->input->get('perPage')   : 50;
-        $sortOn      = $this->input->get('sortOn')    ? $this->input->get('sortOn')    : $tablePrefix . '.label';
-        $sortOrder   = $this->input->get('sortOrder') ? $this->input->get('sortOrder') : 'asc';
-        $keywords    = $this->input->get('keywords')  ? $this->input->get('keywords')  : '';
+        $oInput      = Factory::service('Input');
+        $page        = $oInput->get('page')      ? $oInput->get('page')      : 0;
+        $perPage     = $oInput->get('perPage')   ? $oInput->get('perPage')   : 50;
+        $sortOn      = $oInput->get('sortOn')    ? $oInput->get('sortOn')    : $tablePrefix . '.label';
+        $sortOrder   = $oInput->get('sortOrder') ? $oInput->get('sortOrder') : 'asc';
+        $keywords    = $oInput->get('keywords')  ? $oInput->get('keywords')  : '';
 
         // --------------------------------------------------------------------------
 
@@ -138,8 +139,9 @@ class Survey extends BaseAdmin
         }
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oInput       = Factory::service('Input');
 
-        if ($this->input->post()) {
+        if ($oInput->post()) {
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
@@ -177,9 +179,11 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
+        $oUri         = Factory::service('Uri');
+        $oInput       = Factory::service('Input');
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
-        $iSurveyId = (int) $this->uri->segment(5);
+        $iSurveyId            = (int) $oUri->segment(5);
         $this->data['survey'] = $oSurveyModel->getById(
             $iSurveyId,
             array(
@@ -194,7 +198,7 @@ class Survey extends BaseAdmin
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
-        if ($this->input->post()) {
+        if ($oInput->post()) {
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
@@ -254,6 +258,9 @@ class Survey extends BaseAdmin
             'is_minimal'               => '',
             'notification_email'       => 'valid_emails',
             'allow_anonymous_response' => '',
+            'allow_public_stats'       => '',
+            'stats_header'             => '',
+            'stats_footer'             => '',
             'thankyou_email'           => '',
             'thankyou_email_subject'   => 'xss_clean',
             'thankyou_email_body'      => 'xss_clean',
@@ -285,29 +292,32 @@ class Survey extends BaseAdmin
         $oInput  = Factory::service('Input');
         $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
         $aData   = array(
-            'label'                    => $this->input->post('label'),
-            'is_active'                => (bool) $this->input->post('is_active'),
-            'header'                   => $this->input->post('header'),
-            'footer'                   => $this->input->post('footer'),
-            'cta_label'                => $this->input->post('cta_label'),
-            'cta_attributes'           => $this->input->post('cta_attributes'),
-            'form_attributes'          => $this->input->post('form_attributes'),
-            'is_minimal'               => (bool) $this->input->post('is_minimal'),
-            'allow_anonymous_response' => (bool) $this->input->post('allow_anonymous_response'),
-            'thankyou_email'           => (bool) $this->input->post('thankyou_email'),
-            'thankyou_email_subject'   => $this->input->post('thankyou_email_subject'),
-            'thankyou_email_body'      => $this->input->post('thankyou_email_body'),
-            'thankyou_page_title'      => $this->input->post('thankyou_page_title'),
-            'thankyou_page_body'       => $this->input->post('thankyou_page_body'),
+            'label'                    => $oInput->post('label'),
+            'is_active'                => (bool) $oInput->post('is_active'),
+            'header'                   => $oInput->post('header'),
+            'footer'                   => $oInput->post('footer'),
+            'cta_label'                => $oInput->post('cta_label'),
+            'cta_attributes'           => $oInput->post('cta_attributes'),
+            'form_attributes'          => $oInput->post('form_attributes'),
+            'is_minimal'               => (bool) $oInput->post('is_minimal'),
+            'allow_anonymous_response' => (bool) $oInput->post('allow_anonymous_response'),
+            'allow_public_stats'       => (bool) $oInput->post('allow_public_stats'),
+            'stats_header'             => $oInput->post('stats_header'),
+            'stats_footer'             => $oInput->post('stats_footer'),
+            'thankyou_email'           => (bool) $oInput->post('thankyou_email'),
+            'thankyou_email_subject'   => $oInput->post('thankyou_email_subject'),
+            'thankyou_email_body'      => $oInput->post('thankyou_email_body'),
+            'thankyou_page_title'      => $oInput->post('thankyou_page_title'),
+            'thankyou_page_body'       => $oInput->post('thankyou_page_body'),
             'form'                     => adminNormalizeFormData(
                 $iFormId,
-                (bool) $this->input->post('has_captcha'),
+                (bool) $oInput->post('has_captcha'),
                 $oInput->post('fields')
             )
         );
 
         //  Format the emails
-        $aEmails = explode(',', $this->input->post('notification_email'));
+        $aEmails = explode(',', $oInput->post('notification_email'));
         $aEmails = array_map('trim', $aEmails);
         $aEmails = array_unique($aEmails);
         $aEmails = array_filter($aEmails);
@@ -329,8 +339,10 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
-        $iSurveyId = (int) $this->uri->segment(5);
-        $sReturn   = $this->input->get('return') ? $this->input->get('return') : 'admin/survey/survey/index';
+        $oUri      = Factory::service('Uri');
+        $oInput    = Factory::service('Input');
+        $iSurveyId = (int) $oUri->segment(5);
+        $sReturn   = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
@@ -373,8 +385,10 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
-        $iSurveyId    = (int) $this->uri->segment(5);
-        $sReturn      = $this->input->get('return') ? $this->input->get('return') : 'admin/survey/survey/index';
+        $oUri         = Factory::service('Uri');
+        $oInput       = Factory::service('Input');
+        $iSurveyId    = (int) $oUri->segment(5);
+        $sReturn      = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
         $iNewSurveyId = $oSurveyModel->copy($iSurveyId);
@@ -404,14 +418,15 @@ class Survey extends BaseAdmin
      */
     public function response()
     {
-        $sMethod = $this->uri->segment(6) ?: 'index';
+        $oUri    = Factory::service('Uri');
+        $sMethod = $oUri->segment(6) ?: 'index';
         $sMethod = 'response' . ucfirst($sMethod);
 
         if (is_callable(array($this, $sMethod))) {
 
             $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
-            $iSurveyId = (int) $this->uri->segment(5);
+            $iSurveyId = (int) $oUri->segment(5);
             $this->data['survey'] = $oSurveyModel->getById(
                 $iSurveyId,
                 array(
@@ -456,10 +471,17 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         $oAsset = Factory::service('Asset');
+        $oAsset->library('ZEROCLIPBOARD');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
         $oAsset->load('admin.survey.stats.min.js', 'nailsapp/module-survey');
         $oAsset->load('admin.survey.stats.charts.min.js', 'nailsapp/module-survey');
-        $oAsset->inline('var SurveyStats = new _ADMIN_SURVEY_STATS(' . $this->data['survey']->id . ');', 'JS');
+        $oAsset->inline(
+            'var SurveyStats = new _ADMIN_SURVEY_STATS(
+                ' . $this->data['survey']->id . ',
+                "' . $this->data['survey']->access_token . '"
+            );',
+            'JS'
+        );
 
         // --------------------------------------------------------------------------
 
@@ -470,8 +492,9 @@ class Survey extends BaseAdmin
 
     protected function responseView()
     {
+        $oUri                   = Factory::service('Uri');
         $oResponseModel         = Factory::model('Response', 'nailsapp/module-survey');
-        $iResponseId            = (int) $this->uri->segment(7);
+        $iResponseId            = (int) $oUri->segment(7);
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
             array(
@@ -490,38 +513,5 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         Helper::loadView('response/view');
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Browse existing survey
-     * @return void
-     */
-    public function stats()
-    {
-        if (!userHasPermission('admin:survey:survey:stats')) {
-            unauthorised();
-        }
-
-        // --------------------------------------------------------------------------
-
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
-
-        $iSurveyId = (int) $this->uri->segment(5);
-        $this->data['survey'] = $oSurveyModel->getById($iSurveyId);
-
-        if (empty($this->data['survey'])) {
-            show_404();
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Set method info
-        $this->data['page']->title = 'Survey Statistics &rsaquo; ' . $this->data['survey']->label;
-
-        // --------------------------------------------------------------------------
-
-        Helper::loadView('stats');
     }
 }

@@ -30,7 +30,8 @@ class Survey extends NAILS_Controller
 
         } else {
 
-            if ($this->input->post()) {
+            $oInput = Factory::service('Input');
+            if ($oInput->post()) {
 
                 try {
 
@@ -41,19 +42,15 @@ class Survey extends NAILS_Controller
                     //  Validate
                     $bisFormValid = formBuilderValidate(
                         $oSurvey->form->fields->data,
-                        $this->input->post('field')
+                        $oInput->post('field')
                     );
 
+                    $bIsCaptchaValid = true;
                     if ($oSurvey->form->has_captcha && $this->data['bIsCaptchaEnabled']) {
-
                         if (!$oCaptchaModel->verify()) {
-                            $bIsValid = false;
                             $this->data['captchaError'] = 'You failed the captcha test.';
+                            $bIsCaptchaValid            = false;
                         }
-
-                    } else {
-
-                        $bIsCaptchaValid = true;
                     }
 
                     if ($bisFormValid && $bIsCaptchaValid) {
@@ -61,7 +58,7 @@ class Survey extends NAILS_Controller
                         //  For each response, extract all the components
                         $aParsedResponse = formBuilderParseResponse(
                             $oSurvey->form->fields->data,
-                            $this->input->post('field')
+                            $oInput->post('field')
                         );
 
                         $aResponseData = array();
@@ -146,10 +143,11 @@ class Survey extends NAILS_Controller
 
     public function _remap()
     {
-        $iSurveyId      = (int) $this->uri->rsegment(3);
-        $sSurveyToken   = $this->uri->rsegment(4);
-        $iResponseId    = (int) $this->uri->rsegment(5);
-        $sResponseToken = $this->uri->rsegment(6);
+        $oUri           = Factory::service('Uri');
+        $iSurveyId      = (int) $oUri->rsegment(3);
+        $sSurveyToken   = $oUri->rsegment(4);
+        $iResponseId    = (int) $oUri->rsegment(5);
+        $sResponseToken = $oUri->rsegment(6);
 
         $oSurveyModel   = Factory::model('Survey', 'nailsapp/module-survey');
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
@@ -172,7 +170,7 @@ class Survey extends NAILS_Controller
             $oResponse = null;
         }
 
-        //  Anonymouse responses enabled?
+        //  Anonymous responses enabled?
         if (!$oSurvey->allow_anonymous_response && empty($oResponse)) {
             //  If user has survey permissions then assume they are an admin and allow the rendering
             //  of the survey, but prevent submission
