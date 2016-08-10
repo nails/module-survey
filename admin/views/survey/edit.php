@@ -126,6 +126,17 @@
                 <?php
 
                 $aField = array(
+                    'key'     => 'allow_anonymous_response',
+                    'label'   => 'Allow Anon. Responses',
+                    'info'    => 'If enabled, anyone with the survey link will be able to submit a response.',
+                    'default' => !empty($survey->allow_anonymous_response)
+                );
+
+                echo form_field_boolean($aField);
+
+                // --------------------------------------------------------------------------
+
+                $aField = array(
                     'key'         => 'notification_email',
                     'label'       => 'Notify',
                     'placeholder' => 'A comma separated list of email addresses to notify when a survey is submitted.',

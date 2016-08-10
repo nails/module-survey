@@ -243,21 +243,22 @@ class Survey extends BaseAdmin
 
         //  Define the rules
         $aRules = array(
-            'label'                  => 'xss_clean|required',
-            'is_active'              => '',
-            'header'                 => '',
-            'footer'                 => '',
-            'cta_label'              => 'xss_clean',
-            'cta_attributes'         => 'xss_clean',
-            'survey_attributes'      => 'xss_clean',
-            'has_captcha'            => '',
-            'is_minimal'             => '',
-            'notification_email'     => 'valid_emails',
-            'thankyou_email'         => '',
-            'thankyou_email_subject' => 'xss_clean',
-            'thankyou_email_body'    => 'xss_clean',
-            'thankyou_page_title'    => 'xss_clean|required',
-            'thankyou_page_body'     => '',
+            'label'                    => 'xss_clean|required',
+            'is_active'                => '',
+            'header'                   => '',
+            'footer'                   => '',
+            'cta_label'                => 'xss_clean',
+            'cta_attributes'           => 'xss_clean',
+            'survey_attributes'        => 'xss_clean',
+            'has_captcha'              => '',
+            'is_minimal'               => '',
+            'notification_email'       => 'valid_emails',
+            'allow_anonymous_response' => '',
+            'thankyou_email'           => '',
+            'thankyou_email_subject'   => 'xss_clean',
+            'thankyou_email_body'      => 'xss_clean',
+            'thankyou_page_title'      => 'xss_clean|required',
+            'thankyou_page_body'       => ''
         );
 
         foreach ($aRules as $sKey => $sRules) {
@@ -284,20 +285,21 @@ class Survey extends BaseAdmin
         $oInput  = Factory::service('Input');
         $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
         $aData   = array(
-            'label'                  => $this->input->post('label'),
-            'is_active'              => (bool) $this->input->post('is_active'),
-            'header'                 => $this->input->post('header'),
-            'footer'                 => $this->input->post('footer'),
-            'cta_label'              => $this->input->post('cta_label'),
-            'cta_attributes'         => $this->input->post('cta_attributes'),
-            'form_attributes'        => $this->input->post('form_attributes'),
-            'is_minimal'             => (bool) $this->input->post('is_minimal'),
-            'thankyou_email'         => (bool) $this->input->post('thankyou_email'),
-            'thankyou_email_subject' => $this->input->post('thankyou_email_subject'),
-            'thankyou_email_body'    => $this->input->post('thankyou_email_body'),
-            'thankyou_page_title'    => $this->input->post('thankyou_page_title'),
-            'thankyou_page_body'     => $this->input->post('thankyou_page_body'),
-            'form'                   => adminNormalizeFormData(
+            'label'                    => $this->input->post('label'),
+            'is_active'                => (bool) $this->input->post('is_active'),
+            'header'                   => $this->input->post('header'),
+            'footer'                   => $this->input->post('footer'),
+            'cta_label'                => $this->input->post('cta_label'),
+            'cta_attributes'           => $this->input->post('cta_attributes'),
+            'form_attributes'          => $this->input->post('form_attributes'),
+            'is_minimal'               => (bool) $this->input->post('is_minimal'),
+            'allow_anonymous_response' => (bool) $this->input->post('allow_anonymous_response'),
+            'thankyou_email'           => (bool) $this->input->post('thankyou_email'),
+            'thankyou_email_subject'   => $this->input->post('thankyou_email_subject'),
+            'thankyou_email_body'      => $this->input->post('thankyou_email_body'),
+            'thankyou_page_title'      => $this->input->post('thankyou_page_title'),
+            'thankyou_page_body'       => $this->input->post('thankyou_page_body'),
+            'form'                     => adminNormalizeFormData(
                 $iFormId,
                 (bool) $this->input->post('has_captcha'),
                 $oInput->post('fields')
