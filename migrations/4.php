@@ -15,6 +15,7 @@
 namespace Nails\Database\Migration\Nailsapp\ModuleSurvey;
 
 use Nails\Common\Console\Migrate\Base;
+use Nails\Factory;
 
 class Migration4 extends Base
 {
@@ -30,6 +31,10 @@ class Migration4 extends Base
         $this->query("ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` ADD `stats_footer` TEXT  NOT NULL  AFTER `stats_header`;");
 
         //  Generate a stats access token for any existing surveys
-        //  @todo
+        Factory::helper('String');
+        $oResult = $this->query('SELECT `id` FROM  `{{NAILS_DB_PREFIX}}survey_survey`;');
+        foreach ($oResult as $aRow) {
+            $this->query('UPDATE `{{NAILS_DB_PREFIX}}survey_survey` SET `access_token_stats` = "' . generateToken() . '" WHERE `id` = ' . $aRow['id'] . ';');
+        }
     }
 }
