@@ -31,7 +31,7 @@ class Migration4 extends Base
         $this->query("ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` ADD `stats_footer` TEXT  NOT NULL  AFTER `stats_header`;");
 
         //  Generate a stats access token for any existing surveys
-        Factory::helper('String');
+        Factory::helper('string');
         $oResult = $this->query('SELECT `id` FROM  `{{NAILS_DB_PREFIX}}survey_survey`;');
         foreach ($oResult as $aRow) {
             $this->query('UPDATE `{{NAILS_DB_PREFIX}}survey_survey` SET `access_token_stats` = "' . generateToken() . '" WHERE `id` = ' . $aRow['id'] . ';');
