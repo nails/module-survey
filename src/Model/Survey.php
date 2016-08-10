@@ -305,6 +305,7 @@ class Survey extends Base
         $aFloats = array()
     ) {
         $aBools[] = 'thankyou_email';
+        $aBools[] = 'allow_anonymous_response';
         $aBools[] = 'is_active';
         $aBools[] = 'is_minimal';
 
