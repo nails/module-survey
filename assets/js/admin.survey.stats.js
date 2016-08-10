@@ -1,6 +1,6 @@
 /* globals google */
 var _ADMIN_SURVEY_STATS;
-_ADMIN_SURVEY_STATS = function(surveyId)
+_ADMIN_SURVEY_STATS = function(surveyId, accessToken)
 {
     /**
      * Avoid scope issues in callbacks and anonymous functions by referring to `this` as `base`
@@ -10,7 +10,8 @@ _ADMIN_SURVEY_STATS = function(surveyId)
 
     // --------------------------------------------------------------------------
 
-    base.surveyId = surveyId;
+    base.surveyId    = surveyId;
+    base.accessToken = accessToken;
 
     // --------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
     base.__construct = function() {
 
         //  Set up charts
-        //  Instanciate all defined charts
+        //  Instantiate all defined charts
         for (var key in window.NAILS.ModuleSurvey.charts) {
             if (window.NAILS.ModuleSurvey.charts.hasOwnProperty(key)) {
                 base.charts.push(new window.NAILS.ModuleSurvey.charts[key]());
@@ -62,9 +63,11 @@ _ADMIN_SURVEY_STATS = function(surveyId)
         $('.js-response input').on('click', function() {
             base.loadStats();
         });
+
         $('.js-chart-target').on('draw', function() {
             base.drawChart($(this));
         });
+
         $('.js-chart-type select').on('change', function() {
             $(this)
                 .closest('.js-field')
@@ -72,6 +75,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 .data('chart-type', $(this).val())
                 .trigger('draw');
         });
+
         var redrawTimeout;
         $(window).on('resize', function() {
             clearTimeout(redrawTimeout);
@@ -79,6 +83,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 $('.js-chart-target').trigger('draw');
             }, 250);
         });
+
         $('.js-hide-respondents').on('click', function() {
 
             //  Fix the width of the inner content
@@ -106,6 +111,8 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                 $('.js-chart-target').trigger('draw');
             }, 500);
         });
+
+        base.initCopyButtons();
 
         return base;
     };
@@ -143,6 +150,7 @@ _ADMIN_SURVEY_STATS = function(surveyId)
                     'url': window.SITE_URL + 'api/survey/survey/stats',
                     'data': {
                         'survey_id': base.surveyId,
+                        'access_token': base.accessToken,
                         'field_id': field.data('id'),
                         'response_ids': responseIds.join(',')
                     }
@@ -275,6 +283,30 @@ _ADMIN_SURVEY_STATS = function(surveyId)
         }
 
         return base;
+    };
+
+    // --------------------------------------------------------------------------
+
+    base.initCopyButtons = function() {
+        $('button.copy-link').each(function() {
+            var $button = $(this);
+            var client = new ZeroClipboard($button.get(0));
+            client.on('ready', function() {
+                client.on('aftercopy', function() {
+                    $button
+                        .removeClass('btn-info')
+                        .addClass('success btn-success');
+                    setTimeout(function() {
+                        $button
+                            .removeClass('success btn-success')
+                            .addClass('btn-default');
+                    }, 1500);
+                });
+            });
+            client.on('error', function() {
+                $button.hide();
+            });
+        });
     };
 
     // --------------------------------------------------------------------------

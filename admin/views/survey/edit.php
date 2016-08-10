@@ -22,6 +22,11 @@
             </a>
         </li>
         <li class="tab">
+            <a href="#" data-tab="stats">
+                Stats
+            </a>
+        </li>
+        <li class="tab">
             <a href="#" data-tab="advanced">
                 Advanced
             </a>
@@ -205,6 +210,42 @@
                     'default'     => !empty($survey->thankyou_page->body) ? $survey->thankyou_page->body : ''
                 );
                 echo form_field_cms_widgets($aField);
+
+                ?>
+            </div>
+        </div>
+        <div class="tab-page stats">
+            <div class="fieldset">
+                <?php
+
+                $aField = array(
+                    'key'     => 'allow_public_stats',
+                    'label'   => 'Public Stats',
+                    'id'      => 'allow-public-stats',
+                    'default' => !empty($survey->allow_public_stats)
+                );
+
+                echo form_field_boolean($aField);
+
+                // --------------------------------------------------------------------------
+
+                echo '<div id="public-stats-options">';
+                $aField = array(
+                    'key'     => 'stats_header',
+                    'label'   => 'Header',
+                    'default' => !empty($survey->stats_header) ? $survey->stats_header : ''
+                );
+                echo form_field_cms_widgets($aField);
+
+                // --------------------------------------------------------------------------
+
+                $aField = array(
+                    'key'     => 'stats_footer',
+                    'label'   => 'Footer',
+                    'default' => !empty($survey->stats_footer) ? $survey->stats_footer : ''
+                );
+                echo form_field_cms_widgets($aField);
+                echo '</div>';
 
                 ?>
             </div>

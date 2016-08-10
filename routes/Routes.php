@@ -24,6 +24,7 @@ class Routes
     {
         return array(
             'survey/response/(.*)' => 'survey/response/index/$1',
+            'survey/stats/(.*)'    => 'survey/stats/index/$1',
             'survey/(.*)'          => 'survey/survey/index/$1'
         );
     }

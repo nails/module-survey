@@ -156,4 +156,21 @@
             }
         }
     }
+    .copy-link {
+        transition: all 0.25s;
+        .fa {
+            margin-right: 0.25em;
+        }
+        .copied {
+            display: none;
+        }
+        &.success {
+            .copied {
+                display: inline;
+            }
+            .waiting {
+                display: none;
+            }
+        }
+    }
 }
