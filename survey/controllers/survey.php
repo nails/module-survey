@@ -34,6 +34,10 @@ class Survey extends NAILS_Controller
 
                 try {
 
+                    if (!empty($this->data['is_admin_preview'])) {
+                        throw new \Exception('Anonymous submissions are disabled for this survey.');
+                    }
+
                     //  Validate
                     $bisFormValid = formBuilderValidate(
                         $oSurvey->form->fields->data,
@@ -129,6 +133,9 @@ class Survey extends NAILS_Controller
                 }
             }
 
+            $oAsset = Factory::service('Asset');
+            $oAsset->load('survey.css', 'nailsapp/module-survey');
+
             $this->load->view('structure/header', $this->data);
             $this->load->view('survey/survey', $this->data);
             $this->load->view('structure/footer', $this->data);
@@ -163,6 +170,17 @@ class Survey extends NAILS_Controller
             }
         } else {
             $oResponse = null;
+        }
+
+        //  Anonymouse responses enabled?
+        if (!$oSurvey->allow_anonymous_response && empty($oResponse)) {
+            //  If user has survey permissions then assume they are an admin and allow the rendering
+            //  of the survey, but prevent submission
+            if (!userHasPermission('admin:survey:survey:*')) {
+                show_404();
+            } else {
+                $this->data['is_admin_preview'] = true;
+            }
         }
 
         //  Minimal layout?
