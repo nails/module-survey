@@ -1,3 +1,27 @@
+<style type="text/css">
+    .nails-survey.stats .media-screen {
+        display: block;
+    }
+    .nails-survey.stats .media-print {
+        display: none;
+    }
+    @media print {
+        .nails-survey.stats .chart-type {
+            display: none;
+        }
+        .nails-survey.stats .target-text {
+            overflow: visible;
+            max-height: initial;
+        }
+        .nails-survey.stats .media-screen {
+            display: none;
+        }
+        .nails-survey.stats .media-print {
+            display: block;
+            margin: auto;
+        }
+    }
+</style>
 <div class="nails-survey stats">
     <?php
 
