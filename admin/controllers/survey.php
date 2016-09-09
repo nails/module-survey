@@ -80,11 +80,11 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         //  Get pagination and search/sort variables
-        $tablePrefix = $oSurveyModel->getTableAlias();
+        $tableAlias = $oSurveyModel->getTableAlias();
         $oInput      = Factory::service('Input');
         $page        = $oInput->get('page')      ? $oInput->get('page')      : 0;
         $perPage     = $oInput->get('perPage')   ? $oInput->get('perPage')   : 50;
-        $sortOn      = $oInput->get('sortOn')    ? $oInput->get('sortOn')    : $tablePrefix . '.label';
+        $sortOn      = $oInput->get('sortOn')    ? $oInput->get('sortOn')    : $tableAlias . '.label';
         $sortOrder   = $oInput->get('sortOrder') ? $oInput->get('sortOrder') : 'asc';
         $keywords    = $oInput->get('keywords')  ? $oInput->get('keywords')  : '';
 
@@ -92,9 +92,9 @@ class Survey extends BaseAdmin
 
         //  Define the sortable columns
         $sortColumns = array(
-            $tablePrefix . '.id'       => 'Survey ID',
-            $tablePrefix . '.label'    => 'Label',
-            $tablePrefix . '.modified' => 'Modified Date'
+            $tableAlias . '.id'       => 'Survey ID',
+            $tableAlias . '.label'    => 'Label',
+            $tableAlias . '.modified' => 'Modified Date'
         );
 
         // --------------------------------------------------------------------------

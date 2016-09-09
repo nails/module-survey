@@ -30,7 +30,7 @@ class Response extends Base
         parent::__construct();
 
         $this->table             = NAILS_DB_PREFIX . 'survey_response';
-        $this->tablePrefix       = 'sr';
+        $this->tableAlias       = 'sr';
         $this->destructiveDelete = false;
         $this->defaultSortColumn = 'created';
         $this->defaultSortOrder  = 'desc';

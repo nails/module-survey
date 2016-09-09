@@ -25,7 +25,7 @@ class Survey extends Base
         parent::__construct();
 
         $this->table             = NAILS_DB_PREFIX . 'survey_survey';
-        $this->tablePrefix       = 's';
+        $this->tableAlias       = 's';
         $this->destructiveDelete = false;
     }
 
