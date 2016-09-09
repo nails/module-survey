@@ -80,7 +80,7 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         //  Get pagination and search/sort variables
-        $tablePrefix = $oSurveyModel->getTablePrefix();
+        $tablePrefix = $oSurveyModel->getTableAlias();
         $oInput      = Factory::service('Input');
         $page        = $oInput->get('page')      ? $oInput->get('page')      : 0;
         $perPage     = $oInput->get('perPage')   ? $oInput->get('perPage')   : 50;
