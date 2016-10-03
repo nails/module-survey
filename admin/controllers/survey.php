@@ -51,6 +51,7 @@ class Survey extends BaseAdmin
         $permissions['delete']          = 'Can delete surveys';
         $permissions['stats']           = 'Can view survey stats';
         $permissions['response']        = 'Can view responses';
+        $permissions['response:edit']   = 'Can edit text component of responses';
         $permissions['response:delete'] = 'Can delete responses';
 
         return $permissions;
@@ -513,5 +514,62 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         Helper::loadView('response/view');
+    }
+
+    // --------------------------------------------------------------------------
+
+    protected function responseEdit() {
+
+        $oUri                 = Factory::service('Uri');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+        $iSurveyId            = (int) $oUri->segment(5);
+        $iAnswerId            = (int) $oUri->segment(7);
+        $oAnswer              = $oResponseAnswerModel->getById(
+            $iAnswerId
+        );
+
+        if (empty($oAnswer)) {
+            show_404();
+        }
+
+        $oInput = Factory::service('Input');
+        if ($oInput->post()) {
+
+            try {
+
+                $oFormValidation = Factory::service('FormValidation');
+                $oFormValidation->set_rules('text', '', 'trim');
+                if (!$oFormValidation->run()) {
+                    throw new \Exception(lang('fv_there_were_errors'));
+                }
+
+                $aData = array(
+                    'text' => $oInput->post('text')
+                );
+
+                if (!$oResponseAnswerModel->update($iAnswerId, $aData)) {
+                    throw new \Exception('Failed to update answer. ' . $oResponseAnswerModel->lastError());
+                }
+
+                $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                $oSession->set_flashdata('success', 'Answer updated successfully.');
+
+                $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';
+
+                redirect('admin/survey/survey/response/' . $iSurveyId . '/view/' . $oAnswer->survey_response_id . $sIsModal);
+
+            } catch (\Exception $e) {
+                $this->data['error'] = $e->getMessage();
+            }
+        }
+
+        // --------------------------------------------------------------------------
+
+        $this->data['answer']      = $oAnswer;
+        $this->data['page']->title = 'Edit Survey Responses &rsaquo; ' . $this->data['survey']->label . ' &rsaquo; Answer';
+
+        // --------------------------------------------------------------------------
+
+        Helper::loadView('response/edit');
     }
 }
