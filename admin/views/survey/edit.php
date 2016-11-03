@@ -268,7 +268,7 @@
                     'key'         => 'form_attributes',
                     'label'       => 'Survey Attributes',
                     'placeholder' => 'Define any custom attributes which should be attached to the survey.',
-                    'default'     => !empty($survey->survey->attributes) ? $survey->survey->attributes : ''
+                    'default'     => !empty($survey->form_attributes) ? $survey->form_attributes : ''
                 );
                 echo form_field($aField);
 

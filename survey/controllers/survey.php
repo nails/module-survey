@@ -59,7 +59,7 @@ class Survey extends Base
                         //  For each response, extract all the components
                         $aParsedResponse = formBuilderParseResponse(
                             $oSurvey->form->fields->data,
-                            $oInput->post('field')
+                            (array) $oInput->post('field')
                         );
 
                         $aResponseData = array();

@@ -8,7 +8,7 @@
     } else {
 
         ?>
-        <p>
+        <p class="text-center">
             Thank you, your responses have been recorded.
         </p>
         <?php

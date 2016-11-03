@@ -265,7 +265,7 @@ class Survey extends BaseAdmin
             'thankyou_email'           => '',
             'thankyou_email_subject'   => 'xss_clean',
             'thankyou_email_body'      => 'xss_clean',
-            'thankyou_page_title'      => 'xss_clean|required',
+            'thankyou_page_title'      => 'xss_clean',
             'thankyou_page_body'       => ''
         );
 
