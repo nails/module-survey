@@ -11,9 +11,10 @@
  */
 
 use Nails\Factory;
+use App\Controller\Base;
 use Nails\Cms\Exception\RenderException;
 
-class Survey extends NAILS_Controller
+class Survey extends Base
 {
     public function index($oSurvey, $oResponse)
     {

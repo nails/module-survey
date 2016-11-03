@@ -11,8 +11,9 @@
  */
 
 use Nails\Factory;
+use App\Controller\Base;
 
-class Stats extends NAILS_Controller
+class Stats extends Base
 {
     public function index($oSurvey)
     {

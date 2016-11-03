@@ -11,8 +11,9 @@
  */
 
 use Nails\Factory;
+use App\Controller\Base;
 
-class Response extends NAILS_Controller
+class Response extends Base
 {
     public function _remap()
     {
