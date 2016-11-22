@@ -114,6 +114,49 @@ class Survey extends Base
                             );
                         }
 
+                        //  Send a notification email
+                        if (!empty($oSurvey->notification_email)) {
+
+                            $oResponse = $oResponseModel->getById($oResponse->id, ['includeAnswer' => true]);
+                            if ($oResponse->answers->count > 0) {
+
+                                $aResponses = [];
+
+                                foreach ($oResponse->answers->data as $oAnswer) {
+
+                                    if (!empty($oAnswer->option)) {
+                                        $sAnswer = $oAnswer->option->label;
+                                    } elseif (!empty($oAnswer->text)) {
+                                        $sAnswer = $oAnswer->text;
+                                    } else {
+                                        $sAnswer = '<i>Did not answer</i>';
+                                    }
+
+                                    $aResponses[] = (object) [
+                                        'q' => $oAnswer->question->label,
+                                        'a' => $sAnswer,
+                                    ];
+                                }
+
+                                $oEmailer = Factory::service('Emailer', 'nailsapp/module-email');
+                                $oEmail   = (object) [
+                                    'type' => 'survey_notification',
+                                    'data' => (object) [
+                                        'survey' => (object) [
+                                            'id'    => $oSurvey->id,
+                                            'label' => $oSurvey->label,
+                                        ],
+                                        'responses' => $aResponses,
+                                    ]
+                                ];
+
+                                foreach ($oSurvey->notification_email as $sEmail) {
+                                    $oEmail->to_email = $sEmail;
+                                    $oEmailer->send($oEmail);
+                                }
+                            }
+                        }
+
                         //  Show thank you page
                         $this->load->view('structure/header', $this->data);
                         $this->load->view('survey/thanks', $this->data);
@@ -121,12 +164,10 @@ class Survey extends Base
                         return;
 
                     } else {
-
                         $this->data['error'] = lang('fv_there_were_errors');
                     }
 
                 } catch (\Exception $e) {
-
                     $this->data['error'] = $e->getMessage();
                 }
             }
