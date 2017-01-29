@@ -18,14 +18,15 @@ class Routes
 {
     /**
      * Returns an array of routes for this module
+
      * @return array
      */
     public function getRoutes()
     {
-        return array(
+        return [
             'survey/response/(.*)' => 'survey/response/index/$1',
             'survey/stats/(.*)'    => 'survey/stats/index/$1',
             'survey/(.*)'          => 'survey/survey/index/$1'
-        );
+        ];
     }
 }
