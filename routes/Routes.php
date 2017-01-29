@@ -12,13 +12,12 @@
 
 namespace Nails\Routes\Survey;
 
-use Nails\Factory;
+use Nails\Common\Model\BaseRoutes;
 
-class Routes
+class Routes extends BaseRoutes
 {
     /**
      * Returns an array of routes for this module
-
      * @return array
      */
     public function getRoutes()
@@ -26,7 +25,7 @@ class Routes
         return [
             'survey/response/(.*)' => 'survey/response/index/$1',
             'survey/stats/(.*)'    => 'survey/stats/index/$1',
-            'survey/(.*)'          => 'survey/survey/index/$1'
+            'survey/(.*)'          => 'survey/survey/index/$1',
         ];
     }
 }
