@@ -325,6 +325,8 @@ class Survey extends Base
         $oObj->header             = json_decode($oObj->header);
         $oObj->footer             = json_decode($oObj->footer);
         $oObj->notification_email = json_decode($oObj->notification_email);
+        $oObj->stats_header       = json_decode($oObj->stats_header);
+        $oObj->stats_footer       = json_decode($oObj->stats_footer);
 
         // --------------------------------------------------------------------------
 
