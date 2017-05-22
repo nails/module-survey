@@ -158,9 +158,10 @@ class Survey extends Base
                         }
 
                         //  Show thank you page
-                        $this->load->view('structure/header', $this->data);
-                        $this->load->view('survey/thanks', $this->data);
-                        $this->load->view('structure/footer', $this->data);
+                        $oView = Factory::service('View');
+                        $oView->load('structure/header', $this->data);
+                        $oView->load('survey/thanks', $this->data);
+                        $oView->load('structure/footer', $this->data);
                         return;
 
                     } else {
@@ -175,9 +176,10 @@ class Survey extends Base
             $oAsset = Factory::service('Asset');
             $oAsset->load('survey.css', 'nailsapp/module-survey');
 
-            $this->load->view('structure/header', $this->data);
-            $this->load->view('survey/survey', $this->data);
-            $this->load->view('structure/footer', $this->data);
+            $oView = Factory::service('View');
+            $oView->load('structure/header', $this->data);
+            $oView->load('survey/survey', $this->data);
+            $oView->load('structure/footer', $this->data);
         }
     }
 
