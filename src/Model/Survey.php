@@ -12,8 +12,8 @@
 
 namespace Nails\Survey\Model;
 
-use Nails\Factory;
 use Nails\Common\Model\Base;
+use Nails\Factory;
 
 class Survey extends Base
 {
@@ -25,14 +25,21 @@ class Survey extends Base
         parent::__construct();
 
         $this->table             = NAILS_DB_PREFIX . 'survey_survey';
-        $this->tableAlias       = 's';
+        $this->tableAlias        = 's';
         $this->destructiveDelete = false;
     }
 
     // --------------------------------------------------------------------------
 
-    public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
         $aItems = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
 
         if (!empty($aItems)) {
@@ -44,9 +51,9 @@ class Survey extends Base
                     'form',
                     'Form',
                     'nailsapp/module-form-builder',
-                    array(
-                        'includeFields' => true
-                    )
+                    [
+                        'includeFields' => true,
+                    ]
                 );
             }
 
@@ -57,9 +64,9 @@ class Survey extends Base
                     'survey_id',
                     'Response',
                     'nailsapp/module-survey',
-                    array(
-                        'includeUser' => true
-                    )
+                    [
+                        'includeUser' => true,
+                    ]
                 );
 
                 // Loop through them and add a second `count` field, that of actually submitted responses
@@ -81,11 +88,11 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
-    public function create($aData = array(), $bReturnObject = false)
+    public function create($aData = [], $bReturnObject = false)
     {
         //  Generate access tokens
         Factory::helper('string');
-        $aData['access_token'] = generateToken();
+        $aData['access_token']       = generateToken();
         $aData['access_token_stats'] = generateToken();
 
         //  Extract the form
@@ -133,7 +140,7 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
-    public function update($iId, $aData = array())
+    public function update($iId, $aData = [])
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
@@ -180,12 +187,14 @@ class Survey extends Base
 
     /**
      * Creates a new copy of an existing survey
-     * @param  integer $iSurveyId    The ID of the survey to duplicate
+     *
+     * @param  integer $iSurveyId     The ID of the survey to duplicate
      * @param  boolean $bReturnObject Whether to return the entire new survey object, or just the ID
      * @param  array   $aReturnData   An array to pass to the getById() call when $bReturnObject is true
+     *
      * @return mixed
      */
-    public function copy($iSurveyId, $bReturnObject = false, $aReturnData = array())
+    public function copy($iSurveyId, $bReturnObject = false, $aReturnData = [])
     {
         try {
 
@@ -253,16 +262,18 @@ class Survey extends Base
 
     /**
      * Generates aggregated stats for all the responses for a particular survey
+     *
      * @param  integer $iSurveyId The ID of the survey
+     *
      * @return array
      */
     public function getStats($iSurveyId)
     {
         $oSurvey = $this->getById(
             $iSurveyId,
-            array(
-                'includeForm' => true
-            )
+            [
+                'includeForm' => true,
+            ]
         );
 
         if (empty($oSurvey)) {
@@ -270,7 +281,7 @@ class Survey extends Base
         }
 
         $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
-        $aOut                 = array();
+        $aOut                 = [];
 
         //  Generate stats for each field
         foreach ($oSurvey->form->fields->data as $oField) {
@@ -279,20 +290,19 @@ class Survey extends Base
             $aResponses = $oResponseAnswerModel->getAll(
                 null,
                 null,
-                array(
+                [
                     'includeOption' => true,
-                    'where' => array(
-                        array('form_field_id', $oField->id)
-                    )
-                )
+                    'where'         => [
+                        ['form_field_id', $oField->id],
+                    ],
+                ]
             );
 
-
-            $aOut[] = (object) array(
+            $aOut[] = (object) [
                 'id'    => $oField->id,
                 'label' => $oField->label,
-                'data'  => array()
-            );
+                'data'  => [],
+            ];
         }
 
         return $aOut;
@@ -302,10 +312,10 @@ class Survey extends Base
 
     protected function formatObject(
         &$oObj,
-        $aData = array(),
-        $aIntegers = array(),
-        $aBools = array(),
-        $aFloats = array()
+        $aData = [],
+        $aIntegers = [],
+        $aBools = [],
+        $aFloats = []
     ) {
         $aBools[] = 'thankyou_email';
         $aBools[] = 'allow_anonymous_response';
@@ -317,7 +327,7 @@ class Survey extends Base
 
         // --------------------------------------------------------------------------
 
-        $oObj->url = site_url('survey/' . $oObj->id . '/' . $oObj->access_token);
+        $oObj->url       = site_url('survey/' . $oObj->id . '/' . $oObj->access_token);
         $oObj->url_stats = site_url('survey/stats/' . $oObj->id . '/' . $oObj->access_token_stats);
 
         // --------------------------------------------------------------------------

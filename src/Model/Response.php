@@ -12,8 +12,8 @@
 
 namespace Nails\Survey\Model;
 
-use Nails\Factory;
 use Nails\Common\Model\Base;
+use Nails\Factory;
 
 class Response extends Base
 {
@@ -30,7 +30,7 @@ class Response extends Base
         parent::__construct();
 
         $this->table             = NAILS_DB_PREFIX . 'survey_response';
-        $this->tableAlias       = 'sr';
+        $this->tableAlias        = 'sr';
         $this->destructiveDelete = false;
         $this->defaultSortColumn = 'created';
         $this->defaultSortOrder  = 'desc';
@@ -38,8 +38,15 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function getAll($iPage = null, $iPerPage = null, $aData = array(), $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
     {
+        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
+        //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
+        if (is_array($iPage)) {
+            $aData = $iPage;
+            $iPage = null;
+        }
+
         $aItems = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
 
         if (!empty($aItems)) {
@@ -71,10 +78,10 @@ class Response extends Base
                     'survey_response_id',
                     'ResponseAnswer',
                     'nailsapp/module-survey',
-                    array(
+                    [
                         'includeQuestion' => true,
-                        'includeOption' => true
-                    )
+                        'includeOption'   => true,
+                    ]
                 );
             }
         }
@@ -84,7 +91,7 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function create($aData = array(), $bReturnObject = false)
+    public function create($aData = [], $bReturnObject = false)
     {
         //  Generate an access token
         Factory::helper('string');
@@ -94,7 +101,7 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function update($iId, $aData = array())
+    public function update($iId, $aData = [])
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
@@ -107,10 +114,10 @@ class Response extends Base
     {
         $bResult = $this->update(
             $iResponseId,
-            array(
+            [
                 'status'         => self::STATUS_OPEN,
-                'date_submitted' => null
-            )
+                'date_submitted' => null,
+            ]
         );
 
         if ($bResult) {
@@ -127,10 +134,10 @@ class Response extends Base
     {
         $bResult = $this->update(
             $iResponseId,
-            array(
+            [
                 'status'         => self::STATUS_SUBMITTED,
-                'date_submitted' => array('NOW()', false)
-            )
+                'date_submitted' => ['NOW()', false],
+            ]
         );
 
         if ($bResult) {
@@ -145,10 +152,10 @@ class Response extends Base
 
     protected function formatObject(
         &$oObj,
-        $aData = array(),
-        $aIntegers = array(),
-        $aBools = array(),
-        $aFloats = array()
+        $aData = [],
+        $aIntegers = [],
+        $aBools = [],
+        $aFloats = []
     ) {
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
 
