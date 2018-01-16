@@ -13,6 +13,7 @@
 namespace Nails\Survey\Model;
 
 use Nails\Common\Model\Base;
+use Nails\Survey\Events;
 use Nails\Factory;
 
 class Response extends Base
@@ -110,10 +111,10 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function setOpen($iResponseId)
+    public function setOpen($iId)
     {
         $bResult = $this->update(
-            $iResponseId,
+            $iId,
             [
                 'status'         => self::STATUS_OPEN,
                 'date_submitted' => null,
@@ -122,7 +123,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger('RESPONSE.OPEN', 'nailsapp/module-survey', $iResponseId);
+            $oEventService->trigger(Events::RESPONSE_OPEN, 'nailsapp/module-survey', [$iId]);
         }
 
         return $bResult;
@@ -130,10 +131,10 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function setSubmitted($iResponseId)
+    public function setSubmitted($iId)
     {
         $bResult = $this->update(
-            $iResponseId,
+            $iId,
             [
                 'status'         => self::STATUS_SUBMITTED,
                 'date_submitted' => ['NOW()', false],
@@ -142,7 +143,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger('RESPONSE.SUBMITTED', 'nailsapp/module-survey', $iResponseId);
+            $oEventService->trigger(Events::RESPONSE_SUBMITTED, 'nailsapp/module-survey', [$iId]);
         }
 
         return $bResult;
