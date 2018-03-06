@@ -248,13 +248,13 @@ class Survey extends BaseAdmin
 
         //  Define the rules
         $aRules = array(
-            'label'                    => 'xss_clean|required',
+            'label'                    => 'required',
             'is_active'                => '',
             'header'                   => '',
             'footer'                   => '',
-            'cta_label'                => 'xss_clean',
-            'cta_attributes'           => 'xss_clean',
-            'survey_attributes'        => 'xss_clean',
+            'cta_label'                => '',
+            'cta_attributes'           => '',
+            'survey_attributes'        => '',
             'has_captcha'              => '',
             'is_minimal'               => '',
             'notification_email'       => 'valid_emails',
@@ -263,9 +263,9 @@ class Survey extends BaseAdmin
             'stats_header'             => '',
             'stats_footer'             => '',
             'thankyou_email'           => '',
-            'thankyou_email_subject'   => 'xss_clean',
-            'thankyou_email_body'      => 'xss_clean',
-            'thankyou_page_title'      => 'xss_clean',
+            'thankyou_email_subject'   => '',
+            'thankyou_email_body'      => '',
+            'thankyou_page_title'      => '',
             'thankyou_page_body'       => ''
         );
 

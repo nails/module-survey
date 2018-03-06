@@ -23,9 +23,9 @@ class Routes implements RouteGenerator
     public static function generate()
     {
         return [
-            'survey/response/(.*)' => 'survey/response/index/$1',
-            'survey/stats/(.*)'    => 'survey/stats/index/$1',
-            'survey/(.*)'          => 'survey/survey/index/$1',
+            'survey/response/(.+)' => 'survey/response/index/$1',
+            'survey/stats/(.+)'    => 'survey/stats/index/$1',
+            'survey/(.+)'          => 'survey/survey/index/$1',
         ];
     }
 }
