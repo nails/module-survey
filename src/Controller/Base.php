@@ -24,7 +24,7 @@ if (class_exists('\App\Survey\Controller\Base')) {
     {
     }
 } else {
-    abstract class BaseMiddle extends \Nails\Common\Controller\Base
+    abstract class BaseMiddle extends \App\Controller\Base
     {
     }
 }
