@@ -11,7 +11,7 @@
  */
 
 use Nails\Factory;
-use App\Controller\Base;
+use Nails\Survey\Controller\Base;
 
 class Stats extends Base
 {

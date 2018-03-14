@@ -11,7 +11,7 @@
  */
 
 use Nails\Factory;
-use App\Controller\Base;
+use Nails\Survey\Controller\Base;
 use Nails\Cms\Exception\RenderException;
 
 class Survey extends Base
