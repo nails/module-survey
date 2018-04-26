@@ -19,11 +19,11 @@ class Survey extends Base
     public function index($oSurvey, $oResponse)
     {
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
-        $oCaptchaModel  = Factory::model('Captcha', 'nailsapp/module-captcha');
+        $oCaptcha       = Factory::service('Captcha', 'nailsapp/module-captcha');
 
         $this->data['oSurvey']           = $oSurvey;
         $this->data['oResponse']         = $oResponse;
-        $this->data['bIsCaptchaEnabled'] = $oCaptchaModel->isEnabled();
+        $this->data['bIsCaptchaEnabled'] = $oCaptcha->isEnabled();
 
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
 
@@ -48,7 +48,7 @@ class Survey extends Base
 
                     $bIsCaptchaValid = true;
                     if ($oSurvey->form->has_captcha && $this->data['bIsCaptchaEnabled']) {
-                        if (!$oCaptchaModel->verify()) {
+                        if (!$oCaptcha->verify()) {
                             $this->data['captchaError'] = 'You failed the captcha test.';
                             $bIsCaptchaValid            = false;
                         }
