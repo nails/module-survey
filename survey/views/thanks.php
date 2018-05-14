@@ -1,18 +1,13 @@
 <div class="nails-survey thanks">
-    <?php
+    <div class="survey__thanks">
+        <?php
 
-    if (!empty($oSurvey->thankyou_page->body)) {
-
-        echo cmsAreaWithData($oSurvey->thankyou_page->body);
-
-    } else {
+        if (!empty($oSurvey->thankyou_page->body)) {
+            echo cmsAreaWithData($oSurvey->thankyou_page->body);
+        } else {
+            echo 'Thank you, your responses have been recorded.';
+        }
 
         ?>
-        <p class="text-center">
-            Thank you, your responses have been recorded.
-        </p>
-        <?php
-    }
-
-    ?>
+    </div>
 </div>
