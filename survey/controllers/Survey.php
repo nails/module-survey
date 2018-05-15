@@ -41,7 +41,7 @@ class Survey extends Base
                     }
 
                     //  Validate
-                    $bisFormValid = formBuilderValidate(
+                    $bIsFormValid = formBuilderValidate(
                         $oSurvey->form->fields->data,
                         $oInput->post('field')
                     );
@@ -54,7 +54,7 @@ class Survey extends Base
                         }
                     }
 
-                    if ($bisFormValid && $bIsCaptchaValid) {
+                    if ($bIsFormValid && $bIsCaptchaValid) {
 
                         //  For each response, extract all the components
                         $aParsedResponse = formBuilderParseResponse(
@@ -80,7 +80,7 @@ class Survey extends Base
                         if (empty($oResponse)) {
                             $aResponse = array(
                                 'survey_id' => $oSurvey->id,
-                                'user_id'   => activeUser('id')
+                                'user_id'   => (int) activeUser('id') ?: null,
                             );
 
                             $oResponse = $oResponseModel->create($aResponse, true);
