@@ -1,7 +1,6 @@
 /* globals google */
 var _ADMIN_SURVEY_STATS;
-_ADMIN_SURVEY_STATS = function(surveyId, accessToken)
-{
+_ADMIN_SURVEY_STATS = function(surveyId, accessToken) {
     /**
      * Avoid scope issues in callbacks and anonymous functions by referring to `this` as `base`
      * @type {Object}
@@ -10,7 +9,7 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken)
 
     // --------------------------------------------------------------------------
 
-    base.surveyId    = surveyId;
+    base.surveyId = surveyId;
     base.accessToken = accessToken;
 
     // --------------------------------------------------------------------------
@@ -136,89 +135,91 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken)
             $('.js-field').each(function() {
 
                 //  Show loading and hide errors
-                var field   = $(this);
-                var loader  = field.find('.js-loading');
-                var error   = field.find('.js-error');
+                var field = $(this);
+                var loader = field.find('.js-loading');
+                var error = field.find('.js-error');
                 var targets = field.find('.js-targets');
                 error.addClass('hidden');
 
                 //  If the request is returned quick enough then don't show the loader (bit jumpy)
-                var loaderTimeout = setTimeout(function() { loader.removeClass('hidden'); }, 250);
+                var loaderTimeout = setTimeout(function() {
+                    loader.removeClass('hidden');
+                }, 250);
 
                 //  Get chart & text data
                 $.ajax({
-                    'url': window.SITE_URL + 'api/survey/survey/stats',
-                    'data': {
-                        'survey_id': base.surveyId,
-                        'access_token': base.accessToken,
-                        'field_id': field.data('id'),
-                        'response_ids': responseIds.join(',')
-                    }
-                })
-                .always(function() {
-                    clearTimeout(loaderTimeout);
-                    loader.addClass('hidden');
-                })
-                .done(function(data) {
-
-                    var chartTarget  = field.find('.js-chart-target');
-                    var textTarget   = field.find('.js-text-target');
-                    var chartType    = field.find('.js-chart-type');
-                    var chartTypeVal = chartType.find('select').val();
-
-                    //  Populate
-                    field.find('.js-response-count').text(data.response_count);
-                    chartTarget.data('chart-data', data.data.chart);
-                    chartTarget.data('chart-type', chartTypeVal);
-
-                    //  Show targets
-                    targets.removeClass('hidden');
-
-                    //  Draw charts
-                    if (data.data.chart.length > 0) {
-
-                        chartTarget.trigger('draw');
-                        chartType.removeClass('hidden');
-                        chartTarget.removeClass('hidden');
-
-                    } else {
-
-                        chartType.addClass('hidden');
-                        chartTarget.addClass('hidden');
-                    }
-
-                    //  Render text portion of the responses
-                    textTarget.empty();
-                    if (data.data.text.length > 0) {
-
-                        for (var i = 0; i < data.data.text.length; i++) {
-                            var li = $('<li>').html(data.data.text[i]);
-                            textTarget.append(li);
+                        'url': window.SITE_URL + 'api/survey/survey/stats',
+                        'data': {
+                            'survey_id': base.surveyId,
+                            'access_token': base.accessToken,
+                            'field_id': field.data('id'),
+                            'response_ids': responseIds.join(',')
                         }
-                        textTarget.removeClass('hidden');
+                    })
+                    .always(function() {
+                        clearTimeout(loaderTimeout);
+                        loader.addClass('hidden');
+                    })
+                    .done(function(data) {
 
-                    } else {
+                        var chartTarget = field.find('.js-chart-target');
+                        var textTarget = field.find('.js-text-target');
+                        var chartType = field.find('.js-chart-type');
+                        var chartTypeVal = chartType.find('select').val();
 
-                        textTarget.addClass('hidden');
-                    }
-                })
-                .error(function(data) {
+                        //  Populate
+                        field.find('.js-response-count').text(data.response_count);
+                        chartTarget.data('chart-data', data.data.chart);
+                        chartTarget.data('chart-type', chartTypeVal);
 
-                    var _data;
-                    try {
+                        //  Show targets
+                        targets.removeClass('hidden');
 
-                        _data = JSON.parse(data.responseText);
+                        //  Draw charts
+                        if (data.data.chart.length > 0) {
 
-                    } catch (e) {
+                            chartTarget.trigger('draw');
+                            chartType.removeClass('hidden');
+                            chartTarget.removeClass('hidden');
 
-                        _data = {
-                            'status': 500,
-                            'error': 'An unknown error occurred.'
-                        };
-                    }
+                        } else {
 
-                    error.html(_data.error).removeClass('hidden');
-                });
+                            chartType.addClass('hidden');
+                            chartTarget.addClass('hidden');
+                        }
+
+                        //  Render text portion of the responses
+                        textTarget.empty();
+                        if (data.data.text.length > 0) {
+
+                            for (var i = 0; i < data.data.text.length; i++) {
+                                var li = $('<li>').html(data.data.text[i]);
+                                textTarget.append(li);
+                            }
+                            textTarget.removeClass('hidden');
+
+                        } else {
+
+                            textTarget.addClass('hidden');
+                        }
+                    })
+                    .fail(function(data) {
+
+                        var _data;
+                        try {
+
+                            _data = JSON.parse(data.responseText);
+
+                        } catch (e) {
+
+                            _data = {
+                                'status': 500,
+                                'error': 'An unknown error occurred.'
+                            };
+                        }
+
+                        error.html(_data.error).removeClass('hidden');
+                    });
             });
         }
 
