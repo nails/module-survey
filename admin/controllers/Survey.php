@@ -466,7 +466,7 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         //  Sort the responses so that newest is at the top and unsubmitted are at the bottom
-        array_sort_multi($this->data['survey']->responses->data, 'date_submitted');
+        arraySortMulti($this->data['survey']->responses->data, 'date_submitted');
         $this->data['survey']->responses->data = array_reverse($this->data['survey']->responses->data);
 
         // --------------------------------------------------------------------------
