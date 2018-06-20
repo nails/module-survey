@@ -147,7 +147,7 @@ class Survey extends BaseAdmin
                 if ($oSurveyModel->create($this->getPostObject())) {
 
                     $oSession = Factory::service('Session', 'nailsapp/module-auth');
-                    $oSession->set_flashdata('success', 'Survey created successfully.');
+                    $oSession->setFlashData('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
                 } else {
@@ -204,7 +204,7 @@ class Survey extends BaseAdmin
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
                     $oSession = Factory::service('Session', 'nailsapp/module-auth');
-                    $oSession->set_flashdata('success', 'Survey updated successfully.');
+                    $oSession->setFlashData('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
                 } else {
@@ -370,7 +370,7 @@ class Survey extends BaseAdmin
         }
 
         $oSession = Factory::service('Session', 'nailsapp/module-auth');
-        $oSession->set_flashdata($sStatus, $sMessage);
+        $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
 
@@ -407,7 +407,7 @@ class Survey extends BaseAdmin
         }
 
         $oSession = Factory::service('Session', 'nailsapp/module-auth');
-        $oSession->set_flashdata($sStatus, $sMessage);
+        $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
 
@@ -552,7 +552,7 @@ class Survey extends BaseAdmin
                 }
 
                 $oSession = Factory::service('Session', 'nailsapp/module-auth');
-                $oSession->set_flashdata('success', 'Answer updated successfully.');
+                $oSession->setFlashData('success', 'Answer updated successfully.');
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';
 
