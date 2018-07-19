@@ -31,7 +31,7 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
-    public function getAll($iPage = null, $iPerPage = null, $aData = [], $bIncludeDeleted = false)
+    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
     {
         //  If the first value is an array then treat as if called with getAll(null, null, $aData);
         //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
@@ -88,7 +88,7 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
-    public function create($aData = [], $bReturnObject = false)
+    public function create(array $aData = [], $bReturnObject = false)
     {
         //  Generate access tokens
         Factory::helper('string');
@@ -140,7 +140,7 @@ class Survey extends Base
 
     // --------------------------------------------------------------------------
 
-    public function update($iId, $aData = [])
+    public function update($iId, array $aData = [])
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
@@ -312,10 +312,10 @@ class Survey extends Base
 
     protected function formatObject(
         &$oObj,
-        $aData = [],
-        $aIntegers = [],
-        $aBools = [],
-        $aFloats = []
+        array $aData = [],
+        array $aIntegers = [],
+        array $aBools = [],
+        array $aFloats = []
     ) {
         $aBools[] = 'thankyou_email';
         $aBools[] = 'allow_anonymous_response';
