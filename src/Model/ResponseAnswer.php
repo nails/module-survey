@@ -22,59 +22,32 @@ class ResponseAnswer extends Base
     public function __construct()
     {
         parent::__construct();
-
         $this->table             = NAILS_DB_PREFIX . 'survey_response_answer';
-        $this->tableAlias       = 'sr';
         $this->destructiveDelete = false;
         $this->defaultSortColumn = 'order';
-    }
-
-    // --------------------------------------------------------------------------
-
-    public function getAll($iPage = null, $iPerPage = null, array $aData = array(), $bIncludeDeleted = false)
-    {
-        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
-        //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
-        if (is_array($iPage)) {
-            $aData = $iPage;
-            $iPage = null;
-        }
-
-        $aItems = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
-
-        if (!empty($aItems)) {
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeResponse'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'survey_response_id',
-                    'response',
-                    'Response',
-                    'nailsapp/module-survey'
-                );
-            }
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeQuestion'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'form_field_id',
-                    'question',
-                    'FormField',
-                    'nailsapp/module-form-builder'
-                );
-            }
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeOption'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'form_field_option_id',
-                    'option',
-                    'FormFieldOption',
-                    'nailsapp/module-form-builder'
-                );
-            }
-        }
-
-        return $aItems;
+        $this->addExpandableField([
+            'trigger'   => 'response',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'response',
+            'model'     => 'Response',
+            'provider'  => 'nailsapp/module-survey',
+            'id_column' => 'survey_response_id',
+        ]);
+        $this->addExpandableField([
+            'trigger'   => 'question',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'question',
+            'model'     => 'FormField',
+            'provider'  => 'nailsapp/module-form-builder',
+            'id_column' => 'form_field_id',
+        ]);
+        $this->addExpandableField([
+            'trigger'   => 'option',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'option',
+            'model'     => 'FormFieldOption',
+            'provider'  => 'nailsapp/module-form-builder',
+            'id_column' => 'form_field_option_id',
+        ]);
     }
 }

@@ -12,7 +12,6 @@
 
 use Nails\Factory;
 use Nails\Survey\Controller\Base;
-use Nails\Cms\Exception\RenderException;
 
 class Survey extends Base
 {
@@ -27,7 +26,7 @@ class Survey extends Base
 
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
 
-            show_404();
+            show404();
 
         } else {
 
@@ -62,26 +61,25 @@ class Survey extends Base
                             (array) $oInput->post('field')
                         );
 
-                        $aResponseData = array();
+                        $aResponseData = [];
                         $iOrder        = 0;
                         foreach ($aParsedResponse as $oRow) {
-                            $aResponseData[] = array(
+                            $aResponseData[] = [
                                 'survey_response_id'   => $oSurvey->id,
                                 'form_field_id'        => $oRow->field_id,
                                 'form_field_option_id' => $oRow->option_id,
                                 'text'                 => $oRow->text,
                                 'data'                 => $oRow->data,
-                                'order'                => $iOrder
-                            );
+                                'order'                => $iOrder,
+                            ];
                             $iOrder++;
                         }
 
-
                         if (empty($oResponse)) {
-                            $aResponse = array(
+                            $aResponse = [
                                 'survey_id' => $oSurvey->id,
                                 'user_id'   => (int) activeUser('id') ?: null,
-                            );
+                            ];
 
                             $oResponse = $oResponseModel->create($aResponse, true);
                             if (empty($oResponse)) {
@@ -142,12 +140,12 @@ class Survey extends Base
                                 $oEmail   = (object) [
                                     'type' => 'survey_notification',
                                     'data' => (object) [
-                                        'survey' => (object) [
+                                        'survey'    => (object) [
                                             'id'    => $oSurvey->id,
                                             'label' => $oSurvey->label,
                                         ],
                                         'responses' => $aResponses,
-                                    ]
+                                    ],
                                 ];
 
                                 foreach ($oSurvey->notification_email as $sEmail) {
@@ -199,16 +197,16 @@ class Survey extends Base
         Factory::helper('formbuilder', 'nailsapp/module-form-builder');
 
         //  Get the Survey
-        $oSurvey = $oSurveyModel->getById($iSurveyId, array('includeForm' => true));
+        $oSurvey = $oSurveyModel->getById($iSurveyId, ['expand' => ['form']]);
         if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token != $sSurveyToken) {
-            show_404();
+            show404();
         }
 
         //  Get the Response, if any
         if (!empty($iResponseId)) {
             $oResponse = $oResponseModel->getById($iResponseId);
             if (empty($oResponse) || $oResponse->access_token != $sResponseToken) {
-                show_404();
+                show404();
             }
         } else {
             $oResponse = null;
@@ -219,7 +217,7 @@ class Survey extends Base
             //  If user has survey permissions then assume they are an admin and allow the rendering
             //  of the survey, but prevent submission
             if (!userHasPermission('admin:survey:survey:*')) {
-                show_404();
+                show404();
             } else {
                 $this->data['is_admin_preview'] = true;
             }

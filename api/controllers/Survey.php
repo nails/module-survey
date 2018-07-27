@@ -12,8 +12,8 @@
 
 namespace Nails\Api\Survey;
 
-use Nails\Factory;
 use Nails\Api\Controller\Base;
+use Nails\Factory;
 
 class Survey extends Base
 {
@@ -29,10 +29,10 @@ class Survey extends Base
         $oSurvey      = $oSurveyModel->getById($oInput->get('survey_id'));
 
         if (empty($oSurvey)) {
-            return array(
+            return [
                 'status' => 404,
-                'error' => 'Invalid Survey ID.'
-            );
+                'error'  => 'Invalid Survey ID.',
+            ];
         }
 
         //  Verify the token:
@@ -41,23 +41,23 @@ class Survey extends Base
         $sToken = $oInput->get('access_token');
         if ($oSurvey->access_token == $sToken) {
             if (!userHasPermission('admin:survey:survey:response')) {
-                return array(
+                return [
                     'status' => 401,
-                    'error' => 'You are not authorised to see survey stats.'
-                );
+                    'error'  => 'You are not authorised to see survey stats.',
+                ];
             }
-        } else if ($oSurvey->access_token_stats == $sToken) {
+        } elseif ($oSurvey->access_token_stats == $sToken) {
             if (!$oSurvey->allow_public_stats) {
-                return array(
+                return [
                     'status' => 401,
-                    'error' => 'You are not authorised to see survey stats.'
-                );
+                    'error'  => 'You are not authorised to see survey stats.',
+                ];
             }
         } else {
-            return array(
+            return [
                 'status' => 400,
-                'error' => 'Invalid Access Token.'
-            );
+                'error'  => 'Invalid Access Token.',
+            ];
         }
 
         //  Get field
@@ -66,10 +66,10 @@ class Survey extends Base
         $oField          = $oFormFieldModel->getById($iFieldId);
 
         if (empty($oField)) {
-            return array(
+            return [
                 'status' => 404,
-                'error' => 'Invalid Field ID.'
-            );
+                'error'  => 'Invalid Field ID.',
+            ];
         }
 
         //  Get Field Type Driver
@@ -77,10 +77,10 @@ class Survey extends Base
         $oFieldType      = $oFieldTypeModel->getBySlug($oField->type);
 
         if (empty($oFieldType)) {
-            return array(
+            return [
                 'status' => 404,
-                'error' => 'Invalid Field Type.'
-            );
+                'error'  => 'Invalid Field Type.',
+            ];
         }
 
         //  Get responses
@@ -89,30 +89,30 @@ class Survey extends Base
         $aResponseIds = array_filter($aResponseIds);
         $aResponseIds = array_unique($aResponseIds);
 
-        $aData = array(
-            'includeOption' => true,
-            'where' => array(
-                array('form_field_id', $oField->id)
-            )
-        );
+        $aData = [
+            'expand' => ['option'],
+            'where'  => [
+                ['form_field_id', $oField->id],
+            ],
+        ];
 
         if (!empty($aResponseIds)) {
-            $aData['where_in'] = array(
-                array('survey_response_id', $aResponseIds)
-            );
+            $aData['where_in'] = [
+                ['survey_response_id', $aResponseIds],
+            ];
         }
 
         $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
         $aResponses           = $oResponseAnswerModel->getAll(null, null, $aData);
 
         //  Format into a data table
-        $aOut = array(
+        $aOut = [
             'response_count' => count($aResponses),
-            'data' => array(
+            'data'           => [
                 'chart' => $oFieldType->getStatsChartData($aResponses),
-                'text'  => $oFieldType->getStatsTextData($aResponses)
-            )
-        );
+                'text'  => $oFieldType->getStatsTextData($aResponses),
+            ],
+        ];
 
         return $aOut;
     }

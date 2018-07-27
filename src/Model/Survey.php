@@ -25,65 +25,26 @@ class Survey extends Base
         parent::__construct();
 
         $this->table             = NAILS_DB_PREFIX . 'survey_survey';
-        $this->tableAlias        = 's';
         $this->destructiveDelete = false;
-    }
-
-    // --------------------------------------------------------------------------
-
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
-    {
-        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
-        //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
-        if (is_array($iPage)) {
-            $aData = $iPage;
-            $iPage = null;
-        }
-
-        $aItems = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
-
-        if (!empty($aItems)) {
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeForm'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'form_id',
-                    'form',
-                    'Form',
-                    'nailsapp/module-form-builder',
-                    [
-                        'includeFields' => true,
-                    ]
-                );
-            }
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeResponses'])) {
-                $this->getManyAssociatedItems(
-                    $aItems,
-                    'responses',
-                    'survey_id',
-                    'Response',
-                    'nailsapp/module-survey',
-                    [
-                        'includeUser' => true,
-                    ]
-                );
-
-                // Loop through them and add a second `count` field, that of actually submitted responses
-                $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
-                foreach ($aItems as $oItem) {
-                    $iCounter = 0;
-                    foreach ($oItem->responses->data as $oResponse) {
-                        if ($oResponse->status == $oResponseModel::STATUS_SUBMITTED) {
-                            $iCounter++;
-                        }
-                    }
-                    $oItem->responses->count_submitted = $iCounter;
-                }
-            }
-        }
-
-        return $aItems;
+        $this->addExpandableField([
+            'trigger'   => 'form',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'form',
+            'model'     => 'Form',
+            'provider'  => 'nailsapp/module-form-builder',
+            'id_column' => 'form_id',
+            'data'      => [
+                'expand' => ['fields'],
+            ],
+        ]);
+        $this->addExpandableField([
+            'trigger'   => 'responses',
+            'type'      => self::EXPANDABLE_TYPE_MANY,
+            'property'  => 'responses',
+            'model'     => 'Responses',
+            'provider'  => 'nailsapp/module-survey',
+            'id_column' => 'survey_id',
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -102,7 +63,6 @@ class Survey extends Base
         try {
 
             $oDb = Factory::service('Database');
-
             $oDb->trans_begin();
 
             //  Create the associated form (if no ID supplied)
@@ -116,7 +76,6 @@ class Survey extends Base
                 }
 
             } else {
-
                 $aData['form_id'] = $aForm['id'];
             }
 
@@ -130,12 +89,10 @@ class Survey extends Base
             return $mResult;
 
         } catch (\Exception $e) {
-
             $oDb->trans_rollback();
             $this->setError($e->getMessage());
             return false;
         }
-
     }
 
     // --------------------------------------------------------------------------
@@ -153,7 +110,6 @@ class Survey extends Base
         try {
 
             $oDb = Factory::service('Database');
-
             $oDb->trans_begin();
 
             //  Update the associated form (if no ID supplied)
@@ -174,7 +130,6 @@ class Survey extends Base
             return true;
 
         } catch (\Exception $e) {
-
             $oDb->trans_rollback();
             $this->setError($e->getMessage());
             return false;
@@ -251,7 +206,6 @@ class Survey extends Base
             return $bReturnObject ? $this->getById($iNewSurveyId, $aReturnData) : $iNewSurveyId;
 
         } catch (\Exception $e) {
-
             $oDb->trans_rollback();
             $this->setError($e->getMessage());
             return false;
@@ -269,13 +223,7 @@ class Survey extends Base
      */
     public function getStats($iSurveyId)
     {
-        $oSurvey = $this->getById(
-            $iSurveyId,
-            [
-                'includeForm' => true,
-            ]
-        );
-
+        $oSurvey = $this->getById($iSurveyId, ['expand' => ['form']]);
         if (empty($oSurvey)) {
             return false;
         }
@@ -287,16 +235,12 @@ class Survey extends Base
         foreach ($oSurvey->form->fields->data as $oField) {
 
             //  Get responses which apply to this field
-            $aResponses = $oResponseAnswerModel->getAll(
-                null,
-                null,
-                [
-                    'includeOption' => true,
-                    'where'         => [
-                        ['form_field_id', $oField->id],
-                    ],
-                ]
-            );
+            $aResponses = $oResponseAnswerModel->getAll([
+                'expand' => ['option'],
+                'where'  => [
+                    ['form_field_id', $oField->id],
+                ],
+            ]);
 
             $aOut[] = (object) [
                 'id'    => $oField->id,
@@ -340,30 +284,32 @@ class Survey extends Base
 
         // --------------------------------------------------------------------------
 
-        $oObj->cta             = new \stdClass();
-        $oObj->cta->label      = $oObj->cta_label;
-        $oObj->cta->attributes = $oObj->cta_attributes;
+        $oObj->cta = (object) [
+            'label'      => $oObj->cta_label,
+            'attributes' => $oObj->cta_attributes,
+        ];
 
         unset($oObj->cta_label);
         unset($oObj->cta_attributes);
 
         // --------------------------------------------------------------------------
 
-        $bSendThankYouEmail = $oObj->thankyou_email;
-
-        $oObj->thankyou_email          = new \stdClass();
-        $oObj->thankyou_email->send    = $bSendThankYouEmail;
-        $oObj->thankyou_email->subject = $oObj->thankyou_email_subject;
-        $oObj->thankyou_email->body    = $oObj->thankyou_email_body;
+        $bSendThankYouEmail   = $oObj->thankyou_email;
+        $oObj->thankyou_email = (object) [
+            'send'    => $bSendThankYouEmail,
+            'subject' => $oObj->thankyou_email_subject,
+            'body'    => $oObj->thankyou_email_body,
+        ];
 
         unset($oObj->thankyou_email_subject);
         unset($oObj->thankyou_email_body);
 
         // --------------------------------------------------------------------------
 
-        $oObj->thankyou_page        = new \stdClass();
-        $oObj->thankyou_page->title = $oObj->thankyou_page_title;
-        $oObj->thankyou_page->body  = json_decode($oObj->thankyou_page_body);
+        $oObj->thankyou_page = (object) [
+            'title' => $oObj->thankyou_page_title,
+            'body'  => json_decode($oObj->thankyou_page_body),
+        ];
 
         unset($oObj->thankyou_page_title);
         unset($oObj->thankyou_page_body);

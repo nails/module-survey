@@ -12,8 +12,8 @@
 
 namespace Nails\Admin\Survey;
 
-use Nails\Factory;
 use Nails\Admin\Helper;
+use Nails\Factory;
 use Nails\Survey\Controller\BaseAdmin;
 
 class Survey extends BaseAdmin
@@ -25,7 +25,6 @@ class Survey extends BaseAdmin
     public static function announce()
     {
         if (userHasPermission('admin:survey:survey:browse')) {
-
             $oNavGroup = Factory::factory('Nav', 'nailsapp/module-admin');
             $oNavGroup->setLabel('Surveys');
             $oNavGroup->setIcon('fa-list-alt');
@@ -42,19 +41,19 @@ class Survey extends BaseAdmin
      */
     public static function permissions()
     {
-        $permissions = parent::permissions();
+        $aPermissions = parent::permissions();
 
-        $permissions['browse']          = 'Can browse surveys';
-        $permissions['create']          = 'Can create surveys';
-        $permissions['edit']            = 'Can edit surveys';
-        $permissions['copy']            = 'Can copy surveys';
-        $permissions['delete']          = 'Can delete surveys';
-        $permissions['stats']           = 'Can view survey stats';
-        $permissions['response']        = 'Can view responses';
-        $permissions['response:edit']   = 'Can edit text component of responses';
-        $permissions['response:delete'] = 'Can delete responses';
+        $aPermissions['browse']          = 'Can browse surveys';
+        $aPermissions['create']          = 'Can create surveys';
+        $aPermissions['edit']            = 'Can edit surveys';
+        $aPermissions['copy']            = 'Can copy surveys';
+        $aPermissions['delete']          = 'Can delete surveys';
+        $aPermissions['stats']           = 'Can view survey stats';
+        $aPermissions['response']        = 'Can view responses';
+        $aPermissions['response:edit']   = 'Can edit text component of responses';
+        $aPermissions['response:delete'] = 'Can delete responses';
 
-        return $permissions;
+        return $aPermissions;
     }
 
     // --------------------------------------------------------------------------
@@ -81,45 +80,45 @@ class Survey extends BaseAdmin
         // --------------------------------------------------------------------------
 
         //  Get pagination and search/sort variables
-        $tableAlias = $oSurveyModel->getTableAlias();
+        $sTableAlias = $oSurveyModel->getTableAlias();
         $oInput      = Factory::service('Input');
-        $page        = $oInput->get('page')      ? $oInput->get('page')      : 0;
-        $perPage     = $oInput->get('perPage')   ? $oInput->get('perPage')   : 50;
-        $sortOn      = $oInput->get('sortOn')    ? $oInput->get('sortOn')    : $tableAlias . '.label';
-        $sortOrder   = $oInput->get('sortOrder') ? $oInput->get('sortOrder') : 'asc';
-        $keywords    = $oInput->get('keywords')  ? $oInput->get('keywords')  : '';
+        $iPage       = (int) $oInput->get('page') ? $oInput->get('page') : 0;
+        $iPerPage    = (int) $oInput->get('perPage') ? $oInput->get('perPage') : 50;
+        $sSortOn     = $oInput->get('sortOn') ? $oInput->get('sortOn') : $sTableAlias . '.label';
+        $sSortOrder  = $oInput->get('sortOrder') ? $oInput->get('sortOrder') : 'asc';
+        $sKeywords   = $oInput->get('keywords') ? $oInput->get('keywords') : '';
 
         // --------------------------------------------------------------------------
 
         //  Define the sortable columns
-        $sortColumns = array(
-            $tableAlias . '.id'       => 'Survey ID',
-            $tableAlias . '.label'    => 'Label',
-            $tableAlias . '.modified' => 'Modified Date'
-        );
+        $sortColumns = [
+            $sTableAlias . '.id'       => 'Survey ID',
+            $sTableAlias . '.label'    => 'Label',
+            $sTableAlias . '.modified' => 'Modified Date',
+        ];
 
         // --------------------------------------------------------------------------
 
-        //  Define the $data variable for the queries
-        $data = array(
-            'includeResponses' => true,
-            'sort' => array(
-                array($sortOn, $sortOrder)
-            ),
-            'keywords' => $keywords
-        );
+        //  Define the $aData variable for the queries
+        $aData = [
+            'expand'   => ['responses'],
+            'sort'     => [
+                [$sSortOn, $sSortOrder],
+            ],
+            'keywords' => $sKeywords,
+        ];
 
         //  Get the items for the page
-        $totalRows             = $oSurveyModel->countAll($data);
-        $this->data['surveys'] = $oSurveyModel->getAll($page, $perPage, $data);
+        $totalRows             = $oSurveyModel->countAll($aData);
+        $this->data['surveys'] = $oSurveyModel->getAll($iPage, $iPerPage, $aData);
 
         //  Set Search and Pagination objects for the view
-        $this->data['search']     = Helper::searchObject(true, $sortColumns, $sortOn, $sortOrder, $perPage, $keywords);
-        $this->data['pagination'] = Helper::paginationObject($page, $perPage, $totalRows);
+        $this->data['search']     = Helper::searchObject(true, $sortColumns, $sSortOn, $sSortOrder, $iPerPage, $sKeywords);
+        $this->data['pagination'] = Helper::paginationObject($iPage, $iPerPage, $totalRows);
 
         //  Add a header button
         if (userHasPermission('admin:survey:survey:create')) {
-             Helper::addHeaderButton('admin/survey/survey/create', 'Create Survey');
+            Helper::addHeaderButton('admin/survey/survey/create', 'Create Survey');
         }
 
         // --------------------------------------------------------------------------
@@ -151,12 +150,10 @@ class Survey extends BaseAdmin
                     redirect('admin/survey/survey');
 
                 } else {
-
                     $this->data['error'] = 'Failed to create survey.' . $oSurveyModel->lastError();
                 }
 
             } else {
-
                 $this->data['error'] = lang('fv_there_were_errors');
             }
         }
@@ -185,16 +182,10 @@ class Survey extends BaseAdmin
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
         $iSurveyId            = (int) $oUri->segment(5);
-        $this->data['survey'] = $oSurveyModel->getById(
-            $iSurveyId,
-            array(
-                'includeForm'      => true,
-                'includeResponses' => true
-            )
-        );
+        $this->data['survey'] = $oSurveyModel->getById($iSurveyId, ['expand' => ['form', 'responses']]);
 
         if (empty($this->data['survey']) || $this->data['survey']->responses->count > 0) {
-            show_404();
+            show404();
         }
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
@@ -208,12 +199,10 @@ class Survey extends BaseAdmin
                     redirect('admin/survey/survey');
 
                 } else {
-
                     $this->data['error'] = 'Failed to update survey.' . $oSurveyModel->lastError();
                 }
 
             } else {
-
                 $this->data['error'] = lang('fv_there_were_errors');
             }
         }
@@ -247,7 +236,7 @@ class Survey extends BaseAdmin
         $oInput          = Factory::service('Input');
 
         //  Define the rules
-        $aRules = array(
+        $aRules = [
             'label'                    => 'required',
             'is_active'                => '',
             'header'                   => '',
@@ -266,8 +255,8 @@ class Survey extends BaseAdmin
             'thankyou_email_subject'   => '',
             'thankyou_email_body'      => '',
             'thankyou_page_title'      => '',
-            'thankyou_page_body'       => ''
-        );
+            'thankyou_page_body'       => '',
+        ];
 
         foreach ($aRules as $sKey => $sRules) {
             $oFormValidation->set_rules($sKey, '', $sRules);
@@ -292,7 +281,7 @@ class Survey extends BaseAdmin
         Factory::helper('formbuilder', 'nailsapp/module-form-builder');
         $oInput  = Factory::service('Input');
         $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
-        $aData   = array(
+        $aData   = [
             'label'                    => $oInput->post('label'),
             'is_active'                => (bool) $oInput->post('is_active'),
             'header'                   => $oInput->post('header'),
@@ -314,8 +303,8 @@ class Survey extends BaseAdmin
                 $iFormId,
                 (bool) $oInput->post('has_captcha'),
                 $oInput->post('fields')
-            )
-        );
+            ),
+        ];
 
         //  Format the emails
         $aEmails = explode(',', $oInput->post('notification_email'));
@@ -346,25 +335,16 @@ class Survey extends BaseAdmin
         $sReturn   = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
 
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
-
-        $oSurvey = $oSurveyModel->getById(
-            $iSurveyId,
-            array(
-                'includeResponses' => true
-            )
-        );
+        $oSurvey      = $oSurveyModel->getById($iSurveyId, ['expand' => ['responses']]);
 
         if (empty($oSurvey) || $oSurvey->responses->count > 0) {
-            show_404();
+            show404();
         }
 
         if ($oSurveyModel->delete($iSurveyId)) {
-
             $sStatus  = 'success';
             $sMessage = 'Survey was deleted successfully.';
-
         } else {
-
             $sStatus  = 'error';
             $sMessage = 'Survey failed to delete. ' . $oSurveyModel->lastError();
         }
@@ -401,7 +381,6 @@ class Survey extends BaseAdmin
             $sReturn  = 'admin/survey/survey/edit/' . $iNewSurveyId;
 
         } else {
-
             $sStatus  = 'error';
             $sMessage = 'Survey failed to copy. ' . $oSurveyModel->lastError();
         }
@@ -423,26 +402,20 @@ class Survey extends BaseAdmin
         $sMethod = $oUri->segment(6) ?: 'index';
         $sMethod = 'response' . ucfirst($sMethod);
 
-        if (is_callable(array($this, $sMethod))) {
+        if (is_callable([$this, $sMethod])) {
 
             $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
-            $iSurveyId = (int) $oUri->segment(5);
-            $this->data['survey'] = $oSurveyModel->getById(
-                $iSurveyId,
-                array(
-                    'includeForm'      => true,
-                    'includeResponses' => true
-                )
-            );
+            $iSurveyId            = (int) $oUri->segment(5);
+            $this->data['survey'] = $oSurveyModel->getById($iSurveyId, ['expand' => ['form', 'responses']]);
 
             if (empty($this->data['survey'])) {
-                show_404();
+                show404();
             }
 
             $this->{$sMethod}();
         } else {
-            show_404();
+            show404();
         }
     }
 
@@ -498,13 +471,13 @@ class Survey extends BaseAdmin
         $iResponseId            = (int) $oUri->segment(7);
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
-            array(
-                'includeAnswer' => true
-            )
+            [
+                'includeAnswer' => true,
+            ]
         );
 
         if (empty($this->data['response'])) {
-            show_404();
+            show404();
         }
 
         // --------------------------------------------------------------------------
@@ -518,7 +491,8 @@ class Survey extends BaseAdmin
 
     // --------------------------------------------------------------------------
 
-    protected function responseEdit() {
+    protected function responseEdit()
+    {
 
         $oUri                 = Factory::service('Uri');
         $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
@@ -529,7 +503,7 @@ class Survey extends BaseAdmin
         );
 
         if (empty($oAnswer)) {
-            show_404();
+            show404();
         }
 
         $oInput = Factory::service('Input');
@@ -543,9 +517,9 @@ class Survey extends BaseAdmin
                     throw new \Exception(lang('fv_there_were_errors'));
                 }
 
-                $aData = array(
-                    'text' => $oInput->post('text')
-                );
+                $aData = [
+                    'text' => $oInput->post('text'),
+                ];
 
                 if (!$oResponseAnswerModel->update($iAnswerId, $aData)) {
                     throw new \Exception('Failed to update answer. ' . $oResponseAnswerModel->lastError());

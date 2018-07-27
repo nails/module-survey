@@ -13,8 +13,8 @@
 namespace Nails\Survey\Model;
 
 use Nails\Common\Model\Base;
-use Nails\Survey\Events;
 use Nails\Factory;
+use Nails\Survey\Events;
 
 class Response extends Base
 {
@@ -29,65 +29,37 @@ class Response extends Base
     public function __construct()
     {
         parent::__construct();
-
         $this->table             = NAILS_DB_PREFIX . 'survey_response';
-        $this->tableAlias        = 'sr';
         $this->destructiveDelete = false;
         $this->defaultSortColumn = 'created';
         $this->defaultSortOrder  = 'desc';
-    }
-
-    // --------------------------------------------------------------------------
-
-    public function getAll($iPage = null, $iPerPage = null, array $aData = [], $bIncludeDeleted = false)
-    {
-        //  If the first value is an array then treat as if called with getAll(null, null, $aData);
-        //  @todo (Pablo - 2017-10-06) - Convert these to expandable fields
-        if (is_array($iPage)) {
-            $aData = $iPage;
-            $iPage = null;
-        }
-
-        $aItems = parent::getAll($iPage, $iPerPage, $aData, $bIncludeDeleted);
-
-        if (!empty($aItems)) {
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeSurvey'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'survey_id',
-                    'survey',
-                    'Survey',
-                    'nailsapp/module-survey'
-                );
-            }
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeUser'])) {
-                $this->getSingleAssociatedItem(
-                    $aItems,
-                    'user_id',
-                    'user',
-                    'User',
-                    'nailsapp/module-auth'
-                );
-            }
-
-            if (!empty($aData['includeAll']) || !empty($aData['includeAnswer'])) {
-                $this->getManyAssociatedItems(
-                    $aItems,
-                    'answers',
-                    'survey_response_id',
-                    'ResponseAnswer',
-                    'nailsapp/module-survey',
-                    [
-                        'includeQuestion' => true,
-                        'includeOption'   => true,
-                    ]
-                );
-            }
-        }
-
-        return $aItems;
+        $this->addExpandableField([
+            'trigger'   => 'survey',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'survey',
+            'model'     => 'Survey',
+            'provider'  => 'nailsapp/module-survey',
+            'id_column' => 'survey_id',
+        ]);
+        $this->addExpandableField([
+            'trigger'   => 'user',
+            'type'      => self::EXPANDABLE_TYPE_SINGLE,
+            'property'  => 'user',
+            'model'     => 'User',
+            'provider'  => 'nailsapp/module-auth',
+            'id_column' => 'user_id',
+        ]);
+        $this->addExpandableField([
+            'trigger'   => 'answers',
+            'type'      => self::EXPANDABLE_TYPE_MANY,
+            'property'  => 'answers',
+            'model'     => 'Answers',
+            'provider'  => 'nailsapp/module-survey',
+            'id_column' => 'survey_response_id',
+            'data'      => [
+                'expand' => ['question', 'option'],
+            ],
+        ]);
     }
 
     // --------------------------------------------------------------------------
@@ -159,7 +131,6 @@ class Response extends Base
         array $aFloats = []
     ) {
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
-
         $oObj->url = site_url('survey/response/' . $oObj->id . '/' . $oObj->access_token);
     }
 }
