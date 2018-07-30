@@ -22,10 +22,9 @@ class Response extends Base
         $sResponseToken = $oUri->rsegment(4);
         $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
 
-        //  Get the Survey
-        $oResponse = $oResponseModel->getById($iResponseId, array('includeSurvey' => true));
+        $oResponse = $oResponseModel->getById($iResponseId, ['expand' => ['survey']]);
         if (empty($oResponse) || $oResponse->access_token != $sResponseToken) {
-            show_404();
+            show404();
         }
 
         redirect($oResponse->survey->url . '/' . $oResponse->id . '/' . $oResponse->access_token);
