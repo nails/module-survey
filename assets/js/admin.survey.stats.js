@@ -168,7 +168,7 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken) {
                         var chartTypeVal = chartType.find('select').val();
 
                         //  Populate
-                        field.find('.js-response-count').text(data.response_count);
+                        field.find('.js-response-count').text(data.meta.response_count);
                         chartTarget.data('chart-data', data.data.chart);
                         chartTarget.data('chart-type', chartTypeVal);
 

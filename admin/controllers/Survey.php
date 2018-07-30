@@ -182,7 +182,22 @@ class Survey extends BaseAdmin
         $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
 
         $iSurveyId            = (int) $oUri->segment(5);
-        $this->data['survey'] = $oSurveyModel->getById($iSurveyId, ['expand' => ['form', 'responses']]);
+        $this->data['survey'] = $oSurveyModel->getById(
+            $iSurveyId,
+            [
+                'expand' => [
+                    [
+                        'form',
+                        [
+                            'expand' => [
+                                ['fields', ['expand' => ['options']]],
+                            ],
+                        ],
+                    ],
+                    'responses',
+                ],
+            ]
+        );
 
         if (empty($this->data['survey']) || $this->data['survey']->responses->count > 0) {
             show404();
@@ -404,16 +419,26 @@ class Survey extends BaseAdmin
 
         if (is_callable([$this, $sMethod])) {
 
-            $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
-
+            $oSurveyModel         = Factory::model('Survey', 'nailsapp/module-survey');
             $iSurveyId            = (int) $oUri->segment(5);
-            $this->data['survey'] = $oSurveyModel->getById($iSurveyId, ['expand' => ['form', 'responses']]);
+            $this->data['survey'] = $oSurveyModel->getById(
+                $iSurveyId,
+                [
+                    'expand' => [
+                        [
+                            'form',
+                            ['expand' => ['fields']],
+                        ],
+                        'responses',
+                    ],
+                ]
+            );
 
             if (empty($this->data['survey'])) {
                 show404();
             }
-
             $this->{$sMethod}();
+
         } else {
             show404();
         }
@@ -472,7 +497,7 @@ class Survey extends BaseAdmin
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
             [
-                'includeAnswer' => true,
+                'expand' => ['answers'],
             ]
         );
 

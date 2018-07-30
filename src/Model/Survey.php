@@ -23,7 +23,6 @@ class Survey extends Base
     public function __construct()
     {
         parent::__construct();
-
         $this->table             = NAILS_DB_PREFIX . 'survey_survey';
         $this->destructiveDelete = false;
         $this->addExpandableField([
@@ -33,15 +32,12 @@ class Survey extends Base
             'model'     => 'Form',
             'provider'  => 'nailsapp/module-form-builder',
             'id_column' => 'form_id',
-            'data'      => [
-                'expand' => ['fields'],
-            ],
         ]);
         $this->addExpandableField([
             'trigger'   => 'responses',
             'type'      => self::EXPANDABLE_TYPE_MANY,
             'property'  => 'responses',
-            'model'     => 'Responses',
+            'model'     => 'Response',
             'provider'  => 'nailsapp/module-survey',
             'id_column' => 'survey_id',
         ]);
@@ -313,5 +309,17 @@ class Survey extends Base
 
         unset($oObj->thankyou_page_title);
         unset($oObj->thankyou_page_body);
+
+        // --------------------------------------------------------------------------
+
+        if (!empty($oObj->responses)) {
+            $oResponseModel                   = Factory::model('Response', 'nailsapp/module-survey');
+            $oObj->responses->count_submitted = 0;
+            foreach ($oObj->responses->data as $oResponse) {
+                if ($oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
+                    $oObj->responses->count_submitted++;
+                }
+            }
+        }
     }
 }

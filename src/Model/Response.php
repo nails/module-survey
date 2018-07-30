@@ -53,7 +53,7 @@ class Response extends Base
             'trigger'   => 'answers',
             'type'      => self::EXPANDABLE_TYPE_MANY,
             'property'  => 'answers',
-            'model'     => 'Answers',
+            'model'     => 'ResponseAnswer',
             'provider'  => 'nailsapp/module-survey',
             'id_column' => 'survey_response_id',
             'data'      => [

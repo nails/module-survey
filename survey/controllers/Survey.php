@@ -35,7 +35,9 @@ class Survey extends Base
 
                 try {
 
-                    if (!empty($this->data['is_admin_preview'])) {
+                    if (!empty($this->data['bIsAdminPreviewInactive'])) {
+                        throw new \Exception('Survey is not active.');
+                    } elseif (!empty($this->data['bIsAdminPreviewAnon'])) {
                         throw new \Exception('Anonymous submissions are disabled for this survey.');
                     }
 
@@ -115,7 +117,15 @@ class Survey extends Base
                         //  Send a notification email
                         if (!empty($oSurvey->notification_email)) {
 
-                            $oResponse = $oResponseModel->getById($oResponse->id, ['includeAnswer' => true]);
+                            $oResponse = $oResponseModel->getById(
+                                $oResponse->id,
+                                [
+                                    'expand' => [
+                                        ['answers', ['expand' => ['question', 'option']]],
+                                    ],
+                                ]
+                            );
+
                             if ($oResponse->answers->count > 0) {
 
                                 $aResponses = [];
@@ -197,9 +207,27 @@ class Survey extends Base
         Factory::helper('formbuilder', 'nailsapp/module-form-builder');
 
         //  Get the Survey
-        $oSurvey = $oSurveyModel->getById($iSurveyId, ['expand' => ['form']]);
-        if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token != $sSurveyToken) {
+        $oSurvey = $oSurveyModel->getById(
+            $iSurveyId, [
+                'expand' => [
+                    [
+                        'form',
+                        [
+                            'expand' => [
+                                ['fields', ['expand' => ['options']]],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        if (empty($oSurvey) || $oSurvey->access_token != $sSurveyToken) {
             show404();
+        } elseif (!$oSurvey->is_active && !userHasPermission('admin:survey:survey:*')) {
+            show404();
+        } elseif (!$oSurvey->is_active && userHasPermission('admin:survey:survey:*')) {
+            $this->data['bIsAdminPreviewInactive'] = true;
         }
 
         //  Get the Response, if any
@@ -219,7 +247,7 @@ class Survey extends Base
             if (!userHasPermission('admin:survey:survey:*')) {
                 show404();
             } else {
-                $this->data['is_admin_preview'] = true;
+                $this->data['bIsAdminPreviewAnon'] = true;
             }
         }
 

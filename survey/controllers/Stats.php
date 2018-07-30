@@ -50,7 +50,16 @@ class Stats extends Base
         Factory::helper('formbuilder', 'nailsapp/module-form-builder');
 
         //  Get the Survey
-        $oSurvey = $oSurveyModel->getById($iSurveyId, ['expand' => ['form', 'responses']]);
+        $oSurvey = $oSurveyModel->getById(
+            $iSurveyId,
+            [
+                'expand' => [
+                    ['form', ['expand' => ['fields']]],
+                    'responses',
+                ],
+            ]
+        );
+
         if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token_stats != $sSurveyToken) {
             show_404();
         }

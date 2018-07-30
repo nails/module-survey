@@ -53,11 +53,8 @@
                                     if ($survey->responses->count > 0) {
 
                                         if ($survey->responses->count != $survey->responses->count_submitted) {
-
                                             $sCount = $survey->responses->count_submitted . '/' . $survey->responses->count;
-
                                         } else {
-
                                             $sCount = $survey->responses->count;
                                         }
 
@@ -86,15 +83,13 @@
                     }
 
                 } else {
-
                     ?>
                     <tr>
-                        <td colspan="5" class="no-data">
+                        <td colspan="6" class="no-data">
                             No Surveys Found
                         </td>
                     </tr>
                     <?php
-
                 }
 
                 ?>

@@ -2,19 +2,12 @@
     <table>
         <thead>
             <tr>
-                <th>
-                    Question
-                </th>
-                <th>
-                    Option
-                </th>
-                <th>
-                    Response
-                </th>
+                <th>Question</th>
+                <th>Option</th>
+                <th>Response</th>
                 <?php
 
                 if (userHasPermission('admin:survey:survey:response:edit')) {
-
                     ?>
                     <th class="actions">
                         Actions
