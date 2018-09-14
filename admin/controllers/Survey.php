@@ -25,7 +25,7 @@ class Survey extends BaseAdmin
     public static function announce()
     {
         if (userHasPermission('admin:survey:survey:browse')) {
-            $oNavGroup = Factory::factory('Nav', 'nailsapp/module-admin');
+            $oNavGroup = Factory::factory('Nav', 'nails/module-admin');
             $oNavGroup->setLabel('Surveys');
             $oNavGroup->setIcon('fa-list-alt');
             $oNavGroup->addAction('Browse Surveys');
@@ -70,7 +70,7 @@ class Survey extends BaseAdmin
 
         // --------------------------------------------------------------------------
 
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
 
         // --------------------------------------------------------------------------
 
@@ -138,14 +138,14 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
         $oInput       = Factory::service('Input');
 
         if ($oInput->post()) {
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::service('Session', 'nails/module-auth');
                     $oSession->setFlashData('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
@@ -179,7 +179,7 @@ class Survey extends BaseAdmin
 
         $oUri         = Factory::service('Uri');
         $oInput       = Factory::service('Input');
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
 
         $iSurveyId            = (int) $oUri->segment(5);
         $this->data['survey'] = $oSurveyModel->getById(
@@ -203,13 +203,13 @@ class Survey extends BaseAdmin
             show404();
         }
 
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
 
         if ($oInput->post()) {
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                    $oSession = Factory::service('Session', 'nails/module-auth');
                     $oSession->setFlashData('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
@@ -234,12 +234,12 @@ class Survey extends BaseAdmin
     protected function loadViewData()
     {
         $oAsset = Factory::service('Asset');
-        $oAsset->load('admin.survey.edit.min.js', 'nailsapp/module-survey');
+        $oAsset->load('admin.survey.edit.min.js', 'nails/module-survey');
 
-        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        Factory::helper('formbuilder', 'nails/module-form-builder');
         adminLoadFormBuilderAssets('#survey-fields');
 
-        $oCaptcha                        = Factory::service('Captcha', 'nailsapp/module-captcha');
+        $oCaptcha                        = Factory::service('Captcha', 'nails/module-captcha');
         $this->data['bIsCaptchaEnabled'] = $oCaptcha->isEnabled();
     }
 
@@ -283,7 +283,7 @@ class Survey extends BaseAdmin
         $bValidForm = $oFormValidation->run();
 
         //  Validate fields
-        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        Factory::helper('formbuilder', 'nails/module-form-builder');
         $bValidFields = adminValidateFormData($oInput->post('fields'));
 
         return $bValidForm && $bValidFields;
@@ -293,7 +293,7 @@ class Survey extends BaseAdmin
 
     protected function getPostObject()
     {
-        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        Factory::helper('formbuilder', 'nails/module-form-builder');
         $oInput  = Factory::service('Input');
         $iFormId = !empty($this->data['survey']->form->id) ? $this->data['survey']->form->id : null;
         $aData   = [
@@ -349,7 +349,7 @@ class Survey extends BaseAdmin
         $iSurveyId = (int) $oUri->segment(5);
         $sReturn   = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
 
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
         $oSurvey      = $oSurveyModel->getById($iSurveyId, ['expand' => ['responses']]);
 
         if (empty($oSurvey) || $oSurvey->responses->count > 0) {
@@ -364,7 +364,7 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to delete. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', 'nailsapp/module-auth');
+        $oSession = Factory::service('Session', 'nails/module-auth');
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -385,7 +385,7 @@ class Survey extends BaseAdmin
         $oInput       = Factory::service('Input');
         $iSurveyId    = (int) $oUri->segment(5);
         $sReturn      = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
 
         $iNewSurveyId = $oSurveyModel->copy($iSurveyId);
 
@@ -400,7 +400,7 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to copy. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', 'nailsapp/module-auth');
+        $oSession = Factory::service('Session', 'nails/module-auth');
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -419,7 +419,7 @@ class Survey extends BaseAdmin
 
         if (is_callable([$this, $sMethod])) {
 
-            $oSurveyModel         = Factory::model('Survey', 'nailsapp/module-survey');
+            $oSurveyModel         = Factory::model('Survey', 'nails/module-survey');
             $iSurveyId            = (int) $oUri->segment(5);
             $this->data['survey'] = $oSurveyModel->getById(
                 $iSurveyId,
@@ -472,8 +472,8 @@ class Survey extends BaseAdmin
         $oAsset = Factory::service('Asset');
         $oAsset->library('ZEROCLIPBOARD');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
-        $oAsset->load('admin.survey.stats.min.js', 'nailsapp/module-survey');
-        $oAsset->load('admin.survey.stats.charts.min.js', 'nailsapp/module-survey');
+        $oAsset->load('admin.survey.stats.min.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.charts.min.js', 'nails/module-survey');
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $this->data['survey']->id . ',
@@ -492,7 +492,7 @@ class Survey extends BaseAdmin
     protected function responseView()
     {
         $oUri                   = Factory::service('Uri');
-        $oResponseModel         = Factory::model('Response', 'nailsapp/module-survey');
+        $oResponseModel         = Factory::model('Response', 'nails/module-survey');
         $iResponseId            = (int) $oUri->segment(7);
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
@@ -520,7 +520,7 @@ class Survey extends BaseAdmin
     {
 
         $oUri                 = Factory::service('Uri');
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
         $iSurveyId            = (int) $oUri->segment(5);
         $iAnswerId            = (int) $oUri->segment(7);
         $oAnswer              = $oResponseAnswerModel->getById(
@@ -550,7 +550,7 @@ class Survey extends BaseAdmin
                     throw new \Exception('Failed to update answer. ' . $oResponseAnswerModel->lastError());
                 }
 
-                $oSession = Factory::service('Session', 'nailsapp/module-auth');
+                $oSession = Factory::service('Session', 'nails/module-auth');
                 $oSession->setFlashData('success', 'Answer updated successfully.');
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';

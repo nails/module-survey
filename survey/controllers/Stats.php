@@ -20,10 +20,10 @@ class Stats extends Base
         $this->data['oSurvey'] = $oSurvey;
 
         $oAsset = Factory::service('Asset');
-        $oAsset->load('stats.css', 'nailsapp/module-survey');
+        $oAsset->load('stats.css', 'nails/module-survey');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
-        $oAsset->load('admin.survey.stats.min.js', 'nailsapp/module-survey');
-        $oAsset->load('admin.survey.stats.charts.min.js', 'nailsapp/module-survey');
+        $oAsset->load('admin.survey.stats.min.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.charts.min.js', 'nails/module-survey');
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $oSurvey->id . ',
@@ -43,11 +43,11 @@ class Stats extends Base
     public function _remap()
     {
         $oUri         = Factory::service('Uri');
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
         $iSurveyId    = (int) $oUri->rsegment(3);
         $sSurveyToken = $oUri->rsegment(4);
 
-        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        Factory::helper('formbuilder', 'nails/module-form-builder');
 
         //  Get the Survey
         $oSurvey = $oSurveyModel->getById(

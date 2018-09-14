@@ -20,7 +20,7 @@ class Response extends Base
         $oUri           = Factory::service('Uri');
         $iResponseId    = (int) $oUri->rsegment(3);
         $sResponseToken = $oUri->rsegment(4);
-        $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
+        $oResponseModel = Factory::model('Response', 'nails/module-survey');
 
         $oResponse = $oResponseModel->getById($iResponseId, ['expand' => ['survey']]);
         if (empty($oResponse) || $oResponse->access_token != $sResponseToken) {

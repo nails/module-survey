@@ -25,7 +25,7 @@ class Survey extends Base
     {
         //  Get Survey
         $oInput       = Factory::service('Input');
-        $oSurveyModel = Factory::model('Survey', 'nailsapp/module-survey');
+        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
         $oSurvey      = $oSurveyModel->getById($oInput->get('survey_id'));
 
         if (empty($oSurvey)) {
@@ -50,7 +50,7 @@ class Survey extends Base
 
         //  Get field
         $iFieldId        = $oInput->get('field_id');
-        $oFormFieldModel = Factory::model('FormField', 'nailsapp/module-form-builder');
+        $oFormFieldModel = Factory::model('FormField', 'nails/module-form-builder');
         $oField          = $oFormFieldModel->getById($iFieldId);
 
         if (empty($oField)) {
@@ -58,7 +58,7 @@ class Survey extends Base
         }
 
         //  Get Field Type Driver
-        $oFieldTypeModel = Factory::model('FieldType', 'nailsapp/module-form-builder');
+        $oFieldTypeModel = Factory::model('FieldType', 'nails/module-form-builder');
         $oFieldType      = $oFieldTypeModel->getBySlug($oField->type);
 
         if (empty($oFieldType)) {
@@ -84,10 +84,10 @@ class Survey extends Base
             ];
         }
 
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
         $aResponses           = $oResponseAnswerModel->getAll(null, null, $aData);
 
-        return Factory::factory('ApiResponse', 'nailsapp/module-api')
+        return Factory::factory('ApiResponse', 'nails/module-api')
                       ->setData([
                           'chart' => $oFieldType->getStatsChartData($aResponses),
                           'text'  => $oFieldType->getStatsTextData($aResponses),

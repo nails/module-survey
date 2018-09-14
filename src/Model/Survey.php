@@ -30,7 +30,7 @@ class Survey extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'form',
             'model'     => 'Form',
-            'provider'  => 'nailsapp/module-form-builder',
+            'provider'  => 'nails/module-form-builder',
             'id_column' => 'form_id',
         ]);
         $this->addExpandableField([
@@ -38,7 +38,7 @@ class Survey extends Base
             'type'      => self::EXPANDABLE_TYPE_MANY,
             'property'  => 'responses',
             'model'     => 'Response',
-            'provider'  => 'nailsapp/module-survey',
+            'provider'  => 'nails/module-survey',
             'id_column' => 'survey_id',
         ]);
     }
@@ -64,7 +64,7 @@ class Survey extends Base
             //  Create the associated form (if no ID supplied)
             if (empty($aForm['id'])) {
 
-                $oFormModel       = Factory::model('Form', 'nailsapp/module-form-builder');
+                $oFormModel       = Factory::model('Form', 'nails/module-form-builder');
                 $aData['form_id'] = $oFormModel->create($aForm);
 
                 if (!$aData['form_id']) {
@@ -111,7 +111,7 @@ class Survey extends Base
             //  Update the associated form (if no ID supplied)
             if (!empty($aForm['id'])) {
 
-                $oFormModel = Factory::model('Form', 'nailsapp/module-form-builder');
+                $oFormModel = Factory::model('Form', 'nails/module-form-builder');
 
                 if (!$oFormModel->update($aForm['id'], $aForm)) {
                     throw new \Exception('Failed to update associated form.', 1);
@@ -160,7 +160,7 @@ class Survey extends Base
             }
 
             //  Copy the form
-            $oFormModel = Factory::model('Form', 'nailsapp/module-form-builder');
+            $oFormModel = Factory::model('Form', 'nails/module-form-builder');
             $iNewFormId = $oFormModel->copy($oSurvey->form_id);
 
             if (empty($iNewFormId)) {
@@ -224,7 +224,7 @@ class Survey extends Base
             return false;
         }
 
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
         $aOut                 = [];
 
         //  Generate stats for each field
@@ -313,7 +313,7 @@ class Survey extends Base
         // --------------------------------------------------------------------------
 
         if (!empty($oObj->responses)) {
-            $oResponseModel                   = Factory::model('Response', 'nailsapp/module-survey');
+            $oResponseModel                   = Factory::model('Response', 'nails/module-survey');
             $oObj->responses->count_submitted = 0;
             foreach ($oObj->responses->data as $oResponse) {
                 if ($oResponse->status === $oResponseModel::STATUS_SUBMITTED) {

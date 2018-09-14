@@ -17,8 +17,8 @@ class Survey extends Base
 {
     public function index($oSurvey, $oResponse)
     {
-        $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
-        $oCaptcha       = Factory::service('Captcha', 'nailsapp/module-captcha');
+        $oResponseModel = Factory::model('Response', 'nails/module-survey');
+        $oCaptcha       = Factory::service('Captcha', 'nails/module-captcha');
 
         $this->data['oSurvey']           = $oSurvey;
         $this->data['oResponse']         = $oResponse;
@@ -92,7 +92,7 @@ class Survey extends Base
                             }
                         }
 
-                        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nailsapp/module-survey');
+                        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
 
                         foreach ($aResponseData as $aResponseRow) {
 
@@ -146,7 +146,7 @@ class Survey extends Base
                                     ];
                                 }
 
-                                $oEmailer = Factory::service('Emailer', 'nailsapp/module-email');
+                                $oEmailer = Factory::service('Emailer', 'nails/module-email');
                                 $oEmail   = (object) [
                                     'type' => 'survey_notification',
                                     'data' => (object) [
@@ -182,7 +182,7 @@ class Survey extends Base
             }
 
             $oAsset = Factory::service('Asset');
-            $oAsset->load('survey.css', 'nailsapp/module-survey');
+            $oAsset->load('survey.css', 'nails/module-survey');
 
             $oView = Factory::service('View');
             $oView->load('structure/header', $this->data);
@@ -201,10 +201,10 @@ class Survey extends Base
         $iResponseId    = (int) $oUri->rsegment(5);
         $sResponseToken = $oUri->rsegment(6);
 
-        $oSurveyModel   = Factory::model('Survey', 'nailsapp/module-survey');
-        $oResponseModel = Factory::model('Response', 'nailsapp/module-survey');
+        $oSurveyModel   = Factory::model('Survey', 'nails/module-survey');
+        $oResponseModel = Factory::model('Response', 'nails/module-survey');
 
-        Factory::helper('formbuilder', 'nailsapp/module-form-builder');
+        Factory::helper('formbuilder', 'nails/module-form-builder');
 
         //  Get the Survey
         $oSurvey = $oSurveyModel->getById(

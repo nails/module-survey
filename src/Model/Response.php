@@ -38,7 +38,7 @@ class Response extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'survey',
             'model'     => 'Survey',
-            'provider'  => 'nailsapp/module-survey',
+            'provider'  => 'nails/module-survey',
             'id_column' => 'survey_id',
         ]);
         $this->addExpandableField([
@@ -46,7 +46,7 @@ class Response extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'user',
             'model'     => 'User',
-            'provider'  => 'nailsapp/module-auth',
+            'provider'  => 'nails/module-auth',
             'id_column' => 'user_id',
         ]);
         $this->addExpandableField([
@@ -54,7 +54,7 @@ class Response extends Base
             'type'      => self::EXPANDABLE_TYPE_MANY,
             'property'  => 'answers',
             'model'     => 'ResponseAnswer',
-            'provider'  => 'nailsapp/module-survey',
+            'provider'  => 'nails/module-survey',
             'id_column' => 'survey_response_id',
             'data'      => [
                 'expand' => ['question', 'option'],
@@ -95,7 +95,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger(Events::RESPONSE_OPEN, 'nailsapp/module-survey', [$iId]);
+            $oEventService->trigger(Events::RESPONSE_OPEN, 'nails/module-survey', [$iId]);
         }
 
         return $bResult;
@@ -115,7 +115,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger(Events::RESPONSE_SUBMITTED, 'nailsapp/module-survey', [$iId]);
+            $oEventService->trigger(Events::RESPONSE_SUBMITTED, 'nails/module-survey', [$iId]);
         }
 
         return $bResult;

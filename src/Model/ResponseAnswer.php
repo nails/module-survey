@@ -30,7 +30,7 @@ class ResponseAnswer extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'response',
             'model'     => 'Response',
-            'provider'  => 'nailsapp/module-survey',
+            'provider'  => 'nails/module-survey',
             'id_column' => 'survey_response_id',
         ]);
         $this->addExpandableField([
@@ -38,7 +38,7 @@ class ResponseAnswer extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'question',
             'model'     => 'FormField',
-            'provider'  => 'nailsapp/module-form-builder',
+            'provider'  => 'nails/module-form-builder',
             'id_column' => 'form_field_id',
         ]);
         $this->addExpandableField([
@@ -46,7 +46,7 @@ class ResponseAnswer extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'option',
             'model'     => 'FormFieldOption',
-            'provider'  => 'nailsapp/module-form-builder',
+            'provider'  => 'nails/module-form-builder',
             'id_column' => 'form_field_option_id',
         ]);
     }
