@@ -429,7 +429,7 @@ class Survey extends BaseAdmin
                             'form',
                             ['expand' => ['fields']],
                         ],
-                        'responses',
+                        ['responses', ['expand' => ['user']]],
                     ],
                 ]
             );
