@@ -61,17 +61,17 @@ class Stats extends Base
         );
 
         if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token_stats != $sSurveyToken) {
-            show_404();
+            show404();
         }
 
         //  Public stats enabled?
         if (!$oSurvey->allow_public_stats) {
-            show_404();
+            show404();
         }
 
         //  Are there any responses?
         if ($oSurvey->responses->count === 0) {
-            show_404();
+            show404();
         }
 
         //  Minimal layout?
