@@ -22,8 +22,9 @@ class Stats extends Base
         $oAsset = Factory::service('Asset');
         $oAsset->load('stats.mid.css', 'nails/module-survey');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
-        $oAsset->load('admin.survey.stats.min.js', 'nails/module-survey');
-        $oAsset->load('admin.survey.stats.charts.min.js', 'nails/module-survey');
+        //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
+        $oAsset->load('admin.survey.stats.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.charts.js', 'nails/module-survey');
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $oSurvey->id . ',

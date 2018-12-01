@@ -234,7 +234,8 @@ class Survey extends BaseAdmin
     protected function loadViewData()
     {
         $oAsset = Factory::service('Asset');
-        $oAsset->load('admin.survey.edit.min.js', 'nails/module-survey');
+        //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
+        $oAsset->load('admin.survey.edit.js', 'nails/module-survey');
 
         Factory::helper('formbuilder', 'nails/module-form-builder');
         adminLoadFormBuilderAssets('#survey-fields');
@@ -472,8 +473,9 @@ class Survey extends BaseAdmin
         $oAsset = Factory::service('Asset');
         $oAsset->library('ZEROCLIPBOARD');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
-        $oAsset->load('admin.survey.stats.min.js', 'nails/module-survey');
-        $oAsset->load('admin.survey.stats.charts.min.js', 'nails/module-survey');
+        //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
+        $oAsset->load('admin.survey.stats.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.charts.js', 'nails/module-survey');
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $this->data['survey']->id . ',
