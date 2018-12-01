@@ -20,7 +20,7 @@ class Stats extends Base
         $this->data['oSurvey'] = $oSurvey;
 
         $oAsset = Factory::service('Asset');
-        $oAsset->load('stats.css', 'nails/module-survey');
+        $oAsset->load('stats.mid.css', 'nails/module-survey');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
         $oAsset->load('admin.survey.stats.min.js', 'nails/module-survey');
         $oAsset->load('admin.survey.stats.charts.min.js', 'nails/module-survey');

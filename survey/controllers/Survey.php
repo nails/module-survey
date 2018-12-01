@@ -182,7 +182,7 @@ class Survey extends Base
             }
 
             $oAsset = Factory::service('Asset');
-            $oAsset->load('survey.css', 'nails/module-survey');
+            $oAsset->load('survey.min.css', 'nails/module-survey');
 
             $oView = Factory::service('View');
             $oView->load('structure/header', $this->data);
