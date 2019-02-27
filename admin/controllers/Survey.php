@@ -246,7 +246,14 @@ class Survey extends BaseAdmin
 
     // --------------------------------------------------------------------------
 
-    protected function runFormValidation()
+    /**
+     * Form validation for edit/create
+     *
+     * @param array $aOverrides Any overrides for the fields; best to do this in the model's describeFields() method
+     *
+     * @return bool
+     */
+    protected function runFormValidation(array $aOverrides = [])
     {
         $oFormValidation = Factory::service('FormValidation');
         $oInput          = Factory::service('Input');
