@@ -12,4 +12,4 @@ http://nailsapp.co.uk/modules/survey
 
 ## Documentation
 
-- [Events](events.md) - The events exposed by this module
+- [Events](docs/events.md) - The events exposed by this module
