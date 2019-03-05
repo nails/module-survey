@@ -18,14 +18,14 @@ class Events extends Base
     /**
      * Fired when a response is set as OPEN
      *
-     * @param \stdClass $iId The ID of the response
+     * @param int $iId The ID of the response
      */
     const RESPONSE_OPEN = 'RESPONSE:OPEN';
 
     /**
      * Fired when a response is set as SUBMITTED
      *
-     * @param \stdClass $iId The ID of the response
+     * @param int $iId The ID of the response
      */
     const RESPONSE_SUBMITTED = 'RESPONSE:SUBMITTED';
 }

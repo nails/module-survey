@@ -8,3 +8,8 @@
 This module brings survey functionality to Nails.
 
 http://nailsapp.co.uk/modules/survey
+
+
+## Documentation
+
+- [Events](events.md) - The events exposed by this module
