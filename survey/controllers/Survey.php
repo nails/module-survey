@@ -10,6 +10,7 @@
  * @link
  */
 
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Nails\Survey\Controller\Base;
 
@@ -36,9 +37,9 @@ class Survey extends Base
                 try {
 
                     if (!empty($this->data['bIsAdminPreviewInactive'])) {
-                        throw new \Exception('Survey is not active.');
+                        throw new NailsException('Survey is not active.');
                     } elseif (!empty($this->data['bIsAdminPreviewAnon'])) {
-                        throw new \Exception('Anonymous submissions are disabled for this survey.');
+                        throw new NailsException('Anonymous submissions are disabled for this survey.');
                     }
 
                     //  Validate
@@ -85,7 +86,7 @@ class Survey extends Base
 
                             $oResponse = $oResponseModel->create($aResponse, true);
                             if (empty($oResponse)) {
-                                throw new \Exception(
+                                throw new NailsException(
                                     'Failed save response. ' . $oResponseModel->lastError(),
                                     1
                                 );
@@ -99,7 +100,7 @@ class Survey extends Base
                             $aResponseRow['survey_response_id'] = $oResponse->id;
 
                             if (!$oResponseAnswerModel->create($aResponseRow)) {
-                                throw new \Exception(
+                                throw new NailsException(
                                     'Failed save response. ' . $oResponseAnswerModel->lastError(),
                                     2
                                 );
@@ -108,7 +109,7 @@ class Survey extends Base
 
                         //  Mark response as submitted
                         if (!$oResponseModel->setSubmitted($oResponse->id)) {
-                            throw new \Exception(
+                            throw new NailsException(
                                 'Failed to mark response as submitted. ' . $oResponseModel->lastError(),
                                 1
                             );

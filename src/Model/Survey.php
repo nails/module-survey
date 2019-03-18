@@ -12,6 +12,7 @@
 
 namespace Nails\Survey\Model;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Common\Model\Base;
 use Nails\Factory;
 
@@ -68,7 +69,7 @@ class Survey extends Base
                 $aData['form_id'] = $oFormModel->create($aForm);
 
                 if (!$aData['form_id']) {
-                    throw new \Exception('Failed to create associated form.', 1);
+                    throw new NailsException('Failed to create associated form.', 1);
                 }
 
             } else {
@@ -78,7 +79,7 @@ class Survey extends Base
             $mResult = parent::create($aData, $bReturnObject);
 
             if (!$mResult) {
-                throw new \Exception('Failed to create survey. ' . $this->lastError(), 1);
+                throw new NailsException('Failed to create survey. ' . $this->lastError(), 1);
             }
 
             $oDb->trans_commit();
@@ -114,12 +115,12 @@ class Survey extends Base
                 $oFormModel = Factory::model('Form', 'nails/module-form-builder');
 
                 if (!$oFormModel->update($aForm['id'], $aForm)) {
-                    throw new \Exception('Failed to update associated form.', 1);
+                    throw new NailsException('Failed to update associated form.', 1);
                 }
             }
 
             if (!parent::update($iId, $aData)) {
-                throw new \Exception('Failed to update form. ' . $this->lastError(), 1);
+                throw new NailsException('Failed to update form. ' . $this->lastError(), 1);
             }
 
             $oDb->trans_commit();
@@ -156,7 +157,7 @@ class Survey extends Base
             //  Check survey exists
             $oSurvey = $this->getById($iSurveyId);
             if (empty($oSurvey)) {
-                throw new \Exception('Not a valid survey ID.', 1);
+                throw new NailsException('Not a valid survey ID.', 1);
             }
 
             //  Copy the form
@@ -164,7 +165,7 @@ class Survey extends Base
             $iNewFormId = $oFormModel->copy($oSurvey->form_id);
 
             if (empty($iNewFormId)) {
-                throw new \Exception('Failed to copy the survey\'s form. ' . $oFormModel->lastError(), 1);
+                throw new NailsException('Failed to copy the survey\'s form. ' . $oFormModel->lastError(), 1);
             }
 
             $sTableSurvey = $this->getTableName();
@@ -190,7 +191,7 @@ class Survey extends Base
 
             $oDb->set($oSurveyRow);
             if (!$oDb->insert($sTableSurvey)) {
-                throw new \Exception('Failed to copy parent form record.', 1);
+                throw new NailsException('Failed to copy parent form record.', 1);
             }
 
             $iNewSurveyId = $oDb->insert_id();

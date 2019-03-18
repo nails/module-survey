@@ -13,6 +13,7 @@
 namespace Nails\Admin\Survey;
 
 use Nails\Admin\Helper;
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Nails\Survey\Controller\BaseAdmin;
 
@@ -548,7 +549,7 @@ class Survey extends BaseAdmin
                 $oFormValidation = Factory::service('FormValidation');
                 $oFormValidation->set_rules('text', '', 'trim');
                 if (!$oFormValidation->run()) {
-                    throw new \Exception(lang('fv_there_were_errors'));
+                    throw new NailsException(lang('fv_there_were_errors'));
                 }
 
                 $aData = [
@@ -556,7 +557,7 @@ class Survey extends BaseAdmin
                 ];
 
                 if (!$oResponseAnswerModel->update($iAnswerId, $aData)) {
-                    throw new \Exception('Failed to update answer. ' . $oResponseAnswerModel->lastError());
+                    throw new NailsException('Failed to update answer. ' . $oResponseAnswerModel->lastError());
                 }
 
                 $oSession = Factory::service('Session', 'nails/module-auth');
