@@ -74,7 +74,7 @@ class Response extends Base
 
     // --------------------------------------------------------------------------
 
-    public function update($iId, array $aData = [])
+    public function update($iId, array $aData = []): bool
     {
         //  Ensure access tokens aren't updated
         unset($aData['access_token']);
