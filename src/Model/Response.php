@@ -95,7 +95,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger(Events::RESPONSE_OPEN, 'nails/module-survey', [$iId]);
+            $oEventService->trigger(Events::RESPONSE_OPEN, Events::getEventNamespace(), [$iId]);
         }
 
         return $bResult;
@@ -115,7 +115,7 @@ class Response extends Base
 
         if ($bResult) {
             $oEventService = Factory::service('Event');
-            $oEventService->trigger(Events::RESPONSE_SUBMITTED, 'nails/module-survey', [$iId]);
+            $oEventService->trigger(Events::RESPONSE_SUBMITTED, Events::getEventNamespace(), [$iId]);
         }
 
         return $bResult;
