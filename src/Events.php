@@ -28,16 +28,4 @@ class Events extends Base
      * @param int $iId The ID of the response
      */
     const RESPONSE_SUBMITTED = 'RESPONSE:SUBMITTED';
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns the namespace for events fired by this module
-     *
-     * @return stirng
-     */
-    public static function getEventNamespace(): string
-    {
-        return 'nails/module-survey';
-    }
 }
