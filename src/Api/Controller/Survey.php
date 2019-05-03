@@ -58,8 +58,8 @@ class Survey extends Base
         }
 
         //  Get Field Type Driver
-        $oFieldTypeModel = Factory::model('FieldType', 'nails/module-form-builder');
-        $oFieldType      = $oFieldTypeModel->getBySlug($oField->type);
+        $oFieldTypeService = Factory::service('FieldType', 'nails/module-form-builder');
+        $oFieldType        = $oFieldTypeService->getBySlug($oField->type);
 
         if (empty($oFieldType)) {
             throw new ApiException('Invalid Field Type', 404);
