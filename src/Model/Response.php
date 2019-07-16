@@ -131,6 +131,6 @@ class Response extends Base
         array $aFloats = []
     ) {
         parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
-        $oObj->url = site_url('survey/response/' . $oObj->id . '/' . $oObj->access_token);
+        $oObj->url = siteUrl('survey/response/' . $oObj->id . '/' . $oObj->access_token);
     }
 }

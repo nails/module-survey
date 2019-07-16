@@ -268,8 +268,8 @@ class Survey extends Base
 
         // --------------------------------------------------------------------------
 
-        $oObj->url       = site_url('survey/' . $oObj->id . '/' . $oObj->access_token);
-        $oObj->url_stats = site_url('survey/stats/' . $oObj->id . '/' . $oObj->access_token_stats);
+        $oObj->url       = siteUrl('survey/' . $oObj->id . '/' . $oObj->access_token);
+        $oObj->url_stats = siteUrl('survey/stats/' . $oObj->id . '/' . $oObj->access_token_stats);
 
         // --------------------------------------------------------------------------
 
