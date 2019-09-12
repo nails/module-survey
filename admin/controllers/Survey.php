@@ -13,6 +13,7 @@
 namespace Nails\Admin\Survey;
 
 use Nails\Admin\Helper;
+use Nails\Auth;
 use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Nails\Survey\Controller\BaseAdmin;
@@ -146,7 +147,7 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nails/module-auth');
+                    $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
                     $oSession->setFlashData('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
@@ -210,7 +211,7 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', 'nails/module-auth');
+                    $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
                     $oSession->setFlashData('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
@@ -373,7 +374,7 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to delete. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', 'nails/module-auth');
+        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -409,7 +410,7 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to copy. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', 'nails/module-auth');
+        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -560,7 +561,7 @@ class Survey extends BaseAdmin
                     throw new NailsException('Failed to update answer. ' . $oResponseAnswerModel->lastError());
                 }
 
-                $oSession = Factory::service('Session', 'nails/module-auth');
+                $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
                 $oSession->setFlashData('success', 'Answer updated successfully.');
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';

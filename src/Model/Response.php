@@ -12,6 +12,7 @@
 
 namespace Nails\Survey\Model;
 
+use Nails\Auth;
 use Nails\Common\Model\Base;
 use Nails\Factory;
 use Nails\Survey\Events;
@@ -46,7 +47,7 @@ class Response extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'user',
             'model'     => 'User',
-            'provider'  => 'nails/module-auth',
+            'provider'  => Auth\Constants::MODULE_SLUG,
             'id_column' => 'user_id',
         ]);
         $this->addExpandableField([

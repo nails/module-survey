@@ -11,6 +11,7 @@
  */
 
 use Nails\Common\Exception\NailsException;
+use Nails\Email;
 use Nails\Factory;
 use Nails\Survey\Controller\Base;
 
@@ -147,7 +148,7 @@ class Survey extends Base
                                     ];
                                 }
 
-                                $oEmailer = Factory::service('Emailer', 'nails/module-email');
+                                $oEmailer = Factory::service('Emailer', Email\Constants::MODULE_SLUG);
                                 $oEmail   = (object) [
                                     'type' => 'survey_notification',
                                     'data' => (object) [
