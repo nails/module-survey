@@ -44,9 +44,7 @@ _ADMIN_SURVEY_EDIT = function()
             $('#send-thankyou-options').hide();
         }
 
-        if (typeof _nails === 'object') {
-            _nails.addStripes();
-        }
+        window.NAILS.ADMIN.refreshUi();
     };
 
     // --------------------------------------------------------------------------
@@ -62,9 +60,7 @@ _ADMIN_SURVEY_EDIT = function()
             $('#public-stats-options').hide();
         }
 
-        if (typeof _nails === 'object') {
-            _nails.addStripes();
-        }
+        window.NAILS.ADMIN.refreshUi();
     };
 
     // --------------------------------------------------------------------------
