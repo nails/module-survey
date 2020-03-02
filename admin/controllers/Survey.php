@@ -13,8 +13,8 @@
 namespace Nails\Admin\Survey;
 
 use Nails\Admin\Helper;
-use Nails\Auth;
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Session;
 use Nails\Factory;
 use Nails\Survey\Controller\BaseAdmin;
 
@@ -147,7 +147,8 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->create($this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+                    /** @var Session $oSession */
+                    $oSession = Factory::service('Session');
                     $oSession->setFlashData('success', 'Survey created successfully.');
                     redirect('admin/survey/survey');
 
@@ -211,7 +212,8 @@ class Survey extends BaseAdmin
             if ($this->runFormValidation()) {
                 if ($oSurveyModel->update($iSurveyId, $this->getPostObject())) {
 
-                    $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+                    /** @var Session $oSession */
+                    $oSession = Factory::service('Session');
                     $oSession->setFlashData('success', 'Survey updated successfully.');
                     redirect('admin/survey/survey');
 
@@ -374,7 +376,8 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to delete. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+        /** @var Session $oSession */
+        $oSession = Factory::service('Session');
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -410,7 +413,8 @@ class Survey extends BaseAdmin
             $sMessage = 'Survey failed to copy. ' . $oSurveyModel->lastError();
         }
 
-        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+        /** @var Session $oSession */
+        $oSession = Factory::service('Session');
         $oSession->setFlashData($sStatus, $sMessage);
         redirect($sReturn);
     }
@@ -561,7 +565,8 @@ class Survey extends BaseAdmin
                     throw new NailsException('Failed to update answer. ' . $oResponseAnswerModel->lastError());
                 }
 
-                $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
+                /** @var Session $oSession */
+                $oSession = Factory::service('Session');
                 $oSession->setFlashData('success', 'Answer updated successfully.');
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';
