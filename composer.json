@@ -24,6 +24,7 @@
     "prefer-stable": true,
     "require": {
         "nails/common": "dev-develop",
+        "nails/module-auth": "dev-develop",
         "nails/module-form-builder": "dev-develop",
         "nails/module-captcha": "dev-develop"
     },
