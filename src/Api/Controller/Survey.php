@@ -12,11 +12,10 @@
 
 namespace Nails\Survey\Api\Controller;
 
-use Nails\Api\Controller\Base;
-use Nails\Api\Exception\ApiException;
+use Nails\Api;
 use Nails\Factory;
 
-class Survey extends Base
+class Survey extends Api\Controller\Base
 {
     /**
      * Returns aggregated stats for a given survey
@@ -29,7 +28,7 @@ class Survey extends Base
         $oSurvey      = $oSurveyModel->getById($oInput->get('survey_id'));
 
         if (empty($oSurvey)) {
-            throw new ApiException('Invalid Survey ID', 404);
+            throw new Api\Exception\ApiException('Invalid Survey ID', 404);
         }
 
         //  Verify the token:
@@ -38,14 +37,14 @@ class Survey extends Base
         $sToken = $oInput->get('access_token');
         if ($oSurvey->access_token == $sToken) {
             if (!userHasPermission('admin:survey:survey:response')) {
-                throw new ApiException('You are not authorised to see survey stats', 401);
+                throw new Api\Exception\ApiException('You are not authorised to see survey stats', 401);
             }
         } elseif ($oSurvey->access_token_stats == $sToken) {
             if (!$oSurvey->allow_public_stats) {
-                throw new ApiException('You are not authorised to see survey stats', 401);
+                throw new Api\Exception\ApiException('You are not authorised to see survey stats', 401);
             }
         } else {
-            throw new ApiException('Invalid Access Token', 401);
+            throw new Api\Exception\ApiException('Invalid Access Token', 401);
         }
 
         //  Get field
@@ -54,7 +53,7 @@ class Survey extends Base
         $oField          = $oFormFieldModel->getById($iFieldId);
 
         if (empty($oField)) {
-            throw new ApiException('Invalid Field ID', 404);
+            throw new Api\Exception\ApiException('Invalid Field ID', 404);
         }
 
         //  Get Field Type Driver
@@ -62,7 +61,7 @@ class Survey extends Base
         $oFieldType        = $oFieldTypeService->getBySlug($oField->type);
 
         if (empty($oFieldType)) {
-            throw new ApiException('Invalid Field Type', 404);
+            throw new Api\Exception\ApiException('Invalid Field Type', 404);
         }
 
         //  Get responses
@@ -87,13 +86,13 @@ class Survey extends Base
         $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
         $aResponses           = $oResponseAnswerModel->getAll(null, null, $aData);
 
-        return Factory::factory('ApiResponse', 'nails/module-api')
-                      ->setData([
-                          'chart' => $oFieldType->getStatsChartData($aResponses),
-                          'text'  => $oFieldType->getStatsTextData($aResponses),
-                      ])
-                      ->setMeta([
-                          'response_count' => count($aResponses),
-                      ]);
+        return Factory::factory('ApiResponse', Api\Constants::MODULE_SLUG)
+            ->setData([
+                'chart' => $oFieldType->getStatsChartData($aResponses),
+                'text'  => $oFieldType->getStatsTextData($aResponses),
+            ])
+            ->setMeta([
+                'response_count' => count($aResponses),
+            ]);
     }
 }
