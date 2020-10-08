@@ -148,21 +148,26 @@ class Survey extends Base
                                     ];
                                 }
 
-                                $oEmailer = Factory::service('Emailer', Email\Constants::MODULE_SLUG);
-                                $oEmail   = (object) [
-                                    'type' => 'survey_notification',
-                                    'data' => (object) [
+
+                                /** @var \Nails\Survey\Factory\Email\Notification $oEmail */
+                                $oEmail = Factory::factory('EmailNotification', 'nails/module-survey');
+                                $oEmail
+                                    ->data([
                                         'survey'    => (object) [
                                             'id'    => $oSurvey->id,
                                             'label' => $oSurvey->label,
                                         ],
                                         'responses' => $aResponses,
-                                    ],
-                                ];
+                                    ]);
 
                                 foreach ($oSurvey->notification_email as $sEmail) {
-                                    $oEmail->to_email = $sEmail;
-                                    $oEmailer->send($oEmail);
+                                    try {
+                                        $oEmail
+                                            ->to($sEmail)
+                                            ->send();
+                                    } catch (\Nails\Email\Exception\EmailerException $e) {
+                                        //  Do something with this?
+                                    }
                                 }
                             }
                         }

@@ -1,27 +1,39 @@
 <?php
 
-return array(
-    'models' => array(
-        'Survey' => function () {
+use Nails\Survey\Factory;
+use Nails\Survey\Model;
+
+return [
+    'models'    => [
+        'Survey'         => function (): Model\Survey {
             if (class_exists('\App\Survey\Model\Survey')) {
                 return new \App\Survey\Model\Survey();
             } else {
-                return new \Nails\Survey\Model\Survey();
+                return new Model\Survey();
             }
         },
-        'Response' => function () {
+        'Response'       => function (): Model\Response {
             if (class_exists('\App\Survey\Model\Response')) {
                 return new \App\Survey\Model\Response();
             } else {
-                return new \Nails\Survey\Model\Response();
+                return new Model\Response();
             }
         },
-        'ResponseAnswer' => function () {
+        'ResponseAnswer' => function (): Model\ResponseAnswer {
             if (class_exists('\App\Survey\Model\ResponseAnswer')) {
                 return new \App\Survey\Model\ResponseAnswer();
             } else {
-                return new \Nails\Survey\Model\ResponseAnswer();
+                return new Model\ResponseAnswer();
             }
-        }
-    )
-);
+        },
+    ],
+    'factories' => [
+        'EmailNotification' => function (): Factory\Email\Notification {
+            if (class_exists('\App\Survey\Factory\Email\Notification')) {
+                return new \App\Survey\Factory\Email\Notification();
+            } else {
+                return new Factory\Email\Notification();
+            }
+        },
+    ],
+];
