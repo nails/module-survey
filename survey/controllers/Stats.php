@@ -12,6 +12,7 @@
 
 use Nails\Factory;
 use Nails\Survey\Controller\Base;
+use Nails\Survey\Constants;
 
 class Stats extends Base
 {
@@ -20,11 +21,11 @@ class Stats extends Base
         $this->data['oSurvey'] = $oSurvey;
 
         $oAsset = Factory::service('Asset');
-        $oAsset->load('stats.mid.css', 'nails/module-survey');
+        $oAsset->load('stats.mid.css', Constants::MODULE_SLUG);
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
         //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-        $oAsset->load('admin.survey.stats.js', 'nails/module-survey');
-        $oAsset->load('admin.survey.stats.charts.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.js', Constants::MODULE_SLUG);
+        $oAsset->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG);
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $oSurvey->id . ',
@@ -44,7 +45,7 @@ class Stats extends Base
     public function _remap()
     {
         $oUri         = Factory::service('Uri');
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
         $iSurveyId    = (int) $oUri->rsegment(3);
         $sSurveyToken = $oUri->rsegment(4);
 

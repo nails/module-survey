@@ -14,6 +14,7 @@ namespace Nails\Survey\Controller;
 
 use Nails\Admin\Controller\Base;
 use Nails\Factory;
+use Nails\Survey\Constants;
 
 class BaseAdmin extends Base
 {
@@ -21,6 +22,6 @@ class BaseAdmin extends Base
     {
         parent::__construct();
         $oAsset = Factory::service('Asset');
-        $oAsset->load('admin.min.css', 'nails/module-survey');
+        $oAsset->load('admin.min.css', Constants::MODULE_SLUG);
     }
 }

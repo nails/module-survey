@@ -13,13 +13,14 @@
 use Nails\Common\Exception\NailsException;
 use Nails\Email;
 use Nails\Factory;
+use Nails\Survey\Constants;
 use Nails\Survey\Controller\Base;
 
 class Survey extends Base
 {
     public function index($oSurvey, $oResponse)
     {
-        $oResponseModel = Factory::model('Response', 'nails/module-survey');
+        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
         $oCaptcha       = Factory::service('Captcha', 'nails/module-captcha');
 
         $this->data['oSurvey']           = $oSurvey;
@@ -94,7 +95,7 @@ class Survey extends Base
                             }
                         }
 
-                        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
+                        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
 
                         foreach ($aResponseData as $aResponseRow) {
 
@@ -150,7 +151,7 @@ class Survey extends Base
 
 
                                 /** @var \Nails\Survey\Factory\Email\Notification $oEmail */
-                                $oEmail = Factory::factory('EmailNotification', 'nails/module-survey');
+                                $oEmail = Factory::factory('EmailNotification', Constants::MODULE_SLUG);
                                 $oEmail
                                     ->data([
                                         'survey'    => (object) [
@@ -189,7 +190,7 @@ class Survey extends Base
             }
 
             $oAsset = Factory::service('Asset');
-            $oAsset->load('survey.min.css', 'nails/module-survey');
+            $oAsset->load('survey.min.css', Constants::MODULE_SLUG);
 
             $oView = Factory::service('View');
             $oView->load('structure/header', $this->data);
@@ -208,8 +209,8 @@ class Survey extends Base
         $iResponseId    = (int) $oUri->rsegment(5);
         $sResponseToken = $oUri->rsegment(6);
 
-        $oSurveyModel   = Factory::model('Survey', 'nails/module-survey');
-        $oResponseModel = Factory::model('Response', 'nails/module-survey');
+        $oSurveyModel   = Factory::model('Survey', Constants::MODULE_SLUG);
+        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
 
         Factory::helper('formbuilder', 'nails/module-form-builder');
 

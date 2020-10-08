@@ -14,6 +14,7 @@ namespace Nails\Survey\Api\Controller;
 
 use Nails\Api;
 use Nails\Factory;
+use Nails\Survey\Constants;
 
 class Survey extends Api\Controller\Base
 {
@@ -24,7 +25,7 @@ class Survey extends Api\Controller\Base
     {
         //  Get Survey
         $oInput       = Factory::service('Input');
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
         $oSurvey      = $oSurveyModel->getById($oInput->get('survey_id'));
 
         if (empty($oSurvey)) {
@@ -83,7 +84,7 @@ class Survey extends Api\Controller\Base
             ];
         }
 
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
         $aResponses           = $oResponseAnswerModel->getAll(null, null, $aData);
 
         return Factory::factory('ApiResponse', Api\Constants::MODULE_SLUG)

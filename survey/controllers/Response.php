@@ -12,6 +12,7 @@
 
 use Nails\Factory;
 use Nails\Survey\Controller\Base;
+use Nails\Survey\Constants;
 
 class Response extends Base
 {
@@ -20,7 +21,7 @@ class Response extends Base
         $oUri           = Factory::service('Uri');
         $iResponseId    = (int) $oUri->rsegment(3);
         $sResponseToken = $oUri->rsegment(4);
-        $oResponseModel = Factory::model('Response', 'nails/module-survey');
+        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
 
         $oResponse = $oResponseModel->getById($iResponseId, ['expand' => ['survey']]);
         if (empty($oResponse) || $oResponse->access_token != $sResponseToken) {

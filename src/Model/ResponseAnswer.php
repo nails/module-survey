@@ -13,6 +13,7 @@
 namespace Nails\Survey\Model;
 
 use Nails\Common\Model\Base;
+use Nails\Survey\Constants;
 
 class ResponseAnswer extends Base
 {
@@ -30,7 +31,7 @@ class ResponseAnswer extends Base
             'type'      => self::EXPANDABLE_TYPE_SINGLE,
             'property'  => 'response',
             'model'     => 'Response',
-            'provider'  => 'nails/module-survey',
+            'provider'  => Constants::MODULE_SLUG,
             'id_column' => 'survey_response_id',
         ]);
         $this->addExpandableField([

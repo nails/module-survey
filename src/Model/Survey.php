@@ -15,6 +15,7 @@ namespace Nails\Survey\Model;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Model\Base;
 use Nails\Factory;
+use Nails\Survey\Constants;
 
 class Survey extends Base
 {
@@ -39,7 +40,7 @@ class Survey extends Base
             'type'      => self::EXPANDABLE_TYPE_MANY,
             'property'  => 'responses',
             'model'     => 'Response',
-            'provider'  => 'nails/module-survey',
+            'provider'  => Constants::MODULE_SLUG,
             'id_column' => 'survey_id',
         ]);
     }
@@ -225,7 +226,7 @@ class Survey extends Base
             return false;
         }
 
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
         $aOut                 = [];
 
         //  Generate stats for each field
@@ -314,7 +315,7 @@ class Survey extends Base
         // --------------------------------------------------------------------------
 
         if (!empty($oObj->responses)) {
-            $oResponseModel                   = Factory::model('Response', 'nails/module-survey');
+            $oResponseModel                   = Factory::model('Response', Constants::MODULE_SLUG);
             $oObj->responses->count_submitted = 0;
             foreach ($oObj->responses->data as $oResponse) {
                 if ($oResponse->status === $oResponseModel::STATUS_SUBMITTED) {

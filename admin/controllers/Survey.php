@@ -16,6 +16,7 @@ use Nails\Admin\Helper;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\Session;
 use Nails\Factory;
+use Naikls\Survey\Constants;
 use Nails\Survey\Controller\BaseAdmin;
 
 class Survey extends BaseAdmin
@@ -72,7 +73,7 @@ class Survey extends BaseAdmin
 
         // --------------------------------------------------------------------------
 
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
 
         // --------------------------------------------------------------------------
 
@@ -140,7 +141,7 @@ class Survey extends BaseAdmin
             unauthorised();
         }
 
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
         $oInput       = Factory::service('Input');
 
         if ($oInput->post()) {
@@ -182,7 +183,7 @@ class Survey extends BaseAdmin
 
         $oUri         = Factory::service('Uri');
         $oInput       = Factory::service('Input');
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
 
         $iSurveyId            = (int) $oUri->segment(5);
         $this->data['survey'] = $oSurveyModel->getById(
@@ -206,7 +207,7 @@ class Survey extends BaseAdmin
             show404();
         }
 
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
 
         if ($oInput->post()) {
             if ($this->runFormValidation()) {
@@ -239,7 +240,7 @@ class Survey extends BaseAdmin
     {
         $oAsset = Factory::service('Asset');
         //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-        $oAsset->load('admin.survey.edit.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.edit.js', Constants::MODULE_SLUG);
 
         Factory::helper('formbuilder', 'nails/module-form-builder');
         adminLoadFormBuilderAssets('#survey-fields');
@@ -361,7 +362,7 @@ class Survey extends BaseAdmin
         $iSurveyId = (int) $oUri->segment(5);
         $sReturn   = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
 
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
         $oSurvey      = $oSurveyModel->getById($iSurveyId, ['expand' => ['responses']]);
 
         if (empty($oSurvey) || $oSurvey->responses->count > 0) {
@@ -398,7 +399,7 @@ class Survey extends BaseAdmin
         $oInput       = Factory::service('Input');
         $iSurveyId    = (int) $oUri->segment(5);
         $sReturn      = $oInput->get('return') ? $oInput->get('return') : 'admin/survey/survey/index';
-        $oSurveyModel = Factory::model('Survey', 'nails/module-survey');
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
 
         $iNewSurveyId = $oSurveyModel->copy($iSurveyId);
 
@@ -433,7 +434,7 @@ class Survey extends BaseAdmin
 
         if (is_callable([$this, $sMethod])) {
 
-            $oSurveyModel         = Factory::model('Survey', 'nails/module-survey');
+            $oSurveyModel         = Factory::model('Survey', Constants::MODULE_SLUG);
             $iSurveyId            = (int) $oUri->segment(5);
             $this->data['survey'] = $oSurveyModel->getById(
                 $iSurveyId,
@@ -487,8 +488,8 @@ class Survey extends BaseAdmin
         $oAsset->library('ZEROCLIPBOARD');
         $oAsset->load('https://www.gstatic.com/charts/loader.js');
         //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-        $oAsset->load('admin.survey.stats.js', 'nails/module-survey');
-        $oAsset->load('admin.survey.stats.charts.js', 'nails/module-survey');
+        $oAsset->load('admin.survey.stats.js', Constants::MODULE_SLUG);
+        $oAsset->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG);
         $oAsset->inline(
             'var SurveyStats = new _ADMIN_SURVEY_STATS(
                 ' . $this->data['survey']->id . ',
@@ -507,7 +508,7 @@ class Survey extends BaseAdmin
     protected function responseView()
     {
         $oUri                   = Factory::service('Uri');
-        $oResponseModel         = Factory::model('Response', 'nails/module-survey');
+        $oResponseModel         = Factory::model('Response', Constants::MODULE_SLUG);
         $iResponseId            = (int) $oUri->segment(7);
         $this->data['response'] = $oResponseModel->getById(
             $iResponseId,
@@ -535,7 +536,7 @@ class Survey extends BaseAdmin
     {
 
         $oUri                 = Factory::service('Uri');
-        $oResponseAnswerModel = Factory::model('ResponseAnswer', 'nails/module-survey');
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
         $iSurveyId            = (int) $oUri->segment(5);
         $iAnswerId            = (int) $oUri->segment(7);
         $oAnswer              = $oResponseAnswerModel->getById(
