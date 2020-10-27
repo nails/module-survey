@@ -16,7 +16,7 @@ use Nails\Admin\Helper;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Service\Session;
 use Nails\Factory;
-use Naikls\Survey\Constants;
+use Nails\Survey\Constants;
 use Nails\Survey\Controller\BaseAdmin;
 
 class Survey extends BaseAdmin
