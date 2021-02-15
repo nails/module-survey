@@ -1,20 +1,21 @@
+<?php
+
+/**
+ * @var \Nails\Survey\Resource\Survey $oSurvey
+ */
+
+?>
 <div class="group-survey responses">
     <?php
 
-    if ($survey->allow_public_stats) {
+    if ($oSurvey->allow_public_stats) {
 
         ?>
         <div class="alert alert-info">
-            <?=anchor($survey->url_stats, 'View Public Stats', 'class="btn btn-primary btn-xs" target="_blank"')?>
-            <button class="btn btn-xs btn-default copy-link" data-clipboard-text="<?=$survey->url_stats?>">
-                <span class="waiting">
-                    <b class="fa fa-clipboard"></b>
-                    Copy Link
-                </span>
-                <span class="copied">
-                    <b class="fa fa-check-circle"></b>
-                    Copied!
-                </span>
+            <?=anchor($oSurvey->url_stats, 'View Public Stats', 'class="btn btn-primary btn-xs" target="_blank"')?>
+            <button class="btn btn-xs btn-default js-copy-to-clipboard" data-clipboard-text="<?=$oSurvey->url_stats?>">
+                <b class="fa fa-clipboard"></b>
+                Copy Link
             </button>
             &nbsp;&mdash;
             Public stats are enabled for this survey; anybody with the link can view.
@@ -22,7 +23,7 @@
         <?php
     }
 
-    if ($survey->responses->count) {
+    if ($oSurvey->responses->count) {
 
         ?>
         <div class="row">
@@ -38,7 +39,7 @@
 
                     $i = 0;
 
-                    foreach ($survey->form->fields->data as $oField) {
+                    foreach ($oSurvey->form->fields->data as $oField) {
 
                         $i++;
 
@@ -102,7 +103,7 @@
                         <tbody>
                             <?php
 
-                            foreach ($survey->responses->data as $oResponse) {
+                            foreach ($oSurvey->responses->data as $oResponse) {
 
                                 if (empty($oResponse->date_submitted)) {
 
@@ -163,22 +164,16 @@
                                             );
 
                                             ?>
-                                            <button class="btn btn-xs btn-default copy-link" data-clipboard-text="<?=$oResponse->url?>">
-                                                <span class="waiting">
-                                                    <b class="fa fa-clipboard"></b>
-                                                    Copy Link
-                                                </span>
-                                                <span class="copied">
-                                                    <b class="fa fa-check-circle"></b>
-                                                    Copied!
-                                                </span>
+                                            <button class="btn btn-xs btn-default js-copy-to-clipboard" data-clipboard-text="<?=$oResponse->url?>">
+                                                <b class="fa fa-clipboard"></b>
+                                                Copy Link
                                             </button>
                                             <?php
 
                                         } else {
 
                                             echo anchor(
-                                                'admin/survey/survey/response/' . $survey->id . '/view/' . $oResponse->id,
+                                                'admin/survey/response/' . $oSurvey->id . '/view/' . $oResponse->id,
                                                 'Answers',
                                                 'class="btn btn-xs btn-primary fancybox" data-width="100%"'
                                             );
@@ -198,7 +193,6 @@
         </div>
         <?php
     } else {
-
         ?>
         <p class="alert alert-warning">
             There have been no responses to this survey yet.

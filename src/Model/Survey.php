@@ -12,128 +12,145 @@
 
 namespace Nails\Survey\Model;
 
+use Nails\Common\Exception\ModelException;
 use Nails\Common\Exception\NailsException;
 use Nails\Common\Model\Base;
+use Nails\Common\Service\Database;
+use Nails\Common\Service\FormValidation;
+use Nails\Common\Traits\Model\Copyable;
 use Nails\Factory;
+use Nails\FormBuilder;
 use Nails\Survey\Constants;
+use Nails\Survey\Model\Response\Answer;
 
+/**
+ * Class Survey
+ *
+ * @package Nails\Survey\Model
+ */
 class Survey extends Base
 {
+    use Copyable {
+        copy as traitCopy;
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
-     * Construct the model
+     * The table this model represents
+     *
+     * @var string
+     */
+    const TABLE = NAILS_DB_PREFIX . 'survey_survey';
+
+    /**
+     * The name of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_NAME = 'Survey';
+
+    /**
+     * The provider of the resource to use (as passed to \Nails\Factory::resource())
+     *
+     * @var string
+     */
+    const RESOURCE_PROVIDER = Constants::MODULE_SLUG;
+
+    /**
+     * Whether this model uses destructive delete or not
+     *
+     * @var bool
+     */
+    const DESTRUCTIVE_DELETE = false;
+
+    /**
+     * Whether to automatically set tokens or not
+     *
+     * @var bool
+     */
+    const AUTO_SET_TOKEN = true;
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Survey constructor.
+     *
+     * @throws ModelException
      */
     public function __construct()
     {
         parent::__construct();
-        $this->table             = NAILS_DB_PREFIX . 'survey_survey';
-        $this->destructiveDelete = false;
-        $this->addExpandableField([
-            'trigger'   => 'form',
-            'type'      => self::EXPANDABLE_TYPE_SINGLE,
-            'property'  => 'form',
-            'model'     => 'Form',
-            'provider'  => 'nails/module-form-builder',
-            'id_column' => 'form_id',
-        ]);
-        $this->addExpandableField([
-            'trigger'   => 'responses',
-            'type'      => self::EXPANDABLE_TYPE_MANY,
-            'property'  => 'responses',
-            'model'     => 'Response',
-            'provider'  => Constants::MODULE_SLUG,
-            'id_column' => 'survey_id',
-        ]);
+
+        /** @var \Nails\Survey\Model\Response $oResponseModel */
+        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
+
+        $this
+            ->hasOne('form', 'Form', FormBuilder\Constants::MODULE_SLUG)
+            ->hasMany('responses', 'Response', 'survey_id', Constants::MODULE_SLUG)
+            ->hasMany('responses_submitted', 'Response', 'survey_id', Constants::MODULE_SLUG, [
+                'where' => [
+                    ['status', $oResponseModel::STATUS_SUBMITTED],
+                ],
+            ])
+            ->hasMany('responses_open', 'Response', 'survey_id', Constants::MODULE_SLUG, [
+                'where' => [
+                    ['status', $oResponseModel::STATUS_OPEN],
+                ],
+            ]);
     }
 
     // --------------------------------------------------------------------------
 
-    public function create(array $aData = [], $bReturnObject = false)
+    /**
+     * @inheritDoc
+     */
+    public function describeFields($sTable = null)
     {
-        //  Generate access tokens
-        Factory::helper('string');
-        $aData['access_token']       = generateToken();
-        $aData['access_token_stats'] = generateToken();
+        $aFields = parent::describeFields($sTable);
 
-        //  Extract the form
-        $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
-        unset($aData['form']);
+        $aRules = [
+            FormValidation::RULE_REQUIRED     => [
+                'label',
+            ],
+            FormValidation::RULE_VALID_EMAILS => [
+                'notification_email',
+            ],
+        ];
 
-        try {
-
-            $oDb = Factory::service('Database');
-            $oDb->trans_begin();
-
-            //  Create the associated form (if no ID supplied)
-            if (empty($aForm['id'])) {
-
-                $oFormModel       = Factory::model('Form', 'nails/module-form-builder');
-                $aData['form_id'] = $oFormModel->create($aForm);
-
-                if (!$aData['form_id']) {
-                    throw new NailsException('Failed to create associated form.', 1);
-                }
-
-            } else {
-                $aData['form_id'] = $aForm['id'];
+        foreach ($aRules as $sRule => $aColumns) {
+            foreach ($aColumns as $sColumn) {
+                $aFields[$sColumn]->validation[] = $sRule;
             }
-
-            $mResult = parent::create($aData, $bReturnObject);
-
-            if (!$mResult) {
-                throw new NailsException('Failed to create survey. ' . $this->lastError(), 1);
-            }
-
-            $oDb->trans_commit();
-            return $mResult;
-
-        } catch (\Exception $e) {
-            $oDb->trans_rollback();
-            $this->setError($e->getMessage());
-            return false;
         }
+
+        return $aFields;
     }
 
     // --------------------------------------------------------------------------
 
-    public function update($iId, array $aData = []): bool
+    /**
+     * @inheritDoc
+     */
+    protected function prepareWriteData(array &$aData): Base
     {
         //  Ensure access tokens aren't updated
-        unset($aData['access_token']);
-        unset($aData['access_token_stats']);
+        unset($aData['token_stats']);
 
-        //  Extract the form
-        $aForm = array_key_exists('form', $aData) ? $aData['form'] : null;
-        unset($aData['form']);
+        return parent::prepareWriteData($aData);
+    }
 
-        try {
+    // --------------------------------------------------------------------------
 
-            $oDb = Factory::service('Database');
-            $oDb->trans_begin();
+    /**
+     * @inheritDoc
+     */
+    protected function prepareCreateData(array &$aData): Base
+    {
+        //  Generate additional token for stats
+        $aData['token_stats'] = $this->generateToken();
 
-            //  Update the associated form (if no ID supplied)
-            if (!empty($aForm['id'])) {
-
-                $oFormModel = Factory::model('Form', 'nails/module-form-builder');
-
-                if (!$oFormModel->update($aForm['id'], $aForm)) {
-                    throw new NailsException('Failed to update associated form.', 1);
-                }
-            }
-
-            if (!parent::update($iId, $aData)) {
-                throw new NailsException('Failed to update form. ' . $this->lastError(), 1);
-            }
-
-            $oDb->trans_commit();
-            return true;
-
-        } catch (\Exception $e) {
-            $oDb->trans_rollback();
-            $this->setError($e->getMessage());
-            return false;
-        }
-
-        return parent::update($iId, $aData);
+        return parent::prepareCreateData($aData);
     }
 
     // --------------------------------------------------------------------------
@@ -141,72 +158,46 @@ class Survey extends Base
     /**
      * Creates a new copy of an existing survey
      *
-     * @param  integer $iSurveyId     The ID of the survey to duplicate
-     * @param  boolean $bReturnObject Whether to return the entire new survey object, or just the ID
-     * @param  array   $aReturnData   An array to pass to the getById() call when $bReturnObject is true
+     * @param integer $iSurveyId     The ID of the survey to duplicate
+     * @param boolean $bReturnObject Whether to return the entire new survey object, or just the ID
+     * @param array   $aReturnData   An array to pass to the getById() call when $bReturnObject is true
      *
-     * @return mixed
+     * @return int|\Nails\Survey\Resource\Survey
      */
     public function copy($iSurveyId, $bReturnObject = false, $aReturnData = [])
     {
+        /** @var Database $oDb */
+        $oDb = Factory::service('Database');
+        /** @var FormBuilder\Model\Form $oFormModel */
+        $oFormModel = Factory::model('Form', FormBuilder\Constants::MODULE_SLUG);
+
+        /** @var \Nails\Survey\Resource\Survey $oSurvey */
+        $oSurvey = $this->getById($iSurveyId);
+        if (empty($oSurvey)) {
+            throw new NailsException('Not a valid survey ID.');
+        }
+
         try {
 
-            //  Begin the transaction
-            $oDb = Factory::service('Database');
             $oDb->trans_begin();
 
-            //  Check survey exists
-            $oSurvey = $this->getById($iSurveyId);
-            if (empty($oSurvey)) {
-                throw new NailsException('Not a valid survey ID.', 1);
-            }
-
-            //  Copy the form
-            $oFormModel = Factory::model('Form', 'nails/module-form-builder');
-            $iNewFormId = $oFormModel->copy($oSurvey->form_id);
-
+            $iNewSurveyId = $this->traitCopy($iSurveyId);
+            $iNewFormId   = $oFormModel->copy($oSurvey->form_id);
             if (empty($iNewFormId)) {
-                throw new NailsException('Failed to copy the survey\'s form. ' . $oFormModel->lastError(), 1);
+                throw new NailsException('Failed to copy the survey\'s form. ' . $oFormModel->lastError());
             }
 
-            $sTableSurvey = $this->getTableName();
+            $this->update($iNewSurveyId, ['form_id' => $iNewFormId]);
 
-            //  Duplicate the survey
-            $oDb->where('id', $iSurveyId);
-            $oSurveyRow = $oDb->get($sTableSurvey)->row();
-
-            $oNow = Factory::factory('DateTime');
-            $sNow = $oNow->format('Y-m-d H:i:s');
-
-            Factory::helper('string');
-
-            unset($oSurveyRow->id);
-            $oSurveyRow->form_id            = $iNewFormId;
-            $oSurveyRow->access_token       = generateToken();
-            $oSurveyRow->access_token_stats = generateToken();
-            $oSurveyRow->label              = $oSurveyRow->label . ' - copy';
-            $oSurveyRow->created            = $sNow;
-            $oSurveyRow->created_by         = activeUser('id') ?: null;
-            $oSurveyRow->modified           = $sNow;
-            $oSurveyRow->modified_by        = activeUser('id') ?: null;
-
-            $oDb->set($oSurveyRow);
-            if (!$oDb->insert($sTableSurvey)) {
-                throw new NailsException('Failed to copy parent form record.', 1);
-            }
-
-            $iNewSurveyId = $oDb->insert_id();
-
-            //  All done
             $oDb->trans_commit();
 
-            //  Return the new form's ID or object
-            return $bReturnObject ? $this->getById($iNewSurveyId, $aReturnData) : $iNewSurveyId;
+            return $bReturnObject
+                ? $this->getById($iNewSurveyId, $aReturnData)
+                : $iNewSurveyId;
 
         } catch (\Exception $e) {
             $oDb->trans_rollback();
-            $this->setError($e->getMessage());
-            return false;
+            throw $e;
         }
     }
 
@@ -215,7 +206,7 @@ class Survey extends Base
     /**
      * Generates aggregated stats for all the responses for a particular survey
      *
-     * @param  integer $iSurveyId The ID of the survey
+     * @param integer $iSurveyId The ID of the survey
      *
      * @return array
      */
@@ -226,6 +217,7 @@ class Survey extends Base
             return false;
         }
 
+        /** @var Answer $oResponseAnswerModel */
         $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
         $aOut                 = [];
 
@@ -248,80 +240,5 @@ class Survey extends Base
         }
 
         return $aOut;
-    }
-
-    // --------------------------------------------------------------------------
-
-    protected function formatObject(
-        &$oObj,
-        array $aData = [],
-        array $aIntegers = [],
-        array $aBools = [],
-        array $aFloats = []
-    ) {
-        $aBools[] = 'thankyou_email';
-        $aBools[] = 'allow_anonymous_response';
-        $aBools[] = 'allow_public_stats';
-        $aBools[] = 'is_active';
-        $aBools[] = 'is_minimal';
-
-        parent::formatObject($oObj, $aData, $aIntegers, $aBools, $aFloats);
-
-        // --------------------------------------------------------------------------
-
-        $oObj->url       = siteUrl('survey/' . $oObj->id . '/' . $oObj->access_token);
-        $oObj->url_stats = siteUrl('survey/stats/' . $oObj->id . '/' . $oObj->access_token_stats);
-
-        // --------------------------------------------------------------------------
-
-        $oObj->header             = json_decode($oObj->header);
-        $oObj->footer             = json_decode($oObj->footer);
-        $oObj->notification_email = json_decode($oObj->notification_email);
-        $oObj->stats_header       = json_decode($oObj->stats_header);
-        $oObj->stats_footer       = json_decode($oObj->stats_footer);
-
-        // --------------------------------------------------------------------------
-
-        $oObj->cta = (object) [
-            'label'      => $oObj->cta_label,
-            'attributes' => $oObj->cta_attributes,
-        ];
-
-        unset($oObj->cta_label);
-        unset($oObj->cta_attributes);
-
-        // --------------------------------------------------------------------------
-
-        $bSendThankYouEmail   = $oObj->thankyou_email;
-        $oObj->thankyou_email = (object) [
-            'send'    => $bSendThankYouEmail,
-            'subject' => $oObj->thankyou_email_subject,
-            'body'    => $oObj->thankyou_email_body,
-        ];
-
-        unset($oObj->thankyou_email_subject);
-        unset($oObj->thankyou_email_body);
-
-        // --------------------------------------------------------------------------
-
-        $oObj->thankyou_page = (object) [
-            'title' => $oObj->thankyou_page_title,
-            'body'  => json_decode($oObj->thankyou_page_body),
-        ];
-
-        unset($oObj->thankyou_page_title);
-        unset($oObj->thankyou_page_body);
-
-        // --------------------------------------------------------------------------
-
-        if (!empty($oObj->responses)) {
-            $oResponseModel                   = Factory::model('Response', Constants::MODULE_SLUG);
-            $oObj->responses->count_submitted = 0;
-            foreach ($oObj->responses->data as $oResponse) {
-                if ($oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
-                    $oObj->responses->count_submitted++;
-                }
-            }
-        }
     }
 }

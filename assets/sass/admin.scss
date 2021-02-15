@@ -3,19 +3,6 @@
 -------------------------------------------------------------- */
 
 .group-survey {
-    &.browse {
-        table {
-            th.id,
-            td.id {
-                width: 75px;
-                text-align: center;
-            }
-            th.actions,
-            td.actions {
-                width: 280px;
-            }
-        }
-    }
     &.responses {
         .stats,
         .respondents {
@@ -153,23 +140,6 @@
                 &:last-child {
                     border-bottom: none;
                 }
-            }
-        }
-    }
-    .copy-link {
-        transition: all 0.25s;
-        .fa {
-            margin-right: 0.25em;
-        }
-        .copied {
-            display: none;
-        }
-        &.success {
-            .copied {
-                display: inline;
-            }
-            .waiting {
-                display: none;
             }
         }
     }

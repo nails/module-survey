@@ -13,33 +13,55 @@
 use Nails\Common\Exception\NailsException;
 use Nails\Email;
 use Nails\Factory;
+use Nails\FormBuilder;
 use Nails\Survey\Constants;
 use Nails\Survey\Controller\Base;
 
+/**
+ * Class Survey
+ */
 class Survey extends Base
 {
-    public function index($oSurvey, $oResponse)
+    /**
+     * Renders the survey form
+     *
+     * @param \Nails\Survey\Resource\Survey   $oSurvey   The active survey
+     * @param \Nails\Survey\Resource\Response $oResponse The active response
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \Nails\Common\Exception\ViewNotFoundException
+     */
+    public function index(\Nails\Survey\Resource\Survey $oSurvey, \Nails\Survey\Resource\Response $oResponse = null)
     {
+        /** @var \Nails\Common\Service\Input $oInput */
+        $oInput = Factory::service('Input');
+        /** @var \Nails\Common\Service\View $oView */
+        $oView = Factory::service('View');
+        /** @var \Nails\Common\Service\Asset $oAsset */
+        $oAsset = Factory::service('Asset');
+        /** @var \Nails\Captcha\Service\Captcha $oCaptcha */
+        $oCaptcha = Factory::service('Captcha', \Nails\Captcha\Constants::MODULE_SLUG);
+        /** @var \Nails\Survey\Model\Response $oResponseModel */
         $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
-        $oCaptcha       = Factory::service('Captcha', 'nails/module-captcha');
+        /** @var \Nails\Survey\Model\Response\Answer $oResponseAnswerModel */
+        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
 
         $this->data['oSurvey']           = $oSurvey;
         $this->data['oResponse']         = $oResponse;
         $this->data['bIsCaptchaEnabled'] = $oCaptcha->isEnabled();
 
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
-
             show404();
 
         } else {
 
-            $oInput = Factory::service('Input');
             if ($oInput->post()) {
 
                 try {
 
                     if (!empty($this->data['bIsAdminPreviewInactive'])) {
                         throw new NailsException('Survey is not active.');
+
                     } elseif (!empty($this->data['bIsAdminPreviewAnon'])) {
                         throw new NailsException('Anonymous submissions are disabled for this survey.');
                     }
@@ -89,13 +111,10 @@ class Survey extends Base
                             $oResponse = $oResponseModel->create($aResponse, true);
                             if (empty($oResponse)) {
                                 throw new NailsException(
-                                    'Failed save response. ' . $oResponseModel->lastError(),
-                                    1
+                                    'Failed save response. ' . $oResponseModel->lastError()
                                 );
                             }
                         }
-
-                        $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
 
                         foreach ($aResponseData as $aResponseRow) {
 
@@ -103,8 +122,7 @@ class Survey extends Base
 
                             if (!$oResponseAnswerModel->create($aResponseRow)) {
                                 throw new NailsException(
-                                    'Failed save response. ' . $oResponseAnswerModel->lastError(),
-                                    2
+                                    'Failed save response. ' . $oResponseAnswerModel->lastError()
                                 );
                             }
                         }
@@ -112,8 +130,7 @@ class Survey extends Base
                         //  Mark response as submitted
                         if (!$oResponseModel->setSubmitted($oResponse->id)) {
                             throw new NailsException(
-                                'Failed to mark response as submitted. ' . $oResponseModel->lastError(),
-                                1
+                                'Failed to mark response as submitted. ' . $oResponseModel->lastError()
                             );
                         }
 
@@ -174,10 +191,12 @@ class Survey extends Base
                         }
 
                         //  Show thank you page
-                        $oView = Factory::service('View');
-                        $oView->load('structure/header', $this->data);
-                        $oView->load('survey/thanks', $this->data);
-                        $oView->load('structure/footer', $this->data);
+                        $oView
+                            ->load([
+                                'structure/header',
+                                'survey/thanks',
+                                'structure/footer',
+                            ]);
                         return;
 
                     } else {
@@ -189,51 +208,62 @@ class Survey extends Base
                 }
             }
 
-            $oAsset = Factory::service('Asset');
             $oAsset->load('survey.min.css', Constants::MODULE_SLUG);
 
-            $oView = Factory::service('View');
-            $oView->load('structure/header', $this->data);
-            $oView->load('survey/survey', $this->data);
-            $oView->load('structure/footer', $this->data);
+            $oView
+                ->load([
+                    'structure/header',
+                    'survey/survey',
+                    'structure/footer',
+                ]);
         }
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Routes the request
+     *
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \Nails\Common\Exception\ModelException
+     * @throws \Nails\Common\Exception\ViewNotFoundException
+     */
     public function _remap()
     {
-        $oUri           = Factory::service('Uri');
+        /** @var \Nails\Common\Service\Uri $oUri */
+        $oUri = Factory::service('Uri');
+        /** @var \Nails\Survey\Model\Survey $oSurveyModel */
+        $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
+        /** @var \Nails\Survey\Model\Response $oResponseModel */
+        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
+
+        Factory::helper('formbuilder', FormBuilder\Constants::MODULE_SLUG);
+
         $iSurveyId      = (int) $oUri->rsegment(3);
         $sSurveyToken   = $oUri->rsegment(4);
         $iResponseId    = (int) $oUri->rsegment(5);
         $sResponseToken = $oUri->rsegment(6);
 
-        $oSurveyModel   = Factory::model('Survey', Constants::MODULE_SLUG);
-        $oResponseModel = Factory::model('Response', Constants::MODULE_SLUG);
-
-        Factory::helper('formbuilder', 'nails/module-form-builder');
-
         //  Get the Survey
         $oSurvey = $oSurveyModel->getById(
-            $iSurveyId, [
-                'expand' => [
-                    [
-                        'form',
-                        [
-                            'expand' => [
-                                ['fields', ['expand' => ['options']]],
-                            ],
-                        ],
-                    ],
-                ],
+            $iSurveyId,
+            [
+                new \Nails\Common\Helper\Model\Expand(
+                    'form',
+                    new \Nails\Common\Helper\Model\Expand(
+                        'fields',
+                        new \Nails\Common\Helper\Model\Expand('options')
+                    )
+                ),
             ]
         );
 
-        if (empty($oSurvey) || $oSurvey->access_token != $sSurveyToken) {
+        if (empty($oSurvey) || $oSurvey->token != $sSurveyToken) {
             show404();
+
         } elseif (!$oSurvey->is_active && !userHasPermission('admin:survey:survey:*')) {
             show404();
+
         } elseif (!$oSurvey->is_active && userHasPermission('admin:survey:survey:*')) {
             $this->data['bIsAdminPreviewInactive'] = true;
         }
@@ -241,7 +271,7 @@ class Survey extends Base
         //  Get the Response, if any
         if (!empty($iResponseId)) {
             $oResponse = $oResponseModel->getById($iResponseId);
-            if (empty($oResponse) || $oResponse->access_token != $sResponseToken) {
+            if (empty($oResponse) || $oResponse->token != $sResponseToken) {
                 show404();
             }
         } else {
@@ -250,10 +280,13 @@ class Survey extends Base
 
         //  Anonymous responses enabled?
         if (!$oSurvey->allow_anonymous_response && empty($oResponse)) {
-            //  If user has survey permissions then assume they are an admin and allow the rendering
-            //  of the survey, but prevent submission
+            /**
+             * If user has survey permissions then assume they are an admin and allow the rendering
+             * of the survey, but prevent submission
+             */
             if (!userHasPermission('admin:survey:survey:*')) {
                 show404();
+
             } else {
                 $this->data['bIsAdminPreviewAnon'] = true;
             }

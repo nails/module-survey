@@ -111,8 +111,6 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken) {
             }, 500);
         });
 
-        base.initCopyButtons();
-
         return base;
     };
 
@@ -148,14 +146,14 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken) {
 
                 //  Get chart & text data
                 $.ajax({
-                        'url': window.SITE_URL + 'api/survey/survey/stats',
-                        'data': {
-                            'survey_id': base.surveyId,
-                            'access_token': base.accessToken,
-                            'field_id': field.data('id'),
-                            'response_ids': responseIds.join(',')
-                        }
-                    })
+                    'url': window.SITE_URL + 'api/survey/survey/stats',
+                    'data': {
+                        'survey_id': base.surveyId,
+                        'access_token': base.accessToken,
+                        'field_id': field.data('id'),
+                        'response_ids': responseIds.join(',')
+                    }
+                })
                     .always(function() {
                         clearTimeout(loaderTimeout);
                         loader.addClass('hidden');
@@ -284,30 +282,6 @@ _ADMIN_SURVEY_STATS = function(surveyId, accessToken) {
         }
 
         return base;
-    };
-
-    // --------------------------------------------------------------------------
-
-    base.initCopyButtons = function() {
-        $('button.copy-link').each(function() {
-            var $button = $(this);
-            var client = new ZeroClipboard($button.get(0));
-            client.on('ready', function() {
-                client.on('aftercopy', function() {
-                    $button
-                        .removeClass('btn-info')
-                        .addClass('success btn-success');
-                    setTimeout(function() {
-                        $button
-                            .removeClass('success btn-success')
-                            .addClass('btn-default');
-                    }, 1500);
-                });
-            });
-            client.on('error', function() {
-                $button.hide();
-            });
-        });
     };
 
     // --------------------------------------------------------------------------

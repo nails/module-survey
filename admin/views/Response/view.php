@@ -1,3 +1,10 @@
+<?php
+
+/**
+ * @var \Nails\Survey\Resource\Response $oResponse
+ */
+
+?>
 <div class="table-responsive">
     <table>
         <thead>
@@ -21,12 +28,12 @@
         <tbody>
             <?php
 
-            foreach ($response->answers->data as $oAnswer) {
+            foreach ($oResponse->answers->data as $oAnswer) {
 
                 ?>
                 <tr>
-                    <td><?=!empty($oAnswer->question) ? $oAnswer->question->label : ''?></td>
-                    <td><?=!empty($oAnswer->option) ? $oAnswer->option->label : ''?></td>
+                    <td><?=$oAnswer->question->label ?? ''?></td>
+                    <td><?=$oAnswer->option->label ?? ''?></td>
                     <td><?=$oAnswer->text?></td>
                     <?php
 
@@ -36,7 +43,7 @@
 
                         echo '<td class="actions">';
                         echo anchor(
-                            'admin/survey/survey/response/' . $response->survey_id . '/edit/' . $oAnswer->id . $sIsModal,
+                            'admin/survey/survey/response/' . $oResponse->survey_id . '/edit/' . $oAnswer->id . $sIsModal,
                             lang('action_edit'),
                             'class="btn btn-xs btn-primary"'
                         );

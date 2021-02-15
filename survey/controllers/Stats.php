@@ -11,68 +11,84 @@
  */
 
 use Nails\Factory;
+use Nails\FormBuilder;
 use Nails\Survey\Controller\Base;
 use Nails\Survey\Constants;
 
+/**
+ * Class Stats
+ */
 class Stats extends Base
 {
-    public function index($oSurvey)
+    /**
+     * @param \Nails\Survey\Resource\Survey $oSurvey
+     *
+     * @throws \Nails\Common\Exception\AssetException
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \Nails\Common\Exception\NailsException
+     * @throws \Nails\Common\Exception\ViewNotFoundException
+     */
+    public function index(\Nails\Survey\Resource\Survey $oSurvey)
     {
-        $this->data['oSurvey'] = $oSurvey;
-
+        /** @var \Nails\Common\Service\Asset $oAsset */
         $oAsset = Factory::service('Asset');
-        $oAsset->load('stats.mid.css', Constants::MODULE_SLUG);
-        $oAsset->load('https://www.gstatic.com/charts/loader.js');
-        //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-        $oAsset->load('admin.survey.stats.js', Constants::MODULE_SLUG);
-        $oAsset->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG);
-        $oAsset->inline(
-            'var SurveyStats = new _ADMIN_SURVEY_STATS(
-                ' . $oSurvey->id . ',
-                "' . $oSurvey->access_token_stats . '"
-            );',
-            'JS'
-        );
+        $oAsset
+            ->load('stats.min.css', Constants::MODULE_SLUG)
+            ->load('https://www.gstatic.com/charts/loader.js')
+            //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
+            ->load('admin.survey.stats.js', Constants::MODULE_SLUG)
+            ->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG)
+            ->inline(
+                sprintf(
+                    'var SurveyStats = new _ADMIN_SURVEY_STATS(%s,"%s");',
+                    $oSurvey->id,
+                    $oSurvey->token_stats
+                ),
+                'JS'
+            );
 
+        /** @var \Nails\Common\Service\View $oView */
         $oView = Factory::service('View');
-        $oView->load('structure/header', $this->data);
-        $oView->load('survey/stats', $this->data);
-        $oView->load('structure/footer', $this->data);
+        $oView
+            ->setData([
+                'oSurvey' => $oSurvey,
+            ])
+            ->load([
+                'structure/header',
+                'survey/stats',
+                'structure/footer',
+            ]);
     }
 
     // --------------------------------------------------------------------------
 
+    /**
+     * @throws \Nails\Common\Exception\FactoryException
+     * @throws \Nails\Common\Exception\ModelException
+     */
     public function _remap()
     {
-        $oUri         = Factory::service('Uri');
+        /** @var \Nails\Common\Service\Uri $oUri */
+        $oUri = Factory::service('Uri');
+        /** @var \Nails\Survey\Model\Survey $oSurveyModel */
         $oSurveyModel = Factory::model('Survey', Constants::MODULE_SLUG);
+
         $iSurveyId    = (int) $oUri->rsegment(3);
         $sSurveyToken = $oUri->rsegment(4);
-
-        Factory::helper('formbuilder', 'nails/module-form-builder');
 
         //  Get the Survey
         $oSurvey = $oSurveyModel->getById(
             $iSurveyId,
             [
-                'expand' => [
-                    ['form', ['expand' => ['fields']]],
-                    'responses',
-                ],
+                new \Nails\Common\Helper\Model\Expand('form', new \Nails\Common\Helper\Model\Expand('fields')),
+                new \Nails\Common\Helper\Model\Expand('responses'),
             ]
         );
 
-        if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->access_token_stats != $sSurveyToken) {
+        if (empty($oSurvey) || !$oSurvey->is_active || $oSurvey->token_stats != $sSurveyToken) {
             show404();
-        }
 
-        //  Public stats enabled?
-        if (!$oSurvey->allow_public_stats) {
-            show404();
-        }
-
-        //  Are there any responses?
-        if ($oSurvey->responses->count === 0) {
+        } elseif (!$oSurvey->allow_public_stats) {
             show404();
         }
 
