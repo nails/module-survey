@@ -224,9 +224,9 @@ class Survey extends DefaultController
         /** @var Asset $oAsset */
         $oAsset = Factory::service('Asset');
         /** @var Captcha $oCaptcha */
-        $oCaptcha = Factory::service('Captcha', 'nails/module-captcha');
+        $oCaptcha = Factory::service('Captcha', \Nails\Captcha\Constants::MODULE_SLUG);
 
-        Factory::helper('formbuilder', 'nails/module-form-builder');
+        Factory::helper('formbuilder', FormBuilder\Constants::MODULE_SLUG);
         adminLoadFormBuilderAssets('#survey-fields');
 
         $this->data['bIsCaptchaEnabled'] = $oCaptcha->isEnabled();
