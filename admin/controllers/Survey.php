@@ -111,7 +111,7 @@ class Survey extends DefaultController
     protected function indexCheckboxFilters(): array
     {
         /** @var IndexFilter $oStatusFilter */
-        $oStatusFilter = Factory::factory('IndexFilter', 'nails/module-admin');
+        $oStatusFilter = Factory::factory('IndexFilter', \Nails\Admin\Constants::MODULE_SLUG);
         $oStatusFilter
             ->setLabel('Active')
             ->setColumn('is_active')
