@@ -57,7 +57,17 @@ class Survey extends DefaultController
     ];
     const CONFIG_EDIT_DATA      = [
         'expand' => [
-            ['form', ['expand' => ['fields']]],
+            [
+                'form',
+                [
+                    'expand' => [
+                        [
+                            'fields',
+                            ['expand' => ['options']],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ];
 
@@ -111,7 +121,7 @@ class Survey extends DefaultController
     protected function indexCheckboxFilters(): array
     {
         /** @var IndexFilter $oStatusFilter */
-        $oStatusFilter = Factory::factory('IndexFilter', \Nails\Admin\Constants::MODULE_SLUG);
+        $oStatusFilter = Factory::factory('IndexFilter', 'nails/module-admin');
         $oStatusFilter
             ->setLabel('Active')
             ->setColumn('is_active')
