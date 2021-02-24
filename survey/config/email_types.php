@@ -1,5 +1,7 @@
 <?php
 
+use Nails\Survey\Constants;
+
 /**
  * This config file defines email types for this module.
  *
@@ -20,6 +22,6 @@ $config['email_types'] = [
         'template_footer' => '',
         'default_subject' => 'Response to {{survey.label}} survey has been received',
         'can_unsubscribe' => true,
-        'factory'         => 'nails/module-survey::EmailNotification',
+        'factory'         => Constants::MODULE_SLUG . '::EmailNotification',
     ],
 ];
