@@ -51,6 +51,13 @@ class Answer extends Base
      */
     const DESTRUCTIVE_DELETE = false;
 
+    /**
+     * The default column to sort on
+     *
+     * @var string|null
+     */
+    const DEFAULT_SORT_COLUMN = 'order';
+
     // --------------------------------------------------------------------------
 
     /**
@@ -61,7 +68,6 @@ class Answer extends Base
     public function __construct()
     {
         parent::__construct();
-        $this->defaultSortColumn = 'order';
         $this
             ->hasOne('response', 'Response', Constants::MODULE_SLUG, 'survey_response_id')
             ->hasOne('question', 'FormField', FormBuilder\Constants::MODULE_SLUG, 'form_field_id')

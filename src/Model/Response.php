@@ -65,6 +65,20 @@ class Response extends Base
     const AUTO_SET_TOKEN = true;
 
     /**
+     * The default column to sort on
+     *
+     * @var string|null
+     */
+    const DEFAULT_SORT_COLUMN = 'created';
+
+    /**
+     * The default sort order
+     *
+     * @var string
+     */
+    const DEFAULT_SORT_ORDER = self::SORT_DESC;
+
+    /**
      * The various response statuses
      *
      * @var string
@@ -82,9 +96,6 @@ class Response extends Base
     public function __construct()
     {
         parent::__construct();
-        $this->defaultSortColumn = 'created';
-        $this->defaultSortOrder  = 'desc';
-
         $this
             ->hasOne('survey', 'Survey', Constants::MODULE_SLUG)
             ->hasOne('user', 'User', Auth\Constants::MODULE_SLUG)
