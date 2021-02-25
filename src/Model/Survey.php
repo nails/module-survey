@@ -179,7 +179,7 @@ class Survey extends Base
 
         try {
 
-            $oDb->trans_begin();
+            $oDb->transaction()->start();
 
             $iNewSurveyId = $this->traitCopy($iSurveyId);
             $iNewFormId   = $oFormModel->copy($oSurvey->form_id);
@@ -189,14 +189,14 @@ class Survey extends Base
 
             $this->update($iNewSurveyId, ['form_id' => $iNewFormId]);
 
-            $oDb->trans_commit();
+            $oDb->transaction()->commit();
 
             return $bReturnObject
                 ? $this->getById($iNewSurveyId, $aReturnData)
                 : $iNewSurveyId;
 
         } catch (\Exception $e) {
-            $oDb->trans_rollback();
+            $oDb->transaction()->rollback();
             throw $e;
         }
     }
