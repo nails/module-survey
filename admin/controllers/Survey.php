@@ -141,7 +141,7 @@ class Survey extends DefaultController
     /**
      * @inheritDoc
      */
-    protected static function isEditButtonEnabled($oItem): bool
+    protected static function isEditButtonEnabled($oItem = null): bool
     {
         return parent::isEditButtonEnabled($oItem) && $oItem->responses === 0;
     }
@@ -151,7 +151,7 @@ class Survey extends DefaultController
     /**
      * @inheritDoc
      */
-    protected static function isDeleteButtonEnabled($oItem): bool
+    protected static function isDeleteButtonEnabled($oItem = null): bool
     {
         return parent::isDeleteButtonEnabled($oItem) && $oItem->responses === 0;
     }
