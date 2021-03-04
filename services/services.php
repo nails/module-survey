@@ -80,5 +80,12 @@ return [
                 return new Factory\Email\Notification();
             }
         },
+        'EmailSave'         => function (): Factory\Email\Save {
+            if (class_exists('\App\Survey\Factory\Email\Save')) {
+                return new \App\Survey\Factory\Email\Save();
+            } else {
+                return new Factory\Email\Save();
+            }
+        },
     ],
 ];

@@ -59,6 +59,9 @@ class Survey extends Entity
     public $allow_anonymous_response;
 
     /** @var bool */
+    public $allow_save;
+
+    /** @var bool */
     public $allow_public_stats;
 
     /** @var stdClass[]|null */

@@ -6,9 +6,16 @@
 
 echo form_field_boolean([
     'key'     => 'allow_anonymous_response',
-    'label'   => 'Allow Anon. Responses',
+    'label'   => 'Allow Anonymous Responses',
     'info'    => 'If enabled, anyone with the survey link will be able to submit a response.',
     'default' => $oItem->allow_anonymous_response ?? false,
+]);
+
+echo form_field_boolean([
+    'key'     => 'allow_save',
+    'label'   => 'Allow Save',
+    'info'    => 'If enabled, responses can be saved and come back to later.',
+    'default' => $oItem->allow_save ?? false,
 ]);
 
 echo form_field([
@@ -24,7 +31,7 @@ echo form_field_boolean([
     'info'    => 'Send the user a thank you email',
     'default' => $oItem->thankyou_email->send ?? false,
     'data'    => [
-        'revealer'  => 'thankyou-email',
+        'revealer' => 'thankyou-email',
     ],
 ]);
 
@@ -33,7 +40,7 @@ echo form_field([
     'label'       => 'Subject',
     'placeholder' => 'Define the subject of the thank you email',
     'default'     => $oItem->thankyou_email->subject ?? '',
-    'data'    => [
+    'data'        => [
         'revealer'  => 'thankyou-email',
         'reveal-on' => true,
     ],
@@ -45,7 +52,7 @@ echo form_field_wysiwyg([
     'placeholder' => 'Define the body of the thank you email',
     'class'       => 'wysiwyg-basic',
     'default'     => $oItem->thankyou_email->body ?? '',
-    'data'    => [
+    'data'        => [
         'revealer'  => 'thankyou-email',
         'reveal-on' => true,
     ],

@@ -1,4 +1,4 @@
-.admin-preview-modal {
+.survey-modal {
     position: fixed;
     left: 0;
     top: 0;
@@ -6,11 +6,26 @@
     height: 100%;
     z-indeX: 100;
     background: rgba(0, 0, 0, 0.5);
-    transition: opacity .25s, z-index 0 .25s;
+    transition: opacity .25s, z-index 0.25s;
+
+    &__close {
+        display: none;
+
+        &:checked + .survey-modal {
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+
+            .survey-modal__content {
+                top: 45%;
+            }
+        }
+    }
+
     &__content {
         padding: 1em;
         border-radius: 2px;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgb(255, 255, 255);
         width: 400px;
         margin: auto;
         position: relative;
@@ -18,16 +33,11 @@
         transform: translateY(-50%);
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         transition: all .25s;
-    }
-}
-#admin-preview-modal-checkbox {
-    display: none;
-}
-#admin-preview-modal-checkbox:checked + .admin-preview-modal {
-    opacity: 0;
-    z-index: -1;
-    pointer-events: none;
-    .admin-preview-modal__content {
-        top: 45%;
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
     }
 }

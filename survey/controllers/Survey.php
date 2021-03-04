@@ -11,11 +11,16 @@
  */
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\ModelException;
+use Nails\Common\Exception\ViewNotFoundException;
+use Nails\Common\Helper\Model\Expand;
 use Nails\Email;
 use Nails\Factory;
 use Nails\FormBuilder;
 use Nails\Survey\Constants;
 use Nails\Survey\Controller\Base;
+use Nails\Survey\Resource;
 
 /**
  * Class Survey
@@ -25,20 +30,26 @@ class Survey extends Base
     /**
      * Renders the survey form
      *
-     * @param \Nails\Survey\Resource\Survey   $oSurvey   The active survey
-     * @param \Nails\Survey\Resource\Response $oResponse The active response
+     * @param Resource\Survey   $oSurvey   The active survey
+     * @param Resource\Response $oResponse The active response
      *
-     * @throws \Nails\Common\Exception\FactoryException
-     * @throws \Nails\Common\Exception\ViewNotFoundException
+     * @throws FactoryException
+     * @throws ViewNotFoundException
      */
-    public function index(\Nails\Survey\Resource\Survey $oSurvey, \Nails\Survey\Resource\Response $oResponse = null)
-    {
+    public function index(
+        Resource\Survey $oSurvey,
+        ?Resource\Response $oResponse,
+        bool $bIsAdminPreviewInactive,
+        bool $bIsAdminPreviewAnon
+    ) {
         /** @var \Nails\Common\Service\Input $oInput */
         $oInput = Factory::service('Input');
         /** @var \Nails\Common\Service\View $oView */
         $oView = Factory::service('View');
         /** @var \Nails\Common\Service\Asset $oAsset */
         $oAsset = Factory::service('Asset');
+        /** @var \Nails\Common\Service\Session $oSession */
+        $oSession = Factory::service('Session');
         /** @var \Nails\Captcha\Service\Captcha $oCaptcha */
         $oCaptcha = Factory::service('Captcha', \Nails\Captcha\Constants::MODULE_SLUG);
         /** @var \Nails\Survey\Model\Response $oResponseModel */
@@ -46,177 +57,302 @@ class Survey extends Base
         /** @var \Nails\Survey\Model\Response\Answer $oResponseAnswerModel */
         $oResponseAnswerModel = Factory::model('ResponseAnswer', Constants::MODULE_SLUG);
 
-        $this->data['oSurvey']           = $oSurvey;
-        $this->data['oResponse']         = $oResponse;
-        $this->data['bIsCaptchaEnabled'] = $oCaptcha->isEnabled();
-
         if (!empty($oResponse) && $oResponse->status === $oResponseModel::STATUS_SUBMITTED) {
             show404();
+        }
 
-        } else {
+        //  If there is a response, mux in any previously saved answers
+        if (!empty($oResponse)) {
+            foreach ($oSurvey->form->fields->data as $oField) {
+                /** @var Resource\Response\Answer $oAnswer */
+                foreach ($oResponse->answers->data as $oAnswer) {
+                    if ($oAnswer->form_field_id === $oField->id) {
 
-            if ($oInput->post()) {
+                        /**
+                         * Populate the form fields with data from the responses
+                         *
+                         * This is a bit of a tambourine dance due to some poor design decisions
+                         * made in the early stages of the form builder.
+                         *
+                         * In most cases a response will have either a text value or a option value
+                         * however in the case of Likert scales we use the data component to store
+                         * the result. This is POSTed as an array, so we need to mux the values
+                         * and data into a similar array so that the view can recompile properly.
+                         *
+                         * Believe me, I dislike this too and it limits/confuses how to use these
+                         * components.
+                         *
+                         * — Pablo (01/03/2021)
+                         */
 
-                try {
+                        /** @var FormBuilder\Interfaces\FieldType $sFieldType */
+                        $sFieldType = $oField->type;
 
-                    if (!empty($this->data['bIsAdminPreviewInactive'])) {
-                        throw new NailsException('Survey is not active.');
+                        if ($sFieldType::supportsOptions()) {
+                            $mValue = $oAnswer->form_field_option_id;
 
-                    } elseif (!empty($this->data['bIsAdminPreviewAnon'])) {
-                        throw new NailsException('Anonymous submissions are disabled for this survey.');
+                        } else {
+                            $mValue = $oAnswer->text;
+                        }
+
+                        if (property_exists($oField, 'value') && !is_array($oField->value)) {
+                            $oField->value = [$oField->value];
+                        }
+
+                        if (property_exists($oField, 'value') && is_array($oField->value)) {
+                            $oField->value[] = $mValue;
+                        } else {
+                            $oField->value = $mValue;
+                        }
+
+                        $mData = $oAnswer->data;
+
+                        if (property_exists($oField, 'data') && !is_array($oField->data)) {
+                            $oField->data = [$oField->data];
+                        }
+
+                        if (property_exists($oField, 'data') && is_array($oField->data)) {
+                            $oField->data[] = $mData;
+                        } else {
+                            $oField->data = $mData;
+                        }
                     }
+                }
+            }
+        }
 
-                    //  Validate
-                    $bIsFormValid = formBuilderValidate(
+        if ($oInput->post()) {
+
+            try {
+
+                if (!empty($bIsAdminPreviewInactive)) {
+                    throw new NailsException('Survey is not active.');
+
+                } elseif (!empty($bIsAdminPreviewAnon)) {
+                    throw new NailsException('Anonymous submissions are disabled for this survey.');
+                }
+
+                $bIsSave = $oInput->post('action') === 'save';
+
+                //  Validate
+                $bIsFormValid = $bIsSave
+                    ? true
+                    : formBuilderValidate(
                         $oSurvey->form->fields->data,
                         $oInput->post('field')
                     );
 
-                    $bIsCaptchaValid = true;
-                    if ($oSurvey->form->has_captcha && $this->data['bIsCaptchaEnabled']) {
-                        if (!$oCaptcha->verify()) {
-                            $this->data['captchaError'] = 'You failed the captcha test.';
-                            $bIsCaptchaValid            = false;
-                        }
+                $bIsCaptchaValid = $bIsSave || !$oCaptcha->isEnabled()
+                    ? true
+                    : $oSurvey->form->has_captcha && $oCaptcha->verify();
+
+                if ($bIsFormValid && $bIsCaptchaValid) {
+
+                    //  For each response, extract all the components
+                    $aParsedResponse = formBuilderParseResponse(
+                        $oSurvey->form->fields->data,
+                        (array) $oInput->post('field')
+                    );
+
+                    $aResponseData = [];
+                    $iOrder        = 0;
+                    foreach ($aParsedResponse as $oRow) {
+                        $aResponseData[] = [
+                            'survey_response_id'   => $oSurvey->id,
+                            'form_field_id'        => $oRow->field_id,
+                            'form_field_option_id' => $oRow->option_id,
+                            'text'                 => $oRow->text,
+                            'data'                 => $oRow->data,
+                            'order'                => $iOrder,
+                        ];
+                        $iOrder++;
                     }
 
-                    if ($bIsFormValid && $bIsCaptchaValid) {
+                    if (empty($oResponse)) {
 
-                        //  For each response, extract all the components
-                        $aParsedResponse = formBuilderParseResponse(
-                            $oSurvey->form->fields->data,
-                            (array) $oInput->post('field')
-                        );
+                        $aResponse = [
+                            'survey_id' => $oSurvey->id,
+                            'user_id'   => (int) activeUser('id') ?: null,
+                        ];
 
-                        $aResponseData = [];
-                        $iOrder        = 0;
-                        foreach ($aParsedResponse as $oRow) {
-                            $aResponseData[] = [
-                                'survey_response_id'   => $oSurvey->id,
-                                'form_field_id'        => $oRow->field_id,
-                                'form_field_option_id' => $oRow->option_id,
-                                'text'                 => $oRow->text,
-                                'data'                 => $oRow->data,
-                                'order'                => $iOrder,
-                            ];
-                            $iOrder++;
+                        if ($bIsSave) {
+                            $aResponse['email'] = $oInput->post('email') ?: null;
                         }
 
+                        $oResponse = $oResponseModel->create($aResponse, true);
                         if (empty($oResponse)) {
-                            $aResponse = [
-                                'survey_id' => $oSurvey->id,
-                                'user_id'   => (int) activeUser('id') ?: null,
-                            ];
-
-                            $oResponse = $oResponseModel->create($aResponse, true);
-                            if (empty($oResponse)) {
-                                throw new NailsException(
-                                    'Failed save response. ' . $oResponseModel->lastError()
-                                );
-                            }
-                        }
-
-                        foreach ($aResponseData as $aResponseRow) {
-
-                            $aResponseRow['survey_response_id'] = $oResponse->id;
-
-                            if (!$oResponseAnswerModel->create($aResponseRow)) {
-                                throw new NailsException(
-                                    'Failed save response. ' . $oResponseAnswerModel->lastError()
-                                );
-                            }
-                        }
-
-                        //  Mark response as submitted
-                        if (!$oResponseModel->setSubmitted($oResponse->id)) {
                             throw new NailsException(
-                                'Failed to mark response as submitted. ' . $oResponseModel->lastError()
+                                'Failed save response. ' . $oResponseModel->lastError()
                             );
                         }
 
-                        //  Send a notification email
-                        if (!empty($oSurvey->notification_email)) {
+                    } elseif ($bIsSave && empty($oResponse->email)) {
 
-                            $oResponse = $oResponseModel->getById(
+                        $sSaveEmail = $oInput->post('email') ?: ($oResponseModel->email ?? null);
+
+                        if (valid_email($sSaveEmail)) {
+                            $oResponseModel->email = $sSaveEmail;
+                            $oResponseModel->update(
                                 $oResponse->id,
                                 [
-                                    'expand' => [
-                                        ['answers', ['expand' => ['question', 'option']]],
-                                    ],
+                                    'email' => $oResponseModel->email,
                                 ]
                             );
+                        }
+                    }
 
-                            if ($oResponse->answers->count > 0) {
+                    $oResponseAnswerModel->deleteWhere([
+                        ['survey_response_id', $oResponse->id],
+                    ]);
 
-                                $aResponses = [];
+                    foreach ($aResponseData as $aResponseRow) {
 
-                                foreach ($oResponse->answers->data as $oAnswer) {
+                        $aResponseRow['survey_response_id'] = $oResponse->id;
 
-                                    if (!empty($oAnswer->option)) {
-                                        $sAnswer = $oAnswer->option->label;
-                                    } elseif (!empty($oAnswer->text)) {
-                                        $sAnswer = $oAnswer->text;
-                                    } else {
-                                        $sAnswer = '<i>Did not answer</i>';
-                                    }
+                        if (!$oResponseAnswerModel->create($aResponseRow)) {
+                            throw new NailsException(
+                                'Failed save response. ' . $oResponseAnswerModel->lastError()
+                            );
+                        }
+                    }
 
-                                    $aResponses[] = (object) [
-                                        'q' => $oAnswer->question->label,
-                                        'a' => $sAnswer,
-                                    ];
+                    //  Mark response as submitted
+                    if (!$bIsSave && !$oResponseModel->setSubmitted($oResponse->id)) {
+                        throw new NailsException(
+                            'Failed to mark response as submitted. ' . $oResponseModel->lastError()
+                        );
+                    }
+
+                    //  Send a notification email
+                    if (!$bIsSave && !empty($oSurvey->notification_email)) {
+
+                        $oResponse = $oResponseModel->skipCache()->getById(
+                            $oResponse->id,
+                            [
+                                new Expand('answers', new Expand\Group([
+                                    new Expand('question'),
+                                    new Expand('option'),
+                                ])),
+                            ]
+                        );
+
+                        if ($oResponse->answers->count > 0) {
+
+                            $aResponses = [];
+
+                            foreach ($oResponse->answers->data as $oAnswer) {
+
+                                if (!empty($oAnswer->option)) {
+                                    $sAnswer = $oAnswer->option->label;
+
+                                } elseif (!empty($oAnswer->text)) {
+                                    $sAnswer = $oAnswer->text;
+
+                                } else {
+                                    $sAnswer = '<i>Did not answer</i>';
                                 }
 
+                                $aResponses[] = (object) [
+                                    'q' => $oAnswer->question->label,
+                                    'a' => $sAnswer,
+                                ];
+                            }
 
-                                /** @var \Nails\Survey\Factory\Email\Notification $oEmail */
-                                $oEmail = Factory::factory('EmailNotification', Constants::MODULE_SLUG);
-                                $oEmail
-                                    ->data([
-                                        'survey'    => (object) [
-                                            'id'    => $oSurvey->id,
-                                            'label' => $oSurvey->label,
-                                        ],
-                                        'responses' => $aResponses,
-                                    ]);
 
-                                foreach ($oSurvey->notification_email as $sEmail) {
-                                    try {
-                                        $oEmail
-                                            ->to($sEmail)
-                                            ->send();
-                                    } catch (\Nails\Email\Exception\EmailerException $e) {
-                                        //  Do something with this?
-                                    }
+                            /** @var \Nails\Survey\Factory\Email\Notification $oEmail */
+                            $oEmail = Factory::factory('EmailNotification', Constants::MODULE_SLUG);
+                            $oEmail
+                                ->data([
+                                    'survey'    => (object) [
+                                        'id'    => $oSurvey->id,
+                                        'label' => $oSurvey->label,
+                                    ],
+                                    'responses' => $aResponses,
+                                ]);
+
+                            foreach ($oSurvey->notification_email as $sEmail) {
+                                try {
+
+                                    $oEmail
+                                        ->to($sEmail)
+                                        ->send();
+
+                                } catch (\Nails\Email\Exception\EmailerException $e) {
+                                    //  Do something with this?
                                 }
                             }
                         }
-
-                        //  Show thank you page
-                        $oView
-                            ->load([
-                                'structure/header',
-                                'survey/thanks',
-                                'structure/footer',
-                            ]);
-                        return;
-
-                    } else {
-                        $this->data['error'] = lang('fv_there_were_errors');
                     }
 
-                } catch (\Exception $e) {
-                    $this->data['error'] = $e->getMessage();
+                    if ($bIsSave) {
+
+                        $sSaveEmail = $oInput->post('email') ?: ($oResponseModel->email ?? null);
+
+                        try {
+
+                            /** @var \Nails\Survey\Factory\Email\Save $oEmail */
+                            $oEmail = Factory::factory('EmailSave', Constants::MODULE_SLUG);
+                            $oEmail
+                                ->to($sSaveEmail)
+                                ->data([
+                                    'survey'    => [
+                                        'id'    => $oSurvey->id,
+                                        'label' => $oSurvey->label,
+                                    ],
+                                    'response' => [
+                                        'id'  => $oResponse->id,
+                                        'url' => $oResponse->url,
+                                    ],
+                                ])
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            $oSession->setFlashData('save-email-warning', $e->getMessage());
+                        }
+
+                        redirect($oResponse->url);
+                    }
+
+                    $oView
+                        ->load([
+                            'structure/header',
+                            'survey/thanks',
+                            'structure/footer',
+                        ]);
+                    return;
+
+                } elseif (!$bIsCaptchaValid) {
+                    throw new FormBuilder\Exception\ValidationException(
+                        'You failed the captcha test.'
+                    );
+
+                } else {
+                    throw new FormBuilder\Exception\ValidationException(
+                        lang('fv_there_were_errors')
+                    );
                 }
+
+            } catch (\Exception $e) {
+                $this->data['error'] = $e->getMessage();
             }
-
-            $oAsset->load('survey.min.css', Constants::MODULE_SLUG);
-
-            $oView
-                ->load([
-                    'structure/header',
-                    'survey/survey',
-                    'structure/footer',
-                ]);
         }
+
+        $oAsset->load('survey.min.css', Constants::MODULE_SLUG);
+
+        $oView
+            ->setData([
+                'oSurvey'                 => $oSurvey,
+                'oResponse'               => $oResponse,
+                'bIsAdminPreviewInactive' => $bIsAdminPreviewInactive,
+                'bIsAdminPreviewAnon'     => $bIsAdminPreviewAnon,
+                'bIsCaptchaEnabled'       => $oSurvey->form->has_captcha && $oCaptcha->isEnabled(),
+                'sSaveEmailWarning'       => $oSession->getFlashData('save-email-warning'),
+            ])
+            ->load([
+                'structure/header',
+                'survey/survey',
+                'structure/footer',
+            ]);
     }
 
     // --------------------------------------------------------------------------
@@ -224,9 +360,9 @@ class Survey extends Base
     /**
      * Routes the request
      *
-     * @throws \Nails\Common\Exception\FactoryException
-     * @throws \Nails\Common\Exception\ModelException
-     * @throws \Nails\Common\Exception\ViewNotFoundException
+     * @throws FactoryException
+     * @throws ModelException
+     * @throws ViewNotFoundException
      */
     public function _remap()
     {
@@ -248,11 +384,11 @@ class Survey extends Base
         $oSurvey = $oSurveyModel->getById(
             $iSurveyId,
             [
-                new \Nails\Common\Helper\Model\Expand(
+                new Expand(
                     'form',
-                    new \Nails\Common\Helper\Model\Expand(
+                    new Expand(
                         'fields',
-                        new \Nails\Common\Helper\Model\Expand('options')
+                        new Expand('options')
                     )
                 ),
             ]
@@ -265,12 +401,12 @@ class Survey extends Base
             show404();
 
         } elseif (!$oSurvey->is_active && userHasPermission('admin:survey:survey:*')) {
-            $this->data['bIsAdminPreviewInactive'] = true;
+            $bIsAdminPreviewInactive = true;
         }
 
         //  Get the Response, if any
         if (!empty($iResponseId)) {
-            $oResponse = $oResponseModel->getById($iResponseId);
+            $oResponse = $oResponseModel->getById($iResponseId, [new Expand('answers')]);
             if (empty($oResponse) || $oResponse->token != $sResponseToken) {
                 show404();
             }
@@ -288,7 +424,7 @@ class Survey extends Base
                 show404();
 
             } else {
-                $this->data['bIsAdminPreviewAnon'] = true;
+                $bIsAdminPreviewAnon = true;
             }
         }
 
@@ -299,6 +435,6 @@ class Survey extends Base
         }
 
         //  Show the survey
-        $this->index($oSurvey, $oResponse);
+        $this->index($oSurvey, $oResponse, $bIsAdminPreviewInactive ?? false, $bIsAdminPreviewAnon ?? false);
     }
 }

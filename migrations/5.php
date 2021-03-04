@@ -33,5 +33,6 @@ class Migration5 extends Base
         $this->query('ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` CHANGE `access_token` `token` CHAR(29) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT \'\';');
         $this->query('ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` CHANGE `access_token_stats` `token_stats` CHAR(29) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT \'\';');
         $this->query('ALTER TABLE `{{NAILS_DB_PREFIX}}survey_response` CHANGE `access_token` `token` CHAR(29) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT \'\';');
+        $this->query('ALTER TABLE `{{NAILS_DB_PREFIX}}survey_survey` ADD `allow_save` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0  AFTER `allow_anonymous_response`;');
     }
 }
