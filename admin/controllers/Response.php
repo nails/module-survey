@@ -50,25 +50,6 @@ class Response extends Base
 
         // --------------------------------------------------------------------------
 
-        /** @var Asset $oAsset */
-        $oAsset = Factory::service('Asset');
-        $oAsset
-            ->load('https://www.gstatic.com/charts/loader.js')
-            ->load('admin.min.css', Constants::MODULE_SLUG)
-            //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-            ->load('admin.survey.stats.js', Constants::MODULE_SLUG)
-            ->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG)
-            ->inline(
-                sprintf(
-                    'var SurveyStats = new _ADMIN_SURVEY_STATS(%s,"%s");',
-                    $oSurvey->id,
-                    $oSurvey->token
-                ),
-                'JS'
-            );
-
-        // --------------------------------------------------------------------------
-
         $this->data['page']->title = 'Survey Responses &rsaquo; ' . $oSurvey->label;
         $this->data['oSurvey']     = $oSurvey;
 

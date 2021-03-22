@@ -5,7 +5,7 @@
  */
 
 ?>
-<div class="group-survey responses">
+<div class="group-survey responses" data-survey-id="<?=$oSurvey->id?>" data-survey-token="<?=$oSurvey->token?>">
     <?php
 
     if ($oSurvey->allow_public_stats) {

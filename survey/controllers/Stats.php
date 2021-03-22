@@ -10,6 +10,7 @@
  * @link
  */
 
+use Nails\Common\Service\Asset;
 use Nails\Factory;
 use Nails\FormBuilder;
 use Nails\Survey\Controller\Base;
@@ -23,29 +24,14 @@ class Stats extends Base
     /**
      * @param \Nails\Survey\Resource\Survey $oSurvey
      *
-     * @throws \Nails\Common\Exception\AssetException
      * @throws \Nails\Common\Exception\FactoryException
-     * @throws \Nails\Common\Exception\NailsException
      * @throws \Nails\Common\Exception\ViewNotFoundException
      */
     public function index(\Nails\Survey\Resource\Survey $oSurvey)
     {
-        /** @var \Nails\Common\Service\Asset $oAsset */
+        /** @var Asset $oAsset */
         $oAsset = Factory::service('Asset');
-        $oAsset
-            ->load('stats.min.css', Constants::MODULE_SLUG)
-            ->load('https://www.gstatic.com/charts/loader.js')
-            //  @todo (Pablo - 2018-11-15) - Update/Remove/Use minified once JS is refactored to be a module
-            ->load('admin.survey.stats.js', Constants::MODULE_SLUG)
-            ->load('admin.survey.stats.charts.js', Constants::MODULE_SLUG)
-            ->inline(
-                sprintf(
-                    'var SurveyStats = new _ADMIN_SURVEY_STATS(%s,"%s");',
-                    $oSurvey->id,
-                    $oSurvey->token_stats
-                ),
-                'JS'
-            );
+        $oAsset->load('stats.min.js', Constants::MODULE_SLUG);
 
         /** @var \Nails\Common\Service\View $oView */
         $oView = Factory::service('View');
