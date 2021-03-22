@@ -1,5 +1,7 @@
 <?php
 
+use \Nails\FormBuilder\Helper\FormBuilder;
+
 /**
  * @var \Nails\Survey\Resource\Survey $oItem
  */
@@ -12,7 +14,7 @@ if (form_error('fields')) {
     <?php
 }
 
-echo adminLoadFormBuilderView(
+echo FormBuilder::adminLoadView(
     'survey-fields',
     'fields',
     $oItem->form->fields->data ?? []
