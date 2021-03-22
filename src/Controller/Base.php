@@ -12,6 +12,7 @@
 
 namespace Nails\Survey\Controller;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 
 // --------------------------------------------------------------------------
@@ -22,6 +23,17 @@ use Nails\Factory;
 if (class_exists('\App\Survey\Controller\Base')) {
     abstract class BaseMiddle extends \App\Survey\Controller\Base
     {
+        public function __construct()
+        {
+            if (!classExtends(static::class, \App\Controller\Base::class)) {
+                throw new NailsException(sprintf(
+                    'Class %s must extend %s',
+                    parent::class,
+                    \App\Controller\Base::class
+                ));
+            }
+            parent::__construct();
+        }
     }
 } else {
     abstract class BaseMiddle extends \App\Controller\Base
