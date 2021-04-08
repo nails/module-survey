@@ -295,7 +295,7 @@ class Survey extends Base
                             $oEmail
                                 ->to($sSaveEmail)
                                 ->data([
-                                    'survey'    => [
+                                    'survey'   => [
                                         'id'    => $oSurvey->id,
                                         'label' => $oSurvey->label,
                                     ],
@@ -309,6 +309,8 @@ class Survey extends Base
                         } catch (\Exception $e) {
                             $oSession->setFlashData('save-email-warning', $e->getMessage());
                         }
+
+                        $oSession->setFlashData('success', 'Your response was saved successfully.');
 
                         redirect($oResponse->url);
                     }
