@@ -108,17 +108,19 @@
             'has_captcha'   => $bIsCaptchaEnabled,
             'captcha_error' => !empty($captchaError) ? $captchaError : null,
             'fields'        => $oSurvey->form->fields->data,
+            'button_class'  => 'survey__controls text-center',
             'buttons'       => array_filter([
                 $oSurvey->allow_save ? [
                     'tag'   => 'label',
                     'label' => 'Save &amp; Continue Later',
-                    'class' => 'btn btn-secondary',
+                    'class' => 'btn btn-secondary survey_controls__save',
                     'attr'  => 'for="survey-modal-save" id="nails-survey-button-save"',
                 ] : null,
                 [
                     'label' => $oSurvey->cta->label ?: 'Submit Response',
                     'name'  => 'action',
                     'value' => 'submit',
+                    'class' => 'btn btn-primary survey_controls__submit',
                     'attr'  => $oSurvey->cta->attributes . ' id="nails-survey-button-submit" formnovalidate',
                 ],
             ]),
