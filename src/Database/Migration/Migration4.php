@@ -12,7 +12,7 @@
  * @link
  */
 
-namespace Nails\Database\Migration\Nails\ModuleSurvey;
+namespace Nails\Survey\Database\Migration;
 
 use Nails\Common\Console\Migrate\Base;
 use Nails\Factory;
