@@ -50,6 +50,8 @@ class Survey extends Base
         $oAsset = Factory::service('Asset');
         /** @var \Nails\Common\Service\Session $oSession */
         $oSession = Factory::service('Session');
+        /** @var \Nails\Common\Service\UserFeedback $oUserFeedback */
+        $oUserFeedback = Factory::service('UserFeedback');
         /** @var \Nails\Captcha\Service\Captcha $oCaptcha */
         $oCaptcha = Factory::service('Captcha', \Nails\Captcha\Constants::MODULE_SLUG);
         /** @var \Nails\Survey\Model\Response $oResponseModel */
@@ -310,7 +312,7 @@ class Survey extends Base
                             $oSession->setFlashData('save-email-warning', $e->getMessage());
                         }
 
-                        $oSession->setFlashData('success', 'Your response was saved successfully.');
+                        $oUserFeedback->success('Your response was saved successfully.');
 
                         redirect($oResponse->url);
                     }
