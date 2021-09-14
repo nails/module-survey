@@ -22,7 +22,6 @@ use Nails\Common\Helper\Model\Expand;
 use Nails\Common\Service\Asset;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Uri;
-use Nails\Common\Service\UserFeedback;
 use Nails\Factory;
 use Nails\Survey\Constants;
 use Nails\Survey\Model\Response\Answer;
@@ -135,16 +134,14 @@ class Response extends Base
                     throw new NailsException('Failed to update answer. ' . $oResponseAnswerModel->lastError());
                 }
 
-                /** @var UserFeedback $oUserFeedback */
-                $oUserFeedback = Factory::service('UserFeedback');
-                $oUserFeedback->success('Answer updated successfully.');
+                $this->oUserFeedback->success('Answer updated successfully.');
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';
 
                 redirect('admin/survey/response/' . $oSurvey->id . '/view/' . $oAnswer->survey_response_id . $sIsModal);
 
             } catch (\Exception $e) {
-                $this->data['error'] = $e->getMessage();
+                $this->oUserFeedback->error($e->getMessage());
             }
         }
 
