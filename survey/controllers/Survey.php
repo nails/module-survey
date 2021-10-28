@@ -139,7 +139,7 @@ class Survey extends Base
                     ? true
                     : formBuilderValidate(
                         $oSurvey->form->fields->data,
-                        $oInput->post('field')
+                        (array) $oInput->post('field')
                     );
 
                 $bIsCaptchaValid = $bIsSave || !$oCaptcha->isEnabled()
