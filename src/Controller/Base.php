@@ -19,8 +19,13 @@ use Nails\Factory;
 
 /**
  * Allow the app to add functionality, if needed
+ * Negative conditional helps with static analysis
  */
-if (class_exists('\App\Survey\Controller\Base')) {
+if (!class_exists('\App\Survey\Controller\Base')) {
+    abstract class BaseMiddle extends \App\Controller\Base
+    {
+    }
+} else {
     abstract class BaseMiddle extends \App\Survey\Controller\Base
     {
         public function __construct()
@@ -34,10 +39,6 @@ if (class_exists('\App\Survey\Controller\Base')) {
             }
             parent::__construct();
         }
-    }
-} else {
-    abstract class BaseMiddle extends \App\Controller\Base
-    {
     }
 }
 
