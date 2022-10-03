@@ -26,7 +26,7 @@ class Routes implements RouteGenerator
      *
      * @return string[]
      */
-    public static function generate()
+    public static function generate(): array
     {
         return [
             'survey/response/(.+)' => 'survey/response/index/$1',
