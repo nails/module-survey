@@ -23,10 +23,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "nails/common": "dev-develop",
-        "nails/module-auth": "dev-develop",
-        "nails/module-form-builder": "dev-develop",
-        "nails/module-captcha": "dev-develop"
+        "nails/common": "dev-feature/pre-new-admin",
+        "nails/module-auth": "dev-feature/pre-new-admin",
+        "nails/module-form-builder": "dev-feature/pre-new-admin",
+        "nails/module-captcha": "dev-feature/pre-new-admin"
     },
     "scripts": {
         "test": "./vendor/bin/phpunit",
