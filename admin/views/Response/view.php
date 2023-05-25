@@ -43,7 +43,7 @@
 
                         echo '<td class="actions">';
                         echo anchor(
-                            'admin/survey/survey/response/' . $oResponse->survey_id . '/edit/' . $oAnswer->id . $sIsModal,
+                            'admin/survey/response/' . $oResponse->survey_id . '/edit/' . $oAnswer->id . $sIsModal,
                             lang('action_edit'),
                             'class="btn btn-xs btn-primary"'
                         );
