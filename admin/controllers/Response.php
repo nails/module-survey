@@ -45,7 +45,7 @@ class Response extends Base
     public function index(\Nails\Survey\Resource\Survey $oSurvey)
     {
         //  Sort the responses so that newest is at the top and unsubmitted are at the bottom
-        arraySortMulti($oSurvey->responses->data, 'date_submitted');
+        arraySortMulti($oSurvey->responses->data, 'date_submitted.raw');
         $oSurvey->responses->data = array_reverse($oSurvey->responses->data);
 
         // --------------------------------------------------------------------------
