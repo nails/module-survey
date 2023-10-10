@@ -52,7 +52,7 @@ class Survey extends Api\Controller\Base
          */
         $sToken = $oInput->get('access_token');
         if ($oSurvey->token == $sToken) {
-            if (!userHasPermission('admin:survey:survey:response')) {
+            if (!userHasPermission('admin:survey:response:view')) {
                 throw new Api\Exception\ApiException('You are not authorised to see survey stats', 401);
             }
 

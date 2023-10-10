@@ -33,6 +33,16 @@ use Nails\Survey\Model\Response\Answer;
  */
 class Response extends Base
 {
+    public static function permissions(): array
+    {
+        return array_merge(
+            parent::permissions(),
+            [
+                'view' => 'Can view survey responses',
+            ]
+        );
+    }
+
     /**
      * Renders the overall index view for a survey's responses
      *
@@ -164,7 +174,7 @@ class Response extends Base
      */
     public function _remap()
     {
-        if (!userHasPermission('admin:survey:survey:response')) {
+        if (!userHasPermission('admin:survey:response:view')) {
             unauthorised();
         }
 
