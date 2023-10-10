@@ -38,8 +38,7 @@ class Response extends Base
         return array_merge(
             parent::permissions(),
             [
-                'manage' => 'Can manage survey responses',
-                'stats'    => 'Can view survey stats',
+                'view' => 'Can view survey responses',
             ]
         );
     }
@@ -175,7 +174,7 @@ class Response extends Base
      */
     public function _remap()
     {
-        if (!userHasPermission('admin:survey:response:manage')) {
+        if (!userHasPermission('admin:survey:response:view')) {
             unauthorised();
         }
 
