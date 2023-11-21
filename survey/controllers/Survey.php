@@ -335,7 +335,7 @@ class Survey extends Base
                 }
 
             } catch (\Exception $e) {
-                $this->oUserFeedback->success($e->getMessage());
+                $this->oUserFeedback->error($e->getMessage());
             }
         }
 
