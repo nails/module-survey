@@ -142,7 +142,7 @@ class Survey extends Base
                         (array) $oInput->post('field')
                     );
 
-                $bIsCaptchaValid = $bIsSave || !$oCaptcha->isEnabled()
+                $bIsCaptchaValid = $bIsSave || !$oSurvey->form->has_captcha  || !$oCaptcha->isEnabled()
                     ? true
                     : $oSurvey->form->has_captcha && $oCaptcha->verify();
 
