@@ -1,4 +1,4 @@
-<style type="text/css">
+<?=styleOpen()?>
     .nails-survey.stats .media-screen {
         display: block;
     }
@@ -26,7 +26,7 @@
             margin: auto;
         }
     }
-</style>
+<?=styleClose()?>
 <div class="nails-survey stats" data-survey-id="<?=$oSurvey->id?>" data-survey-token="<?=$oSurvey->token_stats?>">
     <?php
 
