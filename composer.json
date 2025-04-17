@@ -23,10 +23,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "nails/common": "dev-feature/pre-new-admin",
-        "nails/module-auth": "dev-feature/pre-new-admin",
-        "nails/module-form-builder": "dev-feature/pre-new-admin",
-        "nails/module-captcha": "dev-feature/pre-new-admin"
+        "nails/common": "dev-feature/pre-new-admin-ci-php8",
+        "nails/module-auth": "dev-feature/pre-new-admin-ci-php8",
+        "nails/module-form-builder": "dev-feature/pre-new-admin-ci-php8",
+        "nails/module-captcha": "dev-feature/pre-new-admin-ci-php8"
     },
     "scripts": {
         "test": "./vendor/bin/phpunit",
