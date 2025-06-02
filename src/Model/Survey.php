@@ -109,20 +109,11 @@ class Survey extends Base
     {
         $aFields = parent::describeFields($sTable);
 
-        $aRules = [
-            FormValidation::RULE_REQUIRED     => [
-                'label',
-            ],
-            FormValidation::RULE_VALID_EMAILS => [
-                'notification_email',
-            ],
-        ];
+        $aFields['label']
+            ->setIsRequired(true);
 
-        foreach ($aRules as $sRule => $aColumns) {
-            foreach ($aColumns as $sColumn) {
-                $aFields[$sColumn]->validation[] = $sRule;
-            }
-        }
+        $aFields['notification_email']
+            ->addValidation(FormValidation::RULE_VALID_EMAILS);
 
         return $aFields;
     }
