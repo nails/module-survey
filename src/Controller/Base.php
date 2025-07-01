@@ -31,7 +31,7 @@ abstract class Base extends \Nails\Common\Controller\Base
         parent::__construct();
 
         /** @var Event $oEvent */
-        $oEvent = Factory::service('Events');
+        $oEvent = Factory::service('Event');
         $oEvent
             ->trigger(Events::CONTROLLER_CONSTRUCT_PRE, Events::getEventNamespace())
             ->trigger(Events::CONTROLLER_CONSTRUCT_POST, Events::getEventNamespace());
