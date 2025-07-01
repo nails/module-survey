@@ -28,4 +28,7 @@ class Events extends Base
      * @param int $iId The ID of the response
      */
     const RESPONSE_SUBMITTED = 'RESPONSE:SUBMITTED';
+
+    const CONTROLLER_CONSTRUCT_PRE  = 'CONTROLLER:CONSTRUCT:PRE';
+    const CONTROLLER_CONSTRUCT_POST = 'CONTROLLER:CONSTRUCT:POST';
 }
