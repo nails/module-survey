@@ -12,6 +12,28 @@
 
 namespace Nails\Survey\Controller;
 
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
+use Nails\Common\Service\Event;
+use Nails\Factory;
+use Nails\Survey\Events;
+use ReflectionException;
+
 abstract class Base extends \Nails\Common\Controller\Base
 {
+    /**
+     * @throws FactoryException
+     * @throws NailsException
+     * @throws ReflectionException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        /** @var Event $oEvent */
+        $oEvent = Factory::service('Events');
+        $oEvent
+            ->trigger(Events::CONTROLLER_CONSTRUCT_PRE, Events::getEventNamespace())
+            ->trigger(Events::CONTROLLER_CONSTRUCT_POST, Events::getEventNamespace());
+    }
 }
