@@ -29,46 +29,49 @@ return [
         },
     ],
     'resources' => [
-        'Survey'              => function ($oObj): Resource\Survey {
+        'Survey'              => function ($resource, $model): Resource\Survey {
             if (class_exists('\App\Common\Resource\Survey')) {
-                return new \App\Common\Resource\Survey($oObj);
+                return new \App\Common\Resource\Survey($resource, $model);
             } else {
-                return new Resource\Survey($oObj);
+                return new Resource\Survey($resource, $model);
             }
         },
-        'SurveyCta'           => function ($oObj): Resource\Survey\Cta {
+        'SurveyCta'           => function ($resource, $model = null): Resource\Survey\Cta {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Survey\Cta')) {
-                return new \App\Common\Resource\Survey\Cta($oObj);
+                return new \App\Common\Resource\Survey\Cta($resource);
             } else {
-                return new Resource\Survey\Cta($oObj);
+                return new Resource\Survey\Cta($resource);
             }
         },
-        'SurveyThankYouEmail' => function ($oObj): Resource\Survey\ThankYou\Email {
+        'SurveyThankYouEmail' => function ($resource, $model = null): Resource\Survey\ThankYou\Email {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Survey\ThankYou\Email')) {
-                return new \App\Common\Resource\Survey\ThankYou\Email($oObj);
+                return new \App\Common\Resource\Survey\ThankYou\Email($resource);
             } else {
-                return new Resource\Survey\ThankYou\Email($oObj);
+                return new Resource\Survey\ThankYou\Email($resource);
             }
         },
-        'SurveyThankYouPage'  => function ($oObj): Resource\Survey\ThankYou\Page {
+        'SurveyThankYouPage'  => function ($resource, $model = null): Resource\Survey\ThankYou\Page {
+            //  @todo (Pablo 2025-07-15) - this should be a factory
             if (class_exists('\App\Common\Resource\Survey\ThankYou\Page')) {
-                return new \App\Common\Resource\Survey\ThankYou\Page($oObj);
+                return new \App\Common\Resource\Survey\ThankYou\Page($resource);
             } else {
-                return new Resource\Survey\ThankYou\Page($oObj);
+                return new Resource\Survey\ThankYou\Page($resource);
             }
         },
-        'Response'            => function ($oObj): Resource\Response {
+        'Response'            => function ($resource, $model): Resource\Response {
             if (class_exists('\App\Common\Resource\Response')) {
-                return new \App\Common\Resource\Response($oObj);
+                return new \App\Common\Resource\Response($resource, $model);
             } else {
-                return new Resource\Response($oObj);
+                return new Resource\Response($resource, $model);
             }
         },
-        'ResponseAnswer'      => function ($oObj): Resource\Response\Answer {
+        'ResponseAnswer'      => function ($resource, $model): Resource\Response\Answer {
             if (class_exists('\App\Common\Resource\Response\Answer')) {
-                return new \App\Common\Resource\Response\Answer($oObj);
+                return new \App\Common\Resource\Response\Answer($resource, $model);
             } else {
-                return new Resource\Response\Answer($oObj);
+                return new Resource\Response\Answer($resource, $model);
             }
         },
     ],

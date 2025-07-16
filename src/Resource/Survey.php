@@ -99,53 +99,51 @@ class Survey extends Entity
     /**
      * Survey constructor.
      *
-     * @param array $mObj
-     *
      * @throws FactoryException
      */
-    public function __construct($mObj = [])
+    public function __construct(self|stdClass|array $resource = [], ?Base $model = null)
     {
-        $mObj->url       = siteUrl('survey/' . $mObj->id . '/' . $mObj->token);
-        $mObj->url_stats = siteUrl('survey/stats/' . $mObj->id . '/' . $mObj->token_stats);
+        parent::__construct($resource, $model);
 
         // --------------------------------------------------------------------------
 
-        $mObj->header             = json_decode($mObj->header);
-        $mObj->footer             = json_decode($mObj->footer);
-        $mObj->notification_email = json_decode($mObj->notification_email);
-        $mObj->stats_header       = json_decode($mObj->stats_header);
-        $mObj->stats_footer       = json_decode($mObj->stats_footer);
+        $entity->url       = siteUrl('survey/' . $entity->id . '/' . $entity->token);
+        $entity->url_stats = siteUrl('survey/stats/' . $entity->id . '/' . $entity->token_stats);
 
         // --------------------------------------------------------------------------
 
-        $mObj->cta = Factory::resource('SurveyCta', Constants::MODULE_SLUG, [
-            'label'      => $mObj->cta_label,
-            'attributes' => $mObj->cta_attributes,
+        $entity->header             = json_decode($entity->header);
+        $entity->footer             = json_decode($entity->footer);
+        $entity->notification_email = json_decode($entity->notification_email);
+        $entity->stats_header       = json_decode($entity->stats_header);
+        $entity->stats_footer       = json_decode($entity->stats_footer);
+
+        // --------------------------------------------------------------------------
+
+        $entity->cta = Factory::resource('SurveyCta', Constants::MODULE_SLUG, [
+            'label'      => $entity->cta_label,
+            'attributes' => $entity->cta_attributes,
         ]);
-        unset($mObj->cta_label);
-        unset($mObj->cta_attributes);
+        unset($entity->cta_label);
+        unset($entity->cta_attributes);
 
         // --------------------------------------------------------------------------
 
-        $mObj->thankyou_email = Factory::resource('SurveyThankYouEmail', Constants::MODULE_SLUG, [
-            'send'    => $mObj->thankyou_email,
-            'subject' => $mObj->thankyou_email_subject,
-            'body'    => $mObj->thankyou_email_body,
+        $entity->thankyou_email = Factory::resource('SurveyThankYouEmail', Constants::MODULE_SLUG, [
+            'send'    => $entity->thankyou_email,
+            'subject' => $entity->thankyou_email_subject,
+            'body'    => $entity->thankyou_email_body,
         ]);
-        unset($mObj->thankyou_email_subject);
-        unset($mObj->thankyou_email_body);
+        unset($entity->thankyou_email_subject);
+        unset($entity->thankyou_email_body);
 
         // --------------------------------------------------------------------------
 
-        $mObj->thankyou_page = Factory::resource('SurveyThankYouPage', Constants::MODULE_SLUG, [
-            'title' => $mObj->thankyou_page_title,
-            'body'  => $mObj->thankyou_page_body,
+        $entity->thankyou_page = Factory::resource('SurveyThankYouPage', Constants::MODULE_SLUG, [
+            'title' => $entity->thankyou_page_title,
+            'body'  => $entity->thankyou_page_body,
         ]);
-        unset($mObj->thankyou_page_title);
-        unset($mObj->thankyou_page_body);
-
-        // --------------------------------------------------------------------------
-
-        parent::__construct($mObj);
+        unset($entity->thankyou_page_title);
+        unset($entity->thankyou_page_body);
     }
 }

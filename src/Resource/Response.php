@@ -4,9 +4,11 @@ namespace Nails\Survey\Resource;
 
 use Nails\Auth\Resource\User;
 use Nails\Common\Exception\FactoryException;
+use Nails\Common\Model\Base;
 use Nails\Common\Resource\DateTime;
 use Nails\Common\Resource\Entity;
 use Nails\Common\Resource\ExpandableField;
+use stdClass;
 
 /**
  * Class Response
@@ -55,12 +57,10 @@ class Response extends Entity
 
     /**
      * Response constructor.
-     *
-     * @param array $mObj
      */
-    public function __construct($mObj = [])
+    public function __construct(self|stdClass|array $resource = [], ?Base $model = null)
     {
-        $mObj->url = siteUrl('survey/response/' . $mObj->id . '/' . $mObj->token);
-        parent::__construct($mObj);
+        parent::__construct($resource, $model);
+        $entity->url = siteUrl('survey/response/' . $entity->id . '/' . $entity->token);
     }
 }
