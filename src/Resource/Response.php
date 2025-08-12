@@ -61,6 +61,6 @@ class Response extends Entity
     public function __construct(self|stdClass|array $resource = [], ?Base $model = null)
     {
         parent::__construct($resource, $model);
-        $entity->url = siteUrl('survey/response/' . $entity->id . '/' . $entity->token);
+        $this->url = siteUrl('survey/response/' . $this->id . '/' . $this->token);
     }
 }
