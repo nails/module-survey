@@ -33,7 +33,7 @@
         "analyse": "./vendor/bin/phpstan analyse -c .phpstan/config.neon"
     },
     "require-dev": {
-        "phpunit/phpunit": "10.*",
+        "phpunit/phpunit": "11.*",
         "phpstan/phpstan": "2.*"
     },
     "autoload": {
