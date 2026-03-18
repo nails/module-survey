@@ -7,7 +7,7 @@ use Nails\Common\Exception\FactoryException;
 use Nails\Common\Model\Base;
 use Nails\Common\Resource\DateTime;
 use Nails\Common\Resource\Entity;
-use Nails\Common\Resource\ExpandableField;
+use Nails\Common\Resource\ExpandableFieldData;
 use stdClass;
 
 /**
@@ -50,7 +50,7 @@ class Response extends Entity
     /** @var DateTime */
     public $date_submitted;
 
-    /** @var ExpandableField */
+    /** @var ExpandableFieldData */
     public $answers;
 
     // --------------------------------------------------------------------------

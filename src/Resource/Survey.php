@@ -5,7 +5,7 @@ namespace Nails\Survey\Resource;
 use Nails\Common\Exception\FactoryException;
 use Nails\Common\Model\Base;
 use Nails\Common\Resource\Entity;
-use Nails\Common\Resource\ExpandableField;
+use Nails\Common\Resource\ExpandableFieldData;
 use Nails\Factory;
 use Nails\Survey\Constants;
 use Nails\Survey\Resource\Survey\Cta;
@@ -86,13 +86,13 @@ class Survey extends Entity
     /** @var bool */
     public $is_deleted;
 
-    /** @var ExpandableField */
+    /** @var ExpandableFieldData */
     public $responses;
 
-    /** @var ExpandableField */
+    /** @var ExpandableFieldData */
     public $responses_submitted;
 
-    /** @var ExpandableField */
+    /** @var ExpandableFieldData */
     public $responses_open;
 
     // --------------------------------------------------------------------------
