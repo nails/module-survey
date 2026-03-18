@@ -96,9 +96,9 @@ class Survey extends DefaultController
             function (\Nails\Survey\Resource\Survey $oItem) {
                 return sprintf(
                     'Responses &ndash; %s',
-                    $oItem->responses != $oItem->responses_submitted
-                        ? $oItem->responses_submitted . '/' . $oItem->responses
-                        : $oItem->responses
+                    $oItem->responses->count != $oItem->responses_submitted->count
+                        ? $oItem->responses_submitted->count . '/' . $oItem->responses->count
+                        : $oItem->responses->count
                 );
             },
             'btn-warning'
@@ -149,7 +149,7 @@ class Survey extends DefaultController
     protected static function isEditButtonEnabled($oItem = null): bool
     {
         return parent::isEditButtonEnabled($oItem)
-            && ($oItem->responses->count ?? $oItem->responses ?? 0) === 0;
+            && ($oItem->responses->count ?? 0) === 0;
     }
 
     // --------------------------------------------------------------------------
@@ -160,7 +160,7 @@ class Survey extends DefaultController
     protected static function isDeleteButtonEnabled($oItem = null): bool
     {
         return parent::isDeleteButtonEnabled($oItem)
-            && ($oItem->responses->count ?? $oItem->responses ?? 0) === 0;
+            && ($oItem->responses->count ?? 0) === 0;
     }
 
     // --------------------------------------------------------------------------
