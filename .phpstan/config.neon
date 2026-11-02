@@ -5,3 +5,5 @@ parameters:
     paths:
         - ../src
         - ../survey
+    scanFiles:
+        - ../vendor/nails/common/helpers/url.php
