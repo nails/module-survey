@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Admin\Survey;
+namespace Nails\Survey\Admin\Controller;
 
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Helper;
@@ -23,26 +23,17 @@ use Nails\Common\Service\Asset;
 use Nails\Common\Service\Input;
 use Nails\Common\Service\Uri;
 use Nails\Factory;
+use Nails\Survey\Admin\Permission;
 use Nails\Survey\Constants;
 use Nails\Survey\Model\Response\Answer;
 
 /**
  * Class Response
  *
- * @package Nails\Admin\Survey
+ * @package Nails\Survey\Admin\Controller
  */
 class Response extends Base
 {
-    public static function permissions(): array
-    {
-        return array_merge(
-            parent::permissions(),
-            [
-                'view' => 'Can view survey responses',
-            ]
-        );
-    }
-
     /**
      * Renders the overall index view for a survey's responses
      *
@@ -148,7 +139,7 @@ class Response extends Base
 
                 $sIsModal = !empty($oInput->get('isModal')) ? '?isModal=1' : '';
 
-                redirect('admin/survey/response/' . $oSurvey->id . '/view/' . $oAnswer->survey_response_id . $sIsModal);
+                redirect(static::url($oSurvey->id . '/view/' . $oAnswer->survey_response_id . $sIsModal));
 
             } catch (\Exception $e) {
                 $this->oUserFeedback->error($e->getMessage());
@@ -174,7 +165,7 @@ class Response extends Base
      */
     public function _remap()
     {
-        if (!userHasPermission('admin:survey:response:view')) {
+        if (!userHasPermission(Permission\Response\View::class)) {
             unauthorised();
         }
 

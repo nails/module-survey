@@ -14,7 +14,7 @@
                 <th>Response</th>
                 <?php
 
-                if (userHasPermission('admin:survey:survey:response:edit')) {
+                if (userHasPermission(\Nails\Survey\Admin\Permission\Response\View::class)) {
                     ?>
                     <th class="actions">
                         Actions
@@ -37,13 +37,13 @@
                     <td><?=$oAnswer->text?></td>
                     <?php
 
-                    if (userHasPermission('admin:survey:survey:response:edit')) {
+                    if (userHasPermission(\Nails\Survey\Admin\Permission\Response\View::class)) {
 
                         $sIsModal = !empty($isModal) ? '?isModal=1' : '';
 
                         echo '<td class="actions">';
                         echo anchor(
-                            'admin/survey/response/' . $oResponse->survey_id . '/edit/' . $oAnswer->id . $sIsModal,
+                            \Nails\Survey\Admin\Controller\Response::url($oResponse->survey_id . '/edit/' . $oAnswer->id . $sIsModal),
                             lang('action_edit'),
                             'class="btn btn-xs btn-primary"'
                         );
