@@ -18,6 +18,7 @@ use Nails\Common\Helper\Model\Expand;
 use Nails\Email;
 use Nails\Factory;
 use Nails\FormBuilder;
+use Nails\Survey\Admin\Permission;
 use Nails\Survey\Constants;
 use Nails\Survey\Controller\Base;
 use Nails\Survey\Resource;
@@ -399,10 +400,10 @@ class Survey extends Base
         if (empty($oSurvey) || $oSurvey->token != $sSurveyToken) {
             show404();
 
-        } elseif (!$oSurvey->is_active && !userHasPermission('admin:survey:survey:*')) {
+        } elseif (!$oSurvey->is_active && !static::userCanPreview()) {
             show404();
 
-        } elseif (!$oSurvey->is_active && userHasPermission('admin:survey:survey:*')) {
+        } elseif (!$oSurvey->is_active && static::userCanPreview()) {
             $bIsAdminPreviewInactive = true;
         }
 
@@ -422,7 +423,7 @@ class Survey extends Base
              * If user has survey permissions then assume they are an admin and allow the rendering
              * of the survey, but prevent submission
              */
-            if (!userHasPermission('admin:survey:survey:*')) {
+            if (!static::userCanPreview()) {
                 show404();
 
             } else {
@@ -438,5 +439,23 @@ class Survey extends Base
 
         //  Show the survey
         $this->index($oSurvey, $oResponse, $bIsAdminPreviewInactive ?? false, $bIsAdminPreviewAnon ?? false);
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * The old `admin:survey:survey:*` check: any survey-management permission.
+     */
+    private static function userCanPreview(): bool
+    {
+        return userHasAnyPermission([
+            Permission\Survey\Browse::class,
+            Permission\Survey\Create::class,
+            Permission\Survey\Edit::class,
+            Permission\Survey\Delete::class,
+            Permission\Survey\Destroy::class,
+            Permission\Survey\Restore::class,
+            Permission\Survey\Copy::class,
+        ]);
     }
 }

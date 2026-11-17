@@ -10,7 +10,7 @@
  * @link
  */
 
-namespace Nails\Admin\Survey;
+namespace Nails\Survey\Admin\Controller;
 
 use Nails\Admin\Controller\DefaultController;
 use Nails\Admin\Factory\IndexFilter;
@@ -24,18 +24,25 @@ use Nails\Common\Service\Asset;
 use Nails\Common\Service\Input;
 use Nails\Factory;
 use Nails\FormBuilder;
+use Nails\Survey\Admin\Permission;
 use Nails\Survey\Constants;
 
 /**
  * Class Survey
  *
- * @package Nails\Admin\Survey
+ * @package Nails\Survey\Admin\Controller
  */
 class Survey extends DefaultController
 {
-    const CONFIG_MODEL_NAME     = 'Survey';
-    const CONFIG_MODEL_PROVIDER = Constants::MODULE_SLUG;
-    const CONFIG_PERMISSION     = 'survey:survey';
+    const CONFIG_MODEL_NAME         = 'Survey';
+    const CONFIG_MODEL_PROVIDER     = Constants::MODULE_SLUG;
+    const CONFIG_PERMISSION_BROWSE  = Permission\Survey\Browse::class;
+    const CONFIG_PERMISSION_CREATE  = Permission\Survey\Create::class;
+    const CONFIG_PERMISSION_EDIT    = Permission\Survey\Edit::class;
+    const CONFIG_PERMISSION_DELETE  = Permission\Survey\Delete::class;
+    const CONFIG_PERMISSION_DESTROY = Permission\Survey\Destroy::class;
+    const CONFIG_PERMISSION_RESTORE = Permission\Survey\Restore::class;
+    const CONFIG_PERMISSION_COPY    = Permission\Survey\Copy::class;
     const CONFIG_SORT_OPTIONS   = [
         'Date Modified' => 'modified',
         'Date Created'  => 'created',
@@ -92,7 +99,7 @@ class Survey extends DefaultController
         $this->aConfig['EDIT_IGNORE_FIELDS'][]   = 'form_id';
 
         static::addIndexRowButton(
-            siteUrl('admin/survey/response/{{id}}'),
+            Response::url('{{id}}'),
             function (\Nails\Survey\Resource\Survey $oItem) {
                 return sprintf(
                     'Responses &ndash; %s',
@@ -146,10 +153,17 @@ class Survey extends DefaultController
     /**
      * @inheritDoc
      */
-    protected static function isEditButtonEnabled($oItem = null): bool
+    protected static function isEditButtonEnabled(?Resource $oItem = null): bool
     {
-        return parent::isEditButtonEnabled($oItem)
-            && ($oItem->responses->count ?? 0) === 0;
+        if (!parent::isEditButtonEnabled($oItem)) {
+            return false;
+        }
+
+        if ($oItem === null) {
+            return true;
+        }
+
+        return ($oItem->responses->count ?? 0) === 0;
     }
 
     // --------------------------------------------------------------------------
@@ -157,10 +171,17 @@ class Survey extends DefaultController
     /**
      * @inheritDoc
      */
-    protected static function isDeleteButtonEnabled($oItem = null): bool
+    protected static function isDeleteButtonEnabled(?Resource $oItem = null): bool
     {
-        return parent::isDeleteButtonEnabled($oItem)
-            && ($oItem->responses->count ?? 0) === 0;
+        if (!parent::isDeleteButtonEnabled($oItem)) {
+            return false;
+        }
+
+        if ($oItem === null) {
+            return true;
+        }
+
+        return ($oItem->responses->count ?? 0) === 0;
     }
 
     // --------------------------------------------------------------------------
